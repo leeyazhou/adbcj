@@ -3,10 +3,10 @@
 
 <suite name="ADBCJ-TCK" verbose="1" >
 	<test name="MySQL-JDBC">
-		<parameter name="jdbcUrl" value="jdbc:mysql://localhost/adbcjtck?characterEncoding=UTF-8" />
-		<parameter name="url" value="adbcj:jdbc:mysql://localhost/adbcjtck?characterEncoding=UTF-8" />
-		<parameter name="user" value="adbcjtck" />
-		<parameter name="password" value="adbcjtck" />
+		<parameter name="jdbcUrl" value="jdbc:mysql://10.100.216.147/adbcjtck?characterEncoding=UTF-8" />
+		<parameter name="url" value="adbcj:jdbc:mysql://10.100.216.147/adbcjtck?characterEncoding=UTF-8" />
+		<parameter name="user" value="root" />
+		<parameter name="password" value="UJ9FeAm3Yc@#E%IH8dLj6guyr5K&amp;u#J3" />
         <parameter name="setupClass" value="org.adbcj.tck.InitMysql" />
         <parameter name="connectionPool" value="false" />
 		<packages>
@@ -14,10 +14,10 @@
 		</packages>
 	</test>
     <test name="MySQL">
-        <parameter name="jdbcUrl" value="jdbc:mysql://localhost/adbcjtck?characterEncoding=UTF-8" />
-        <parameter name="url" value="adbcj:mysql://localhost/adbcjtck" />
-        <parameter name="user" value="adbcjtck" />
-        <parameter name="password" value="adbcjtck" />
+        <parameter name="jdbcUrl" value="jdbc:mysql://10.100.216.147/adbcjtck?characterEncoding=UTF-8" />
+        <parameter name="url" value="adbcj:mysql://10.100.216.147/adbcjtck" />
+        <parameter name="user" value="root" />
+        <parameter name="password" value="UJ9FeAm3Yc@#E%IH8dLj6guyr5K&amp;u#J3" />
         <parameter name="setupClass" value="org.adbcj.tck.InitMysql" />
         <parameter name="connectionPool" value="false" />
         <packages>
@@ -25,10 +25,10 @@
         </packages>
     </test>
     <test name="MySQL-ConnectionPool">
-        <parameter name="jdbcUrl" value="jdbc:mysql://localhost/adbcjtck?characterEncoding=UTF-8" />
-        <parameter name="url" value="adbcj:mysql://localhost/adbcjtck" />
-        <parameter name="user" value="adbcjtck" />
-        <parameter name="password" value="adbcjtck" />
+        <parameter name="jdbcUrl" value="jdbc:mysql://10.100.216.147/adbcjtck?characterEncoding=UTF-8" />
+        <parameter name="url" value="adbcj:mysql://10.100.216.147/adbcjtck" />
+        <parameter name="user" value="root" />
+        <parameter name="password" value="UJ9FeAm3Yc@#E%IH8dLj6guyr5K&amp;u#J3" />
         <parameter name="setupClass" value="org.adbcj.tck.InitMysql" />
         <parameter name="connectionPool" value="true" />
         <packages>

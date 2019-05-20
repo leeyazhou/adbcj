@@ -13,7 +13,7 @@ import org.adbcj.support.*;
 public final class MySqlRequests {
     private static final OneArgFunction<MysqlResult, Void> TO_VOID = arg -> null;
 
-    public static MySqlRequest createCloseRequest(
+    public static MySqlRequest<?> createCloseRequest(
             MySqlConnection connection,
             DbCallback<Void> callback,
             StackTraceElement[] entry) {
@@ -24,7 +24,7 @@ public final class MySqlRequests {
                 callback);
     }
 
-    public static <T> MySqlRequest executeQuery(
+    public static <T> MySqlRequest<T> executeQuery(
             MySqlConnection connection,
             String query,
             ResultHandler<T> eventHandler,
@@ -44,7 +44,7 @@ public final class MySqlRequests {
                 callback);
     }
 
-    public static <T> MySqlRequest executePreparedQuery(
+    public static <T> MySqlRequest<T> executePreparedQuery(
             MySqlConnection connection,
             StatementPreparedEOF stmp,
             Object[] data,
@@ -65,7 +65,7 @@ public final class MySqlRequests {
                 callback);
     }
 
-    public static MySqlRequest executeUpdate(
+    public static MySqlRequest<?> executeUpdate(
             MySqlConnection connection,
             String sql,
             DbCallback<Result> callback,
@@ -77,7 +77,7 @@ public final class MySqlRequests {
                 callback);
     }
 
-    public static MySqlRequest prepareQuery(
+    public static MySqlRequest<?> prepareQuery(
             MySqlConnection connection,
             String sql,
             DbCallback<MySqlPreparedStatement> callback,
@@ -89,7 +89,7 @@ public final class MySqlRequests {
                 callback);
     }
 
-    public static MySqlRequest closeStatemeent(
+    public static MySqlRequest<?> closeStatemeent(
             MySqlConnection connection,
             StatementPreparedEOF statementInfo,
             DbCallback<Void> callback) {
@@ -99,7 +99,7 @@ public final class MySqlRequests {
                 new ClosePreparedStatementRequest(statementInfo.getHandlerId()), callback);
     }
 
-    public static MySqlRequest beginTransaction(MySqlConnection connection,
+    public static MySqlRequest<?> beginTransaction(MySqlConnection connection,
                                                 DbCallback<Void> callback,
                                                 StackTraceElement[] entry) {
 
@@ -110,7 +110,7 @@ public final class MySqlRequests {
                 callback);
     }
 
-    public static MySqlRequest commitTransaction(MySqlConnection connection,
+    public static MySqlRequest<?> commitTransaction(MySqlConnection connection,
                                                  DbCallback<Void> callback,
                                                  StackTraceElement[] entry) {
         return new MySqlRequest<>(
@@ -120,7 +120,7 @@ public final class MySqlRequests {
                 callback);
     }
 
-    public static MySqlRequest rollbackTransaction(MySqlConnection connection,
+    public static MySqlRequest<?> rollbackTransaction(MySqlConnection connection,
                                                    DbCallback<Void> callback,
                                                    StackTraceElement[] entry) {
         return new MySqlRequest<>(

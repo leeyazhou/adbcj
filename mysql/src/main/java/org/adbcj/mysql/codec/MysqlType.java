@@ -64,7 +64,7 @@ public enum MysqlType {
 	 */
 	private static final MysqlType[] ALL_VALUES = values();
 
-	MysqlType(int id, Type type, Class javaType) {
+	MysqlType(int id, Type type, Class<?> javaType) {
 		this.id = id;
 		this.type = type;
         this.className = javaType.getName();
@@ -88,7 +88,6 @@ public enum MysqlType {
 	}
 
 	// TODO We need to reverse-engineer all these values
-
 	public boolean isCaseSensitive() {
 		return false;
 	}

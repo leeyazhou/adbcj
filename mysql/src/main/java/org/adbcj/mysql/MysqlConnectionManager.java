@@ -1,14 +1,10 @@
 package org.adbcj.mysql;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufInputStream;
-import io.netty.buffer.ByteBufOutputStream;
-import io.netty.channel.*;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.handler.codec.MessageToByteEncoder;
+import java.io.InputStream;
+import java.net.InetSocketAddress;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.adbcj.CloseMode;
 import org.adbcj.Connection;
 import org.adbcj.DbCallback;
@@ -24,220 +20,216 @@ import org.adbcj.support.ConnectionPool;
 import org.adbcj.support.LoginCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.InputStream;
-import java.net.InetSocketAddress;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
+import io.netty.buffer.ByteBufOutputStream;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.handler.codec.MessageToByteEncoder;
 
 public class MysqlConnectionManager extends AbstractConnectionManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(MysqlConnectionManager.class);
+  private static final Logger logger = LoggerFactory.getLogger(MysqlConnectionManager.class);
 
 
-    private static final String ENCODER = MysqlConnectionManager.class.getName() + ".encoder";
-    static final String DECODER = MysqlConnectionManager.class.getName() + ".decoder";
-    private final LoginCredentials defaultCredentials;
+  private static final String ENCODER = MysqlConnectionManager.class.getName() + ".encoder";
+  static final String DECODER = MysqlConnectionManager.class.getName() + ".decoder";
+  private final LoginCredentials loginCredentials;
 
-    private final Bootstrap bootstrap;
-    private final AtomicInteger idCounter = new AtomicInteger();
-    private final NioEventLoopGroup eventLoop;
+  private final Bootstrap bootstrap;
+  private final AtomicInteger idCounter = new AtomicInteger();
+  private final NioEventLoopGroup eventLoop;
 
-    final ConnectionPool<LoginCredentials, Channel> connectionPool;
+  final ConnectionPool<LoginCredentials, Channel> connectionPool;
 
-    public MysqlConnectionManager(String host,
-                                  int port,
-                                  String username,
-                                  String password,
-                                  String schema,
-                                  Map<String, String> properties) {
-        super(properties);
-        defaultCredentials = new LoginCredentials(username, password, schema);
+  public MysqlConnectionManager(String host, int port, String username, String password, String schema,
+      Map<String, String> properties) {
+    super(properties);
+    this.loginCredentials = new LoginCredentials(username, password, schema);
 
-        eventLoop = new NioEventLoopGroup();
-        bootstrap = new Bootstrap()
-                .group(eventLoop)
-                .channel(NioSocketChannel.class)
-                .option(ChannelOption.TCP_NODELAY, true)
-                .option(ChannelOption.SO_KEEPALIVE, true)
-                .option(ChannelOption.AUTO_READ, false)
-                .remoteAddress(new InetSocketAddress(host, port))
-                .handler(new ChannelInitializer() {
+    this.eventLoop = new NioEventLoopGroup();
+    this.bootstrap = new Bootstrap().group(eventLoop).channel(NioSocketChannel.class);
+    this.bootstrap.option(ChannelOption.TCP_NODELAY, true);
+    this.bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
+    this.bootstrap.option(ChannelOption.AUTO_READ, false);
+    this.bootstrap.remoteAddress(new InetSocketAddress(host, port));
+    this.bootstrap.handler(new ChannelInitializer<NioSocketChannel>() {
 
-                    @Override
-                    public void initChannel(Channel ch) throws Exception {
-                        ch.config().setAutoRead(false);
-                        ch.pipeline().addLast(ENCODER, new Encoder());
+      @Override
+      public void initChannel(NioSocketChannel ch) throws Exception {
+        ch.config().setAutoRead(false);
+        ch.pipeline().addLast(ENCODER, new Encoder());
 
-                    }
-                });
+      }
+    });
 
-        if(useConnectionPool){
-            this.connectionPool = new ConnectionPool<>();
-        } else{
-            this.connectionPool = null;
-        }
+    if (useConnectionPool) {
+      this.connectionPool = new ConnectionPool<>();
+    } else {
+      this.connectionPool = null;
+    }
+  }
+
+
+  @Override
+  public void connect(DbCallback<Connection> connected) {
+    this.connect(loginCredentials.getUserName(), loginCredentials.getPassword(), connected);
+  }
+
+  @Override
+  public void connect(String user, String password, DbCallback<Connection> connected) {
+    StackTraceElement[] entry = entryPointStack();
+    LoginCredentials credentials = new LoginCredentials(user, password, loginCredentials.getDatabase());
+
+    if (isClosed()) {
+      throw new DbException("Connection manager closed");
+    }
+    logger.debug("Starting connection");
+
+
+    if (connectionPool != null) {
+      Channel channel = connectionPool.tryAquire(credentials);
+      if (channel != null) {
+        MySqlConnection connection =
+            new MySqlConnection(credentials, maxQueueLength(), this, channel, getStackTracingOption());
+
+        channel.pipeline().addLast(DECODER, new Decoder(new AcceptNextResponse(connection), connection));
+
+        connected.onComplete(connection, null);
+
+        return;
+      }
     }
 
 
-    @Override
-    public void connect(DbCallback<Connection> connected) {
-        connect(defaultCredentials.getUserName(), defaultCredentials.getPassword(), connected);
-    }
+    final ChannelFuture channelFuture = bootstrap.connect();
 
-    @Override
-    public void connect(String user, String password, DbCallback<Connection> connected) {
-        StackTraceElement[] entry = entryPointStack();
-        LoginCredentials credentials = new LoginCredentials(user, password, defaultCredentials.getDatabase());
+    channelFuture.addListener((ChannelFutureListener) future -> {
+      logger.debug("Physical connect completed");
 
-        if (isClosed()) {
-            throw new DbException("Connection manager closed");
+      Channel channel = future.channel();
+
+      if (!future.isSuccess()) {
+        if (future.cause() != null) {
+          channel.close();
+          connected.onComplete(null, DbException.wrap(future.cause(), entry));
         }
-        logger.debug("Starting connection");
+        return;
+      }
+
+      MySqlConnection connection = new MySqlConnection(credentials, maxQueueLength(), MysqlConnectionManager.this,
+          channel, getStackTracingOption());
+      addConnection(connection);
+      channel.pipeline().addLast(DECODER,
+          new Decoder(new Connecting(connected, entry, connection, credentials), connection));
 
 
-        if(connectionPool!=null){
-            Channel channel = connectionPool.tryAquire(credentials);
-            if(channel!=null){
-                MySqlConnection dbConn = new MySqlConnection(
-                        credentials,
-                        maxQueueLength(),
-                        this,
-                        channel,
-                        getStackTracingOption()
-                );
-
-                channel.pipeline().addLast(DECODER, new Decoder(
-                        new AcceptNextResponse(dbConn), dbConn));
-
-                connected.onComplete(dbConn,
-                        null);
-
-                return;
-            }
-        }
+      channel.config().setAutoRead(true);
+      channel.read();
+    });
+  }
 
 
-        final ChannelFuture channelFuture = bootstrap.connect();
+  @Override
+  protected void doCloseConnection(Connection connection, CloseMode mode, DbCallback<Void> callback) {
+    connection.close(mode, callback);
+  }
 
-        channelFuture.addListener((ChannelFutureListener) future -> {
-            logger.debug("Physical connect completed");
-
-            Channel channel = future.channel();
-
-            if (!future.isSuccess()) {
-                if (future.cause() != null) {
-                    channel.close();
-                    connected.onComplete(null, DbException.wrap(future.cause(), entry));
-                }
-                return;
-            }
-
-            MySqlConnection connection = new MySqlConnection(
-                    credentials,
-                    maxQueueLength(),
-                    MysqlConnectionManager.this,
-                    channel,
-                    getStackTracingOption());
-            addConnection(connection);
-            channel.pipeline().addLast(DECODER, new Decoder(
-                    new Connecting(connected, entry, connection, credentials), connection));
-
-
-            channel.config().setAutoRead(true);
-            channel.read();
+  @Override
+  protected void doClose(DbCallback<Void> callback, StackTraceElement[] entry) {
+    new Thread("Closing MySQL ConnectionManager") {
+      @Override
+      public void run() {
+        eventLoop.shutdownGracefully().addListener(future -> {
+          DbException error = null;
+          if (!future.isSuccess()) {
+            error = DbException.wrap(future.cause(), entry);
+          }
+          callback.onComplete(null, error);
         });
-    }
+      }
+    }.start();
+
+  }
+
+  int nextId() {
+    return idCounter.incrementAndGet();
+  }
 
 
-    @Override
-    protected void doCloseConnection(Connection connection, CloseMode mode, DbCallback<Void> callback) {
-        connection.close(mode,callback);
-    }
-
-    @Override
-    protected void doClose(DbCallback<Void> callback, StackTraceElement[] entry) {
-        new Thread("Closing MySQL ConnectionManager") {
-            @Override
-            public void run() {
-                eventLoop.shutdownGracefully().addListener(future -> {
-                    DbException error = null;
-                    if (!future.isSuccess()) {
-                        error = DbException.wrap(future.cause(), entry);
-                    }
-                    callback.onComplete(null, error);
-                });
-            }
-        }.start();
-
-    }
-
-    int nextId() {
-        return idCounter.incrementAndGet();
-    }
-
-
-    void closedConnect(Connection connection) {
-        removeConnection(connection);
-    }
+  void closedConnect(Connection connection) {
+    removeConnection(connection);
+  }
 }
 
+
 class Decoder extends ByteToMessageDecoder {
-    private final static Logger log = LoggerFactory.getLogger(Decoder.class);
-    private final MySqlClientDecoder decoder;
-    private final MySqlConnection connection;
+  private final static Logger log = LoggerFactory.getLogger(Decoder.class);
+  private final MySqlClientDecoder decoder;
+  private final MySqlConnection connection;
 
-    public Decoder(DecoderState state, MySqlConnection connection) {
-        decoder = new MySqlClientDecoder(state);
-        this.connection = connection;
+  public Decoder(DecoderState state, MySqlConnection connection) {
+    this.decoder = new MySqlClientDecoder(state);
+    this.connection = connection;
+  }
+
+  @Override
+  public void decode(ChannelHandlerContext ctx, ByteBuf buffer, List<Object> out) throws Exception {
+    // debug buffer since 2017-10-15 little-pan
+    final boolean debug = log.isDebugEnabled();
+    if (debug) {
+      log.debug("Decoded buffer#{}: {}", buffer.hashCode(), buffer);
     }
-
-    @Override
-    public void decode(ChannelHandlerContext ctx, ByteBuf buffer, List<Object> out) throws Exception {
-    	// debug buffer since 2017-10-15 little-pan
-    	final boolean debug = log.isDebugEnabled();
-    	if(debug) {
-    		log.debug("Decoded buffer#{}: {}", buffer.hashCode(), buffer);
-    	}
-        final InputStream in = new ByteBufInputStream(buffer);
-        try {
-            Object obj = decoder.decode(in, ctx.channel(), false);
-            if (log.isDebugEnabled() && null != obj) {
-                log.debug("Decoded message: {}", obj);
-            }
-            if (obj != null) {
-                out.add(obj);
-            }
-        } finally {
-            in.close();
-        }
+    final InputStream in = new ByteBufInputStream(buffer);
+    try {
+      Object obj = decoder.decode(in, ctx.channel(), false);
+      if (log.isDebugEnabled() && null != obj) {
+        log.debug("Decoded message: {}", obj);
+      }
+      if (obj != null) {
+        out.add(obj);
+      }
+    } finally {
+      in.close();
     }
+  }
 
 
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        super.channelInactive(ctx);
-        connection.tryCompleteClose(null);
-    }
+  @Override
+  public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+    super.channelInactive(ctx);
+    connection.tryCompleteClose(null);
+  }
 }
 
 
 @ChannelHandler.Sharable
 class Encoder extends MessageToByteEncoder<ClientRequest> {
-    private final static Logger log = LoggerFactory.getLogger(Encoder.class);
+  private final static Logger log = LoggerFactory.getLogger(Encoder.class);
 
-    private final MySqlClientEncoder encoder = new MySqlClientEncoder();
+  private final MySqlClientEncoder encoder = new MySqlClientEncoder();
 
-    @Override
-    public void encode(ChannelHandlerContext ctx, ClientRequest msg, ByteBuf buffer) throws Exception {
-        if (log.isDebugEnabled()) {
-            log.debug("Sending request: {}", msg);
-        }
-
-        ByteBufOutputStream out = new ByteBufOutputStream(buffer);
-        encoder.encode(msg, out);
-        out.close();
+  @Override
+  public void encode(ChannelHandlerContext ctx, ClientRequest msg, ByteBuf buffer) throws Exception {
+    if (log.isDebugEnabled()) {
+      log.debug("Sending request: {}", msg);
     }
+
+    ByteBufOutputStream out = new ByteBufOutputStream(buffer);
+    try {
+      encoder.encode(msg, out);
+    } finally {
+      out.close();
+    }
+  }
 }
 

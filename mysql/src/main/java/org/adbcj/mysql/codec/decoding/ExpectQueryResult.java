@@ -62,7 +62,7 @@ public class ExpectQueryResult<T> extends ResponseStart {
         } catch (Exception any){
             failure = DbException.wrap(any, entry);
         }
-        return result(new FieldDecodingState(
+        return result(new FieldDecodingState<T>(
                         connection,
                         decodingType,
                         expectedFieldPackets,
