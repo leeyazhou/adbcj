@@ -18,52 +18,53 @@ package org.adbcj;
 
 
 /**
- * Stores the column data type and other meta-data for a particular column. 
+ * Stores the column data type and other meta-data for a particular column.
  * 
  * @author Mike Heath
  * @see ResultSet
  */
 public interface Field {
 
-	/**
-	 * The position this column appears in the result set.
-	 * 
-	 * <p>The value returned by this method is analogous to the value return by
-	 * {@link java.sql.ResultSet#findColumn(String)} in JDBC.  However, this value is 0 based in ADBCJ and not 1 based
-	 * as it is in JDBC.
-	 * 
-	 * @return  the position this column appears in the result set, 0 based.
-	 */
-	int getIndex();
-	
-	String getCatalogName();
-	
-	String getColumnLabel();
-	
-	String getColumnName();
-	
-	Type getColumnType();
-	
-	int getPrecision();
-	
-	int getScale();
-	
-	String getSchemaName();
-	
-	String getTableLabel();
-	
-	String getTableName();
-	
-	boolean isAutoIncrement();
-	
-	boolean isCaseSensitive();
-	
-	boolean isCurrency();
-	
-	boolean isNullable();
-	
-	boolean isReadOnly();
-	
-	boolean isSigned();
-	
+  /**
+   * The position this column appears in the result set.
+   * 
+   * <p>
+   * The value returned by this method is analogous to the value return by
+   * {@link java.sql.ResultSet#findColumn(String)} in JDBC. However, this value is
+   * 0 based in ADBCJ and not 1 based as it is in JDBC.
+   * 
+   * @return the position this column appears in the result set, 0 based.
+   */
+  int getIndex();
+
+  String getCatalogName();
+
+  String getColumnLabel();
+
+  String getColumnName();
+
+  Type getColumnType();
+
+  int getPrecision();
+
+  int getScale();
+
+  String getSchemaName();
+
+  String getTableLabel();
+
+  String getTableName();
+
+  boolean isAutoIncrement();
+
+  boolean isCaseSensitive();
+
+  boolean isCurrency();
+
+  boolean isNullable();
+
+  boolean isReadOnly();
+
+  boolean isSigned();
+
 }

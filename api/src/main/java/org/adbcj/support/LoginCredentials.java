@@ -20,55 +20,56 @@ package org.adbcj.support;
 
 public final class LoginCredentials {
 
-	private final String userName;
-	private final String password;
-	private final String database;
+  private final String userName;
+  private final String password;
+  private final String database;
 
-	public LoginCredentials(String userName, String password, String database) {
-		this.userName = userName;
-		this.password = password;
-		this.database = database;
-	}
+  public LoginCredentials(String userName, String password, String database) {
+    this.userName = userName;
+    this.password = password;
+    this.database = database;
+  }
 
-	public String getDatabase() {
-		return database;
-	}
+  public String getDatabase() {
+    return database;
+  }
 
-	public String getPassword() {
-		return password;
-	}
+  public String getPassword() {
+    return password;
+  }
 
-	public String getUserName() {
-		return userName;
-	}
+  public String getUserName() {
+    return userName;
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
 
-        LoginCredentials that = (LoginCredentials) o;
+    LoginCredentials that = (LoginCredentials) o;
 
-        if (!database.equals(that.database)) return false;
-        if (password != null ? !password.equals(that.password) : that.password != null) return false;
-        return userName.equals(that.userName);
-    }
+    if (!database.equals(that.database))
+      return false;
+    if (password != null ? !password.equals(that.password) : that.password != null)
+      return false;
+    return userName.equals(that.userName);
+  }
 
-    @Override
-    public int hashCode() {
-        int result = userName.hashCode();
-        result = 31 * result + (password != null ? password.hashCode() : 0);
-        result = 31 * result + database.hashCode();
-        return result;
-    }
+  @Override
+  public int hashCode() {
+    int result = userName.hashCode();
+    result = 31 * result + (password != null ? password.hashCode() : 0);
+    result = 31 * result + database.hashCode();
+    return result;
+  }
 
-    @Override
-    public String toString() {
-    	// Mask password for security issue sine 2017-10-15 little-pan
-        return "LoginCredentials{" +
-                "userName='" + userName + '\'' +
-                ", password='" + "******" + '\'' +
-                ", database='" + database + '\'' +
-                '}';
-    }
+  @Override
+  public String toString() {
+    // Mask password for security issue sine 2017-10-15 little-pan
+    return "LoginCredentials{" + "userName='" + userName + '\'' + ", password='" + "******" + '\'' + ", database='"
+        + database + '\'' + '}';
+  }
 }

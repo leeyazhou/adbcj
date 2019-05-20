@@ -6,11 +6,10 @@ import java.io.IOException;
 
 public abstract class ClientToServerPacket {
 
-    protected ClientToServerPacket() {
-    }
+  protected ClientToServerPacket() {}
 
 
-    public abstract void writeToStream(DataOutputStream stream) throws IOException;
+  public abstract void writeToStream(DataOutputStream stream) throws IOException;
 
-    public abstract int getLength();
+  public abstract int getLength();
 }

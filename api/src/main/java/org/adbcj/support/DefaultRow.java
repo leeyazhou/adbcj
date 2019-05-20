@@ -20,73 +20,72 @@ import org.adbcj.Field;
 import org.adbcj.ResultSet;
 import org.adbcj.Row;
 import org.adbcj.Value;
-
 import java.util.*;
 
 
 public class DefaultRow extends AbstractMap<Object, Value> implements Row {
 
-	private final ResultSet resultSet;
-	private final Value[] values;
+  private final ResultSet resultSet;
+  private final Value[] values;
 
-	private transient Set<java.util.Map.Entry<Object, Value>> entrySet;
+  private transient Set<java.util.Map.Entry<Object, Value>> entrySet;
 
-	public DefaultRow(ResultSet resultSet, Value... values) {
-		this.resultSet = resultSet;
-		for (Value value : values) {
-			if (value == null) {
-				throw new AssertionError("Value cannot be null");
-			}
-		}
-		this.values = values.clone();
-	}
+  public DefaultRow(ResultSet resultSet, Value... values) {
+    this.resultSet = resultSet;
+    for (Value value : values) {
+      if (value == null) {
+        throw new AssertionError("Value cannot be null");
+      }
+    }
+    this.values = values.clone();
+  }
 
-	@Override
-	public Set<java.util.Map.Entry<Object, Value>> entrySet() {
-		if (entrySet == null) {
-			Set<java.util.Map.Entry<Object, Value>> set = new HashSet<Entry<Object,Value>>();
-            final List<? extends Field> fields = resultSet.getFields();
-            for(int i=0;i< fields.size();i++){
-                set.add(new AbstractMap.SimpleEntry<Object, Value>(fields.get(i), values[i]));
+  @Override
+  public Set<java.util.Map.Entry<Object, Value>> entrySet() {
+    if (entrySet == null) {
+      Set<java.util.Map.Entry<Object, Value>> set = new HashSet<Entry<Object, Value>>();
+      final List<? extends Field> fields = resultSet.getFields();
+      for (int i = 0; i < fields.size(); i++) {
+        set.add(new AbstractMap.SimpleEntry<Object, Value>(fields.get(i), values[i]));
 
-            }
-			entrySet = Collections.unmodifiableSet(set);
-		}
-		return entrySet;
-	}
+      }
+      entrySet = Collections.unmodifiableSet(set);
+    }
+    return entrySet;
+  }
 
-	public ResultSet getResultSet() {
-		return resultSet;
-	}
+  public ResultSet getResultSet() {
+    return resultSet;
+  }
 
-	@Override
-	public int size() {
-		return values.length;
-	}
+  @Override
+  public int size() {
+    return values.length;
+  }
 
-	@Override
-	public boolean containsKey(Object key) {
-		return resultSet.getField(key) != null;
-	}
+  @Override
+  public boolean containsKey(Object key) {
+    return resultSet.getField(key) != null;
+  }
 
-	@Override
-	public Value get(Object key) {
-		Field field = resultSet.getField(key);
-		Value value = values[field.getIndex()];
-		return value;
-	}
+  @Override
+  public Value get(Object key) {
+    Field field = resultSet.getField(key);
+    Value value = values[field.getIndex()];
+    return value;
+  }
 
-	@Override
-	public Value remove(Object key) {
-		throw new UnsupportedOperationException("Results set rows are read-only");
-	}
+  @Override
+  public Value remove(Object key) {
+    throw new UnsupportedOperationException("Results set rows are read-only");
+  }
 
-	@Override
-	public void clear() {
-		throw new UnsupportedOperationException("Results set rows are read-only");
-	}
+  @Override
+  public void clear() {
+    throw new UnsupportedOperationException("Results set rows are read-only");
+  }
 
-	public Value[] getValues() {
-		return values.clone();
-	}
+  public Value[] getValues() {
+    return values.clone();
+  }
 }

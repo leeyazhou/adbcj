@@ -7,54 +7,53 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class DefaultResultEventsHandler implements ResultHandler<DefaultResultSet> {
-    private static final Logger logger = LoggerFactory.getLogger(DefaultResultEventsHandler.class);
+  private static final Logger logger = LoggerFactory.getLogger(DefaultResultEventsHandler.class);
 
-    // TODO: Make this handler stateless
-    private Value[] currentRow;
-    private int rowIndex;
+  // TODO: Make this handler stateless
+  private Value[] currentRow;
+  private int rowIndex;
 
-    public void startFields(DefaultResultSet accumulator) {
-        logger.debug("ResultSetEventHandler: startFields");
-    }
+  public void startFields(DefaultResultSet accumulator) {
+    logger.debug("ResultSetEventHandler: startFields");
+  }
 
-    public void field(Field field, DefaultResultSet accumulator) {
-        logger.debug("ResultSetEventHandler: field");
-        accumulator.addField(field);
-    }
+  public void field(Field field, DefaultResultSet accumulator) {
+    logger.debug("ResultSetEventHandler: field");
+    accumulator.addField(field);
+  }
 
-    public void endFields(DefaultResultSet accumulator) {
-        logger.debug("ResultSetEventHandler: endFields");
-    }
+  public void endFields(DefaultResultSet accumulator) {
+    logger.debug("ResultSetEventHandler: endFields");
+  }
 
-    public void startResults(DefaultResultSet accumulator) {
-        logger.debug("ResultSetEventHandler: startResults");
-    }
+  public void startResults(DefaultResultSet accumulator) {
+    logger.debug("ResultSetEventHandler: startResults");
+  }
 
-    public void startRow(DefaultResultSet accumulator) {
-        logger.debug("ResultSetEventHandler: startRow");
+  public void startRow(DefaultResultSet accumulator) {
+    logger.debug("ResultSetEventHandler: startRow");
 
-        int columnCount = accumulator.getFields().size();
-        currentRow = new Value[columnCount];
-    }
+    int columnCount = accumulator.getFields().size();
+    currentRow = new Value[columnCount];
+  }
 
-    public void value(Value value, DefaultResultSet accumulator) {
-        logger.debug("ResultSetEventHandler: value");
+  public void value(Value value, DefaultResultSet accumulator) {
+    logger.debug("ResultSetEventHandler: value");
 
-        currentRow[rowIndex%currentRow.length] = value;
-        rowIndex++;
-    }
+    currentRow[rowIndex % currentRow.length] = value;
+    rowIndex++;
+  }
 
-    public void endRow(DefaultResultSet accumulator) {
-        logger.debug("ResultSetEventHandler: endRow");
-        DefaultRow row = new DefaultRow(accumulator, currentRow);
-        accumulator.addResult(row);
-        currentRow = null;
-    }
+  public void endRow(DefaultResultSet accumulator) {
+    logger.debug("ResultSetEventHandler: endRow");
+    DefaultRow row = new DefaultRow(accumulator, currentRow);
+    accumulator.addResult(row);
+    currentRow = null;
+  }
 
-    public void endResults(DefaultResultSet accumulator) {
-        logger.debug("ResultSetEventHandler: endResults");
-    }
+  public void endResults(DefaultResultSet accumulator) {
+    logger.debug("ResultSetEventHandler: endResults");
+  }
 
-    public void exception(Throwable t, DefaultResultSet accumulator) {
-    }
+  public void exception(Throwable t, DefaultResultSet accumulator) {}
 }

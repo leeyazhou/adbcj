@@ -1,9 +1,9 @@
 package org.adbcj;
 
-public interface PreparedStatement extends AsyncCloseable{
+public interface PreparedStatement extends AsyncCloseable {
 
-    boolean isClosed();
+  boolean isClosed();
 
 
-    void close(DbCallback<Void> callback);
+  void close(DbCallback<Void> callback);
 }

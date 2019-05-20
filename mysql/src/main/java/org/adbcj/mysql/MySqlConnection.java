@@ -154,7 +154,7 @@ public class MySqlConnection implements Connection {
         // Close the connection forcibly when IO error such as 'Too many connections'
         // even if using connection-pool.
         // @since 2017-09-02 little-pan
-        if (connectionManager.connectionPool == null || CloseMode.CLOSE_FORCIBLY == closeMode) {
+        if (connectionManager.getConnectionPool() == null || CloseMode.CLOSE_FORCIBLY == closeMode) {
           doActualClose(closeMode, entry);
         } else {
           doRollback(entry, (result, failure) -> {
@@ -163,7 +163,7 @@ public class MySqlConnection implements Connection {
                 doActualClose(closeMode, entry);
               } else {
                 channel.pipeline().remove(MysqlConnectionManager.DECODER);
-                connectionManager.connectionPool.release(login, channel);
+                connectionManager.getConnectionPool().release(login, channel);
                 callback.onComplete(result, null);
               }
             } else {
@@ -205,7 +205,7 @@ public class MySqlConnection implements Connection {
     });
   }
 
-  void tryCompleteClose(DbException error) {
+  public void tryCompleteClose(DbException error) {
     synchronized (lock) {
       connectionManager.closedConnect(this);
       closer.didClose(error);

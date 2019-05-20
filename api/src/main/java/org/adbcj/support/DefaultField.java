@@ -21,145 +21,130 @@ import org.adbcj.Type;
 
 public class DefaultField implements Field {
 
-	private final int index;
-	private final String catalogName;
-	private final String schemaName;
-	private final String tableLabel;
-	private final String tableName;
-	private final Type columnType;
-	private final String columnLabel;
-	private final String columnName;
-	private final int precision;
-	private final int scale;
-	private final boolean autoIncrement;
-	private final boolean caseSensitive;
-	private final boolean currency;
-	private final boolean nullable;
-	private final boolean readOnly;
-	private final boolean signed;
-	private final String fieldClassName;
-	
-	public DefaultField(
-			int index,
-			String catalogName,
-			String schemaName,
-			String tableLabel,
-			String tableName,
-			Type columnType,
-			String columnLabel,
-			String columnName,
-			int precision,
-			int scale,
-			boolean autoIncrement,
-			boolean caseSensitive,
-			boolean currency,
-			boolean nullable,
-			boolean readOnly,
-			boolean signed,
-			String fieldClassName
-			) {
-		this.index = index;
-		this.catalogName = catalogName;
-		this.schemaName = schemaName;
-		this.tableLabel = tableLabel;
-		this.tableName = tableName;
-		this.columnType = columnType;
-		this.columnLabel = columnLabel;
-		this.columnName = columnName;
-		this.precision = precision;
-		this.scale = scale;
-		this.autoIncrement = autoIncrement;
-		this.caseSensitive = caseSensitive;
-		this.currency = currency;
-		this.nullable = nullable;
-		this.readOnly = readOnly;
-		this.signed = signed;
-		this.fieldClassName = fieldClassName;
-	}
-	
-	public int getIndex() {
-		return index;
-	}
-	
-	public String getCatalogName() {
-		return catalogName;
-	}
+  private final int index;
+  private final String catalogName;
+  private final String schemaName;
+  private final String tableLabel;
+  private final String tableName;
+  private final Type columnType;
+  private final String columnLabel;
+  private final String columnName;
+  private final int precision;
+  private final int scale;
+  private final boolean autoIncrement;
+  private final boolean caseSensitive;
+  private final boolean currency;
+  private final boolean nullable;
+  private final boolean readOnly;
+  private final boolean signed;
+  private final String fieldClassName;
 
-	public String getColumnLabel() {
-		return columnLabel;
-	}
+  public DefaultField(int index, String catalogName, String schemaName, String tableLabel, String tableName,
+      Type columnType, String columnLabel, String columnName, int precision, int scale, boolean autoIncrement,
+      boolean caseSensitive, boolean currency, boolean nullable, boolean readOnly, boolean signed,
+      String fieldClassName) {
+    this.index = index;
+    this.catalogName = catalogName;
+    this.schemaName = schemaName;
+    this.tableLabel = tableLabel;
+    this.tableName = tableName;
+    this.columnType = columnType;
+    this.columnLabel = columnLabel;
+    this.columnName = columnName;
+    this.precision = precision;
+    this.scale = scale;
+    this.autoIncrement = autoIncrement;
+    this.caseSensitive = caseSensitive;
+    this.currency = currency;
+    this.nullable = nullable;
+    this.readOnly = readOnly;
+    this.signed = signed;
+    this.fieldClassName = fieldClassName;
+  }
 
-	public String getColumnName() {
-		return columnName;
-	}
+  public int getIndex() {
+    return index;
+  }
 
-	public Type getColumnType() {
-		return columnType;
-	}
+  public String getCatalogName() {
+    return catalogName;
+  }
 
-	public String getFieldClassName() {
-		return fieldClassName;
-	}
+  public String getColumnLabel() {
+    return columnLabel;
+  }
 
-	public int getPrecision() {
-		return precision;
-	}
+  public String getColumnName() {
+    return columnName;
+  }
 
-	public int getScale() {
-		return scale;
-	}
+  public Type getColumnType() {
+    return columnType;
+  }
 
-	public String getSchemaName() {
-		return schemaName;
-	}
+  public String getFieldClassName() {
+    return fieldClassName;
+  }
 
-	public String getTableLabel() {
-		return tableLabel;
-	}
+  public int getPrecision() {
+    return precision;
+  }
 
-	public String getTableName() {
-		return tableName;
-	}
+  public int getScale() {
+    return scale;
+  }
 
-	public boolean isAutoIncrement() {
-		return autoIncrement;
-	}
+  public String getSchemaName() {
+    return schemaName;
+  }
 
-	public boolean isCaseSensitive() {
-		return caseSensitive;
-	}
+  public String getTableLabel() {
+    return tableLabel;
+  }
 
-	public boolean isCurrency() {
-		return currency;
-	}
+  public String getTableName() {
+    return tableName;
+  }
 
-	public boolean isNullable() {
-		return nullable;
-	}
+  public boolean isAutoIncrement() {
+    return autoIncrement;
+  }
 
-	public boolean isReadOnly() {
-		return readOnly;
-	}
+  public boolean isCaseSensitive() {
+    return caseSensitive;
+  }
 
-	public boolean isSigned() {
-		return signed;
-	}
+  public boolean isCurrency() {
+    return currency;
+  }
 
-	@Override
-	public int hashCode() {
-		return index;
-	}
+  public boolean isNullable() {
+    return nullable;
+  }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		final DefaultField other = (DefaultField)obj;
-		return index == other.index;
-	}
-	
+  public boolean isReadOnly() {
+    return readOnly;
+  }
+
+  public boolean isSigned() {
+    return signed;
+  }
+
+  @Override
+  public int hashCode() {
+    return index;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    final DefaultField other = (DefaultField) obj;
+    return index == other.index;
+  }
+
 }

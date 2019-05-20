@@ -18,21 +18,18 @@ package org.adbcj.support;
 
 import org.adbcj.ConnectionManager;
 import org.adbcj.DbException;
-
 import java.util.Map;
 
 /**
- * Entry point to find a driver.
- * The {@link org.adbcj.ConnectionManagerProvider} loads the ConnectionManagerFactory's via {@link java.util.ServiceLoader}.
+ * Entry point to find a driver. The {@link org.adbcj.ConnectionManagerProvider}
+ * loads the ConnectionManagerFactory's via {@link java.util.ServiceLoader}.
  * Then checks if can handle the given protocol at hand
  */
 public interface ConnectionManagerFactory {
 
-	ConnectionManager createConnectionManager(String url,
-											  String username,
-											  String password,
-											  Map<String,String> properties) throws DbException;
+  ConnectionManager createConnectionManager(String url, String username, String password,
+      Map<String, String> properties) throws DbException;
 
-	boolean canHandle(String protocol);
+  boolean canHandle(String protocol);
 
 }

@@ -18,30 +18,29 @@ package org.adbcj.support;
 
 import org.adbcj.Result;
 import org.adbcj.ResultSet;
-
 import java.util.List;
 
 
 public class DefaultResult implements Result {
 
-	final long affectedRows;
-	final List<String> warnings;
-	
-	public DefaultResult(Long affectedRows, List<String> warnings) {
-		this.affectedRows = affectedRows;
-		this.warnings = warnings;
-	}
-	
-	public long getAffectedRows() {
-		return affectedRows;
-	}
+  final long affectedRows;
+  final List<String> warnings;
 
-	public ResultSet getGeneratedKeys() {
-		throw new UnsupportedOperationException("Not yet implemented");
-	}
+  public DefaultResult(Long affectedRows, List<String> warnings) {
+    this.affectedRows = affectedRows;
+    this.warnings = warnings;
+  }
 
-	public List<String> getWarnings() {
-		return warnings;
-	}
+  public long getAffectedRows() {
+    return affectedRows;
+  }
+
+  public ResultSet getGeneratedKeys() {
+    throw new UnsupportedOperationException("Not yet implemented");
+  }
+
+  public List<String> getWarnings() {
+    return warnings;
+  }
 
 }

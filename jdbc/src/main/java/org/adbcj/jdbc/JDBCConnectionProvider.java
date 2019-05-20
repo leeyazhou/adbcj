@@ -5,7 +5,8 @@ import java.sql.SQLException;
 
 
 public interface JDBCConnectionProvider {
-    Connection getConnection() throws SQLException;
-    Connection getConnection(String user,String password) throws SQLException;
+  Connection getConnection() throws SQLException;
+
+  Connection getConnection(String user, String password) throws SQLException;
 
 }

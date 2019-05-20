@@ -5,18 +5,18 @@ package org.adbcj;
  */
 public class DbConnectionClosedException extends DbException {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	public DbConnectionClosedException() {
-		super( "This database connection has been closed");
-	}
+  public DbConnectionClosedException() {
+    super("This database connection has been closed");
+  }
 
-	public DbConnectionClosedException(String message) {
-		super(message);
-	}
+  public DbConnectionClosedException(String message) {
+    super(message);
+  }
 
-	public DbConnectionClosedException(String message, Throwable cause, StackTraceElement[] entry) {
-		super(message, cause, entry);
-	}
+  public DbConnectionClosedException(String message, Throwable cause, StackTraceElement[] entry) {
+    super(message, cause, entry);
+  }
 
 }

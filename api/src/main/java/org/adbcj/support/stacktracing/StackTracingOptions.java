@@ -22,8 +22,8 @@ public enum StackTracingOptions {
 
   },
   /**
-   * This {@link ConnectionManagerFactory} or connection wants to have a stack-trace captured,
-   * no mather what.
+   * This {@link ConnectionManagerFactory} or connection wants to have a
+   * stack-trace captured, no mather what.
    */
   FORCED_BY_INSTANCE {
     @Override

@@ -1,5 +1,6 @@
 package org.adbcj.h2.connect;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -9,13 +10,19 @@ import org.adbcj.Connection;
 import org.adbcj.ConnectionManager;
 import org.adbcj.ConnectionManagerProvider;
 import org.adbcj.StandardProperties;
+import org.h2.tools.Server;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ConnectTest {
   final static Logger log = LoggerFactory.getLogger(ConnectTest.class);
+  private Server server;
 
-  public static void main(String[] args) throws InterruptedException {
+  @Test
+  public void test() throws InterruptedException {
     final int n = 1;
     // h2 url schema - adbcj:h2://host:port/db, no "tcp:" after "h2:"
     final String url = "adbcj:h2://localhost:9092/test;DB_CLOSE_DELAY=-1";
@@ -70,6 +77,19 @@ public class ConnectTest {
       colat.await();
       log.info("time: {}ms, ttl: {}, success: {}", (System.currentTimeMillis() - tms), n, success.get());
     }
+  }
+
+  @Before
+  public void before() throws SQLException {
+    server = Server.createTcpServer("-tcpAllowOthers", "-tcpDaemon", "-tcpPort", "9092", "-baseDir", "./h2testdb");
+    // Server inspect = Server.createWebServer();
+    // inspect.start();
+    server.start();
+  }
+
+  @After
+  public void after() {
+    server.stop();
   }
 
 }

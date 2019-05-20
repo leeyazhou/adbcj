@@ -20,6 +20,6 @@ import java.util.Map;
 
 public interface Row extends Map<Object, Value> {
 
-    ResultSet getResultSet();
-    
+  ResultSet getResultSet();
+
 }

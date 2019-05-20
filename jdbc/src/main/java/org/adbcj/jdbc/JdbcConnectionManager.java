@@ -21,124 +21,118 @@ import org.adbcj.support.AbstractConnectionManager;
 import org.adbcj.support.NoArgFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class JdbcConnectionManager extends AbstractConnectionManager implements ConnectionManager {
-    private final ExecutorService executorService;
+  private final ExecutorService executorService;
 
-    private final Object lock = this;
-    private final JDBCConnectionProvider connectionProvider;
-    private static final Logger LOGGER = LoggerFactory.getLogger(JdbcConnectionManager.class);
+  private final Object lock = this;
+  private final JDBCConnectionProvider connectionProvider;
+  private static final Logger LOGGER = LoggerFactory.getLogger(JdbcConnectionManager.class);
 
 
-    public JdbcConnectionManager(JDBCConnectionProvider connectionProvider,
-                                 Map<String, String> properties) {
-        super(properties);
-        this.executorService = createPool();
-        this.connectionProvider = connectionProvider;
+  public JdbcConnectionManager(JDBCConnectionProvider connectionProvider, Map<String, String> properties) {
+    super(properties);
+    this.executorService = createPool();
+    this.connectionProvider = connectionProvider;
 
-        if (useConnectionPool) {
-            throw new DbException("JDBC connection provider does not support a connection pool." +
-                    "The JDBC-ADBCJ connection bridge is for development purpose, to validate that ADBCJ returns the same results as JDBC");
+    if (useConnectionPool) {
+      throw new DbException("JDBC connection provider does not support a connection pool."
+          + "The JDBC-ADBCJ connection bridge is for development purpose, to validate that ADBCJ returns the same results as JDBC");
+    }
+  }
+
+  @Override
+  public void connect(DbCallback<Connection> callback) {
+    connect(callback, () -> {
+      try {
+        return connectionProvider.getConnection();
+      } catch (SQLException e) {
+        throw DbException.wrap(e);
+      }
+    });
+  }
+
+  @Override
+  public void connect(final String user, final String password, DbCallback<Connection> callback) {
+    connect(callback, () -> {
+      try {
+        return connectionProvider.getConnection(user, password);
+      } catch (SQLException e) {
+        throw DbException.wrap(e);
+      }
+    });
+  }
+
+
+  private void connect(DbCallback<Connection> callback, final NoArgFunction<java.sql.Connection> connectionGetter)
+      throws DbException {
+    LOGGER.warn("JDBC to ADBCJ is not intended for production use!");
+    if (isClosed()) {
+      throw new DbException("This connection manager is closed");
+    }
+    StackTraceElement[] entry = getStackTracingOption().captureStacktraceAtEntryPoint();
+    executorService.execute(() -> {
+      try {
+        java.sql.Connection jdbcConnection = connectionGetter.apply();
+        JdbcConnection connection = new JdbcConnection(JdbcConnectionManager.this, jdbcConnection, getExecutorService(),
+            maxQueueLength(), getStackTracingOption());
+        synchronized (lock) {
+          if (isClosed()) {
+            connection.close(CloseMode.CANCEL_PENDING_OPERATIONS,
+                (res, error) -> callback.onComplete(null, new DbException("Connection manager closed", error, entry)));
+          } else {
+            addConnection(connection);
+            callback.onComplete(connection, null);
+          }
         }
-    }
+      } catch (Throwable e) {
+        DbException ex = DbException.wrap(e);
+        callback.onComplete(null, ex);
+      }
+    });
+  }
 
-    @Override
-    public void connect(DbCallback<Connection> callback) {
-        connect(callback, () -> {
-            try {
-                return connectionProvider.getConnection();
-            } catch (SQLException e) {
-                throw DbException.wrap(e);
-            }
-        });
-    }
+  @Override
+  protected void doCloseConnection(Connection connection, CloseMode mode, DbCallback<Void> callback) {
+    connection.close(mode, callback);
+  }
 
-    @Override
-    public void connect(final String user, final String password, DbCallback<Connection> callback) {
-        connect(callback, () -> {
-            try {
-                return connectionProvider.getConnection(user, password);
-            } catch (SQLException e) {
-                throw DbException.wrap(e);
-            }
-        });
-    }
+  @Override
+  protected void doClose(DbCallback<Void> callback, StackTraceElement[] entry) {
+    callback.onComplete(null, null);
+  }
 
 
-    private void connect(
-            DbCallback<Connection> callback,
-            final NoArgFunction<java.sql.Connection> connectionGetter) throws DbException {
-        LOGGER.warn("JDBC to ADBCJ is not intended for production use!");
-        if (isClosed()) {
-            throw new DbException("This connection manager is closed");
-        }
-        StackTraceElement[] entry = getStackTracingOption().captureStacktraceAtEntryPoint();
-        executorService.execute(() -> {
-            try {
-                java.sql.Connection jdbcConnection = connectionGetter.apply();
-                JdbcConnection connection = new JdbcConnection(
-                        JdbcConnectionManager.this,
-                        jdbcConnection,
-                        getExecutorService(),
-                        maxQueueLength(),
-                        getStackTracingOption());
-                synchronized (lock) {
-                    if (isClosed()) {
-                        connection.close(CloseMode.CANCEL_PENDING_OPERATIONS, (res, error) -> callback.onComplete(null, new DbException("Connection manager closed", error, entry)));
-                    } else {
-                        addConnection(connection);
-                        callback.onComplete(connection, null);
-                    }
-                }
-            } catch (Throwable e) {
-                DbException ex = DbException.wrap(e);
-                callback.onComplete(null, ex);
-            }
-        });
-    }
+  void closedConnection(org.adbcj.jdbc.JdbcConnection jdbcConnection) {
+    removeConnection(jdbcConnection);
+  }
 
-    @Override
-    protected void doCloseConnection(Connection connection, CloseMode mode, DbCallback<Void> callback) {
-        connection.close(mode, callback);
-    }
-
-    @Override
-    protected void doClose(DbCallback<Void> callback, StackTraceElement[] entry) {
-        callback.onComplete(null, null);
-    }
+  private ExecutorService getExecutorService() {
+    return executorService;
+  }
 
 
-    void closedConnection(org.adbcj.jdbc.JdbcConnection jdbcConnection) {
-        removeConnection(jdbcConnection);
-    }
+  @Override
+  public String toString() {
+    return "JdbcConnectionManager with" + connectionProvider.toString();
+  }
 
-    private ExecutorService getExecutorService() {
-        return executorService;
-    }
+  private static ExecutorService createPool() {
+    return Executors.newCachedThreadPool(new ThreadFactory() {
+      private final AtomicInteger threadNumber = new AtomicInteger(1);
 
-
-    @Override
-    public String toString() {
-        return "JdbcConnectionManager with" + connectionProvider.toString();
-    }
-
-    private static ExecutorService createPool() {
-        return Executors.newCachedThreadPool(new ThreadFactory() {
-            private final AtomicInteger threadNumber = new AtomicInteger(1);
-
-            @Override
-            public Thread newThread(Runnable r) {
-                Thread thread = Executors.defaultThreadFactory().newThread(r);
-                thread.setName("ADBC to JDBC bridge " + threadNumber.incrementAndGet());
-                thread.setDaemon(true);
-                return thread;
-            }
-        });
-    }
+      @Override
+      public Thread newThread(Runnable r) {
+        Thread thread = Executors.defaultThreadFactory().newThread(r);
+        thread.setName("ADBC to JDBC bridge " + threadNumber.incrementAndGet());
+        thread.setDaemon(true);
+        return thread;
+      }
+    });
+  }
 
 }
