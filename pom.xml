@@ -26,7 +26,7 @@
     <module>mysql</module>
     <module>h2</module>
     <module>tck</module>
-    <module>demo-project</module>
+    <module>adbcj-demo</module>
   </modules>
 
   <scm>

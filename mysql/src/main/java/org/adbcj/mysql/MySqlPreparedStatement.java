@@ -1,8 +1,8 @@
 package org.adbcj.mysql;
 
 import org.adbcj.*;
-import org.adbcj.mysql.codec.MySqlRequests;
-import org.adbcj.mysql.codec.packets.StatementPreparedEOF;
+import org.adbcj.mysql.codec.packets.response.StatementPreparedEOFResponse;
+import org.adbcj.mysql.codec.util.MySqlRequestUtil;
 import org.adbcj.support.CloseOnce;
 import org.adbcj.support.DbCompletableFuture;
 import org.adbcj.support.DefaultResultEventsHandler;
@@ -12,10 +12,10 @@ import java.util.concurrent.CompletableFuture;
 
 public class MySqlPreparedStatement implements PreparedQuery, PreparedUpdate {
   private final MySqlConnection connection;
-  private final StatementPreparedEOF statementInfo;
+  private final StatementPreparedEOFResponse statementInfo;
   private final CloseOnce closeFuture = new CloseOnce();
 
-  public MySqlPreparedStatement(MySqlConnection connection, StatementPreparedEOF statementInfo) {
+  public MySqlPreparedStatement(MySqlConnection connection, StatementPreparedEOFResponse statementInfo) {
     this.connection = connection;
     this.statementInfo = statementInfo;
   }
@@ -37,7 +37,7 @@ public class MySqlPreparedStatement implements PreparedQuery, PreparedUpdate {
     connection.checkClosed();
     validateParameters(params);
     StackTraceElement[] entry = connection.strackTraces.captureStacktraceAtEntryPoint();
-    connection.failIfQueueFull(MySqlRequests.executePreparedQuery(connection, statementInfo, params, eventHandler,
+    connection.failIfQueueFull(MySqlRequestUtil.executePreparedQuery(connection, statementInfo, params, eventHandler,
         accumulator, callback, entry));
   }
 
@@ -50,7 +50,7 @@ public class MySqlPreparedStatement implements PreparedQuery, PreparedUpdate {
   @Override
   public void close(DbCallback<Void> callback) {
     closeFuture.requestClose(callback, () -> {
-      if (connection.failIfQueueFull(MySqlRequests.closeStatemeent(connection, statementInfo, (res, error) -> {
+      if (connection.failIfQueueFull(MySqlRequestUtil.closeStatemeent(connection, statementInfo, (res, error) -> {
       }))) {
         closeFuture.didClose(null);
       }

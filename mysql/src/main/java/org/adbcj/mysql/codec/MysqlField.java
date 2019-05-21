@@ -19,6 +19,9 @@
 package org.adbcj.mysql.codec;
 
 
+import org.adbcj.mysql.codec.model.FieldFlag;
+import org.adbcj.mysql.codec.model.MysqlCharacterSet;
+import org.adbcj.mysql.codec.model.MysqlType;
 import org.adbcj.support.DefaultField;
 
 import java.util.Set;

@@ -3,8 +3,11 @@ package org.adbcj.mysql.codec;
 import io.netty.channel.embedded.EmbeddedChannel;
 import org.adbcj.mysql.MySqlConnection;
 import org.adbcj.mysql.MysqlConnectionManager;
-import org.adbcj.mysql.codec.decoding.Connecting;
-import org.adbcj.mysql.codec.packets.ServerGreeting;
+import org.adbcj.mysql.codec.decoder.ConnectingDecoder;
+import org.adbcj.mysql.codec.model.ClientCapabilities;
+import org.adbcj.mysql.codec.model.MysqlCharacterSet;
+import org.adbcj.mysql.codec.model.ServerStatus;
+import org.adbcj.mysql.codec.packets.response.ServerGreetingResponse;
 import org.adbcj.support.DbCompletableFuture;
 import org.adbcj.support.LoginCredentials;
 import io.netty.channel.Channel;
@@ -46,8 +49,8 @@ public class GreetingDecodeTest {
 	public void decodeGreeting1() throws IOException {
 		InputStream in = new ByteArrayInputStream(GREETING1);
 		MySqlClientDecoder decoder = new MySqlClientDecoder(
-                new Connecting(new DbCompletableFuture<>(), null,  createMockConnection(), login));
-		ServerGreeting greeting = castToServerGreeting(in, decoder);
+                new ConnectingDecoder(new DbCompletableFuture<>(), null,  createMockConnection(), login));
+		ServerGreetingResponse greeting = castToServerGreeting(in, decoder);
 
 		Assert.assertEquals(greeting.getPacketLength(), 64);
 		Assert.assertEquals(greeting.getPacketNumber(), 0);
@@ -81,8 +84,8 @@ public class GreetingDecodeTest {
 	@Test
 	public void decodeGreeting2() throws IOException {
 		InputStream in = new ByteArrayInputStream(GREETING2);
-		MySqlClientDecoder decoder = new MySqlClientDecoder(new Connecting(new DbCompletableFuture<>(), null,createMockConnection(), login));
-		ServerGreeting greeting = castToServerGreeting(in, decoder);
+		MySqlClientDecoder decoder = new MySqlClientDecoder(new ConnectingDecoder(new DbCompletableFuture<>(), null,createMockConnection(), login));
+		ServerGreetingResponse greeting = castToServerGreeting(in, decoder);
 
 		Assert.assertEquals(greeting.getPacketLength(), 74);
 		Assert.assertEquals(greeting.getPacketNumber(), 0);
@@ -95,8 +98,8 @@ public class GreetingDecodeTest {
 		Assert.assertEquals(greeting.getServerStatus(), EnumSet.of(ServerStatus.AUTO_COMMIT));
 	}
 
-    private ServerGreeting castToServerGreeting(InputStream in, MySqlClientDecoder decoder) throws IOException {
-        return (ServerGreeting) decoder.decode(in, new EmbeddedChannel(), true);
+    private ServerGreetingResponse castToServerGreeting(InputStream in, MySqlClientDecoder decoder) throws IOException {
+        return (ServerGreetingResponse) decoder.decode(in, new EmbeddedChannel(), true);
     }
 
     private MySqlConnection createMockConnection() {

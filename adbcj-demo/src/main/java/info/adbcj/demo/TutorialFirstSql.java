@@ -47,6 +47,7 @@ public class TutorialFirstSql {
                 }
                 connection.close();
                 connectionManager.close();
+                demoH2Db.stop();
             });
         });
 

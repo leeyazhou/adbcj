@@ -3,10 +3,11 @@ package org.adbcj.mysql.codec;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.NoSuchAlgorithmException;
+import org.adbcj.mysql.codec.packets.request.AbstractRequest;
 
 public class MySqlClientEncoder {
 
-  public void encode(ClientRequest request, OutputStream out) throws IOException, NoSuchAlgorithmException {
+  public void encode(AbstractRequest request, OutputStream out) throws IOException, NoSuchAlgorithmException {
     int length = request.getLength();
 
     // Write the length of the packet

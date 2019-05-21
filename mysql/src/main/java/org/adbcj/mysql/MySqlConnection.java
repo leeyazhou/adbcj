@@ -14,10 +14,10 @@ import org.adbcj.PreparedUpdate;
 import org.adbcj.Result;
 import org.adbcj.ResultHandler;
 import org.adbcj.StandardProperties;
-import org.adbcj.mysql.codec.ClientCapabilities;
-import org.adbcj.mysql.codec.ExtendedClientCapabilities;
-import org.adbcj.mysql.codec.MySqlRequest;
-import org.adbcj.mysql.codec.MySqlRequests;
+import org.adbcj.mysql.codec.model.ClientCapabilities;
+import org.adbcj.mysql.codec.model.ExtendedClientCapabilities;
+import org.adbcj.mysql.codec.model.MySqlRequest;
+import org.adbcj.mysql.codec.util.MySqlRequestUtil;
 import org.adbcj.support.CloseOnce;
 import org.adbcj.support.LoginCredentials;
 import org.adbcj.support.stacktracing.StackTracingOptions;
@@ -71,7 +71,7 @@ public class MySqlConnection implements Connection {
     checkClosed();
     StackTraceElement[] entry = strackTraces.captureStacktraceAtEntryPoint();
     synchronized (lock) {
-      forceQueRequest(MySqlRequests.beginTransaction(this, callback, entry));
+      forceQueRequest(MySqlRequestUtil.beginTransaction(this, callback, entry));
       isInTransaction = true;
     }
   }
@@ -84,7 +84,7 @@ public class MySqlConnection implements Connection {
     checkClosed();
     StackTraceElement[] entry = strackTraces.captureStacktraceAtEntryPoint();
     synchronized (lock) {
-      if (failIfQueueFull(MySqlRequests.commitTransaction(this, callback, entry))) {
+      if (failIfQueueFull(MySqlRequestUtil.commitTransaction(this, callback, entry))) {
         isInTransaction = false;
       }
     }
@@ -103,7 +103,7 @@ public class MySqlConnection implements Connection {
 
   private void doRollback(StackTraceElement[] entry, DbCallback<Void> callback) {
     synchronized (lock) {
-      if (failIfQueueFull(MySqlRequests.rollbackTransaction(this, callback, entry))) {
+      if (failIfQueueFull(MySqlRequestUtil.rollbackTransaction(this, callback, entry))) {
         isInTransaction = false;
       }
     }
@@ -119,7 +119,7 @@ public class MySqlConnection implements Connection {
   public <T> void executeQuery(String sql, ResultHandler<T> eventHandler, T accumulator, DbCallback<T> callback) {
     checkClosed();
     StackTraceElement[] entry = strackTraces.captureStacktraceAtEntryPoint();
-    failIfQueueFull(MySqlRequests.executeQuery(this, sql, eventHandler, accumulator, callback, entry));
+    failIfQueueFull(MySqlRequestUtil.executeQuery(this, sql, eventHandler, accumulator, callback, entry));
   }
 
 
@@ -127,7 +127,7 @@ public class MySqlConnection implements Connection {
   public void executeUpdate(String sql, DbCallback<Result> callback) {
     checkClosed();
     StackTraceElement[] entry = strackTraces.captureStacktraceAtEntryPoint();
-    failIfQueueFull(MySqlRequests.executeUpdate(this, sql, callback, entry));
+    failIfQueueFull(MySqlRequestUtil.executeUpdate(this, sql, callback, entry));
 
   }
 
@@ -136,14 +136,14 @@ public class MySqlConnection implements Connection {
   public void prepareQuery(String sql, DbCallback<PreparedQuery> callback) {
     checkClosed();
     StackTraceElement[] entry = strackTraces.captureStacktraceAtEntryPoint();
-    failIfQueueFull(MySqlRequests.prepareQuery(this, sql, (DbCallback) callback, entry));
+    failIfQueueFull(MySqlRequestUtil.prepareQuery(this, sql, (DbCallback) callback, entry));
   }
 
   @Override
   public void prepareUpdate(String sql, DbCallback<PreparedUpdate> callback) {
     checkClosed();
     StackTraceElement[] entry = strackTraces.captureStacktraceAtEntryPoint();
-    failIfQueueFull(MySqlRequests.prepareQuery(this, sql, (DbCallback) callback, entry));
+    failIfQueueFull(MySqlRequestUtil.prepareQuery(this, sql, (DbCallback) callback, entry));
   }
 
   @Override
@@ -187,7 +187,7 @@ public class MySqlConnection implements Connection {
       forceCloseOnPendingRequests();
     }
     final MySqlRequest<?> closeRequest =
-        MySqlRequests.createCloseRequest(this, (res, error) -> tryCompleteClose(error), entry);
+        MySqlRequestUtil.createCloseRequest(this, (res, error) -> tryCompleteClose(error), entry);
     forceQueRequest(closeRequest);
   }
 
@@ -258,8 +258,8 @@ public class MySqlConnection implements Connection {
 
   MySqlRequest<?> forceQueRequest(MySqlRequest<?> request) {
     synchronized (lock) {
-      requestQueue.add(request);
-      channel.writeAndFlush(request.getRequest());
+      this.requestQueue.add(request);
+      this.channel.writeAndFlush(request.getRequest());
       return request;
     }
   }

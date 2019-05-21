@@ -2,6 +2,9 @@ package org.adbcj.mysql.codec;
 
 import org.adbcj.Field;
 import org.adbcj.ResultSet;
+import org.adbcj.mysql.codec.model.FieldFlag;
+import org.adbcj.mysql.codec.model.MysqlCharacterSet;
+import org.adbcj.mysql.codec.model.MysqlType;
 import org.adbcj.support.DefaultResult;
 import org.adbcj.support.DefaultResultSet;
 import org.adbcj.support.DefaultRow;

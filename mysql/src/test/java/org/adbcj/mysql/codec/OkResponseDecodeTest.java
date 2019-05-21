@@ -1,8 +1,9 @@
 package org.adbcj.mysql.codec;
 
 import io.netty.channel.embedded.EmbeddedChannel;
-import org.adbcj.mysql.codec.decoding.ExpectOK;
-import org.adbcj.mysql.codec.packets.OkResponse;
+import org.adbcj.mysql.codec.decoder.ExpectOKDecoder;
+import org.adbcj.mysql.codec.model.ServerStatus;
+import org.adbcj.mysql.codec.packets.response.OkResponse;
 import org.adbcj.support.DbCompletableFuture;
 import org.testng.annotations.Test;
 
@@ -32,7 +33,7 @@ public class OkResponseDecodeTest {
     public void okRepsonseWithMessage() throws Exception {
         InputStream in = new ByteArrayInputStream(OK_RESPONSE_WITH_MESSAGE);
         MySqlClientDecoder decoder = new MySqlClientDecoder(
-                new ExpectOK<Void>(null,
+                new ExpectOKDecoder<Void>(null,
                         new DbCompletableFuture<Void>(), null));
         OkResponse.RegularOK response = castToOk(in, decoder);
 
@@ -57,7 +58,7 @@ public class OkResponseDecodeTest {
     @Test
     public void okResponseOneAffectedRow() throws Exception {
         InputStream in = new ByteArrayInputStream(OK_RESPONSE_ONE_AFFECTED_ROW);
-        MySqlClientDecoder decoder = new MySqlClientDecoder(new ExpectOK<Void>(
+        MySqlClientDecoder decoder = new MySqlClientDecoder(new ExpectOKDecoder<Void>(
                 null,
                 new DbCompletableFuture<Void>(),
                 null));

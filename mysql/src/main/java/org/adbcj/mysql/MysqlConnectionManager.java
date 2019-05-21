@@ -7,10 +7,11 @@ import org.adbcj.CloseMode;
 import org.adbcj.Connection;
 import org.adbcj.DbCallback;
 import org.adbcj.DbException;
-import org.adbcj.mysql.codec.decoding.AcceptNextResponse;
-import org.adbcj.mysql.codec.decoding.Connecting;
-import org.adbcj.mysql.netty.Decoder;
-import org.adbcj.mysql.netty.Encoder;
+import org.adbcj.mysql.codec.decoder.AcceptNextResponseDecoder;
+import org.adbcj.mysql.codec.decoder.ConnectingDecoder;
+import org.adbcj.mysql.netty.NettyClientHandler;
+import org.adbcj.mysql.netty.NettyDecoder;
+import org.adbcj.mysql.netty.NettyEncoder;
 import org.adbcj.support.AbstractConnectionManager;
 import org.adbcj.support.ConnectionPool;
 import org.adbcj.support.LoginCredentials;
@@ -54,7 +55,8 @@ public class MysqlConnectionManager extends AbstractConnectionManager {
       public void initChannel(NioSocketChannel ch) throws Exception {
         ch.config().setAutoRead(false);
         // ch.pipeline().addLast("loggingHandler", new LoggingHandler(LogLevel.DEBUG));
-        ch.pipeline().addLast(ENCODER, new Encoder());
+        ch.pipeline().addLast(ENCODER, new NettyEncoder());
+        ch.pipeline().addLast("handler", new NettyClientHandler());
 
       }
     });
@@ -90,7 +92,7 @@ public class MysqlConnectionManager extends AbstractConnectionManager {
       if (channel != null) {
         MySqlConnection connection =
             new MySqlConnection(credentials, maxQueueLength(), this, channel, getStackTracingOption());
-        channel.pipeline().addLast(DECODER, new Decoder(new AcceptNextResponse(connection), connection));
+        channel.pipeline().addLast(DECODER, new NettyDecoder(new AcceptNextResponseDecoder(connection), connection));
         connected.onComplete(connection, null);
         return;
       }
@@ -116,7 +118,7 @@ public class MysqlConnectionManager extends AbstractConnectionManager {
           channel, getStackTracingOption());
       addConnection(connection);
       channel.pipeline().addLast(DECODER,
-          new Decoder(new Connecting(connected, entry, connection, credentials), connection));
+          new NettyDecoder(new ConnectingDecoder(connected, entry, connection, credentials), connection));
 
       channel.config().setAutoRead(true);
       channel.read();
