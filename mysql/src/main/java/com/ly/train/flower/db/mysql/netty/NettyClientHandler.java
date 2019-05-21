@@ -15,11 +15,11 @@
  */
 package com.ly.train.flower.db.mysql.netty;
 
+import java.util.EnumSet;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ly.train.flower.db.api.support.LoginCredentials;
-import com.ly.train.flower.db.mysql.MySqlConnection;
 import com.ly.train.flower.db.mysql.MySqlHandler;
 import com.ly.train.flower.db.mysql.codec.model.ClientCapability;
 import com.ly.train.flower.db.mysql.codec.model.ClientCapabilityExtend;
@@ -33,6 +33,13 @@ import io.netty.channel.SimpleChannelInboundHandler;
 public class NettyClientHandler extends SimpleChannelInboundHandler<AbstractResponse> {
 
   private static final Logger logger = LoggerFactory.getLogger(NettyClientHandler.class);
+  private static final Set<ClientCapability> clientCapabilities =
+      EnumSet.of(ClientCapability.LONG_PASSWORD, ClientCapability.FOUND_ROWS, ClientCapability.LONG_COLUMN_FLAG,
+          ClientCapability.CONNECT_WITH_DB, ClientCapability.LOCAL_FILES, ClientCapability.PROTOCOL_4_1,
+          ClientCapability.TRANSACTIONS, ClientCapability.SECURE_CONNECTION);
+
+  private static final Set<ClientCapabilityExtend> clientCapabilityExtends =
+      EnumSet.of(ClientCapabilityExtend.MULTI_RESULTS);
 
   private final LoginCredentials loginCredentials;
   private final MySqlHandler mySqlHandler;
@@ -62,10 +69,8 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<AbstractResp
    */
   private void handleHandshake(AbstractResponse msg) {
     HandshakeResponse handshakeResponse = (HandshakeResponse) msg;
-    Set<ClientCapability> clientCapabilities = MySqlConnection.getClientCapabilities();
-    Set<ClientCapabilityExtend> clientCapabilityExtend = MySqlConnection.getExtendedClientCapabilities();
     AuthenticationRequest authenticationRequest = new AuthenticationRequest(loginCredentials, clientCapabilities,
-        clientCapabilityExtend, MysqlCharacterSet.UTF8_UNICODE_CI, handshakeResponse.getSalt());
+        clientCapabilityExtends, MysqlCharacterSet.UTF8_UNICODE_CI, handshakeResponse.getSalt());
     handlerContext.channel().writeAndFlush(authenticationRequest);
   }
 

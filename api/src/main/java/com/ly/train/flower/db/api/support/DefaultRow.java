@@ -70,6 +70,9 @@ public class DefaultRow extends AbstractMap<Object, Value> implements Row {
   @Override
   public Value get(Object key) {
     Field field = resultSet.getField(key);
+    if (field == null) {
+      return null;
+    }
     Value value = values[field.getIndex()];
     return value;
   }

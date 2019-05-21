@@ -18,10 +18,10 @@ package com.ly.train.flower.db.h2;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import com.ly.train.flower.db.api.Configuration;
 import com.ly.train.flower.db.api.ConnectionManager;
 import com.ly.train.flower.db.api.DbException;
 import com.ly.train.flower.db.api.support.ConnectionManagerFactory;
-import com.ly.train.flower.db.api.support.LoginCredentials;
 
 public class H2ConnectionManagerFactory implements ConnectionManagerFactory {
   private static final String PROTOCOL = "h2";
@@ -47,10 +47,15 @@ public class H2ConnectionManagerFactory implements ConnectionManagerFactory {
       if (schema.contains(";")) {
         schema = schema.split(";")[0];
       }
+      Configuration configuration = new Configuration();
+      configuration.setHost(host);
+      configuration.setUsername(username);
+      configuration.setPort(port);
+      configuration.setPassword(password);
+      configuration.setDatabase(schema);
 
       Map<String, String> keys = parsKeys(url);
-      return new H2ConnectionManager(uri.toString(), host, port,
-          new LoginCredentials(username.toUpperCase(), password, schema), properties, keys);
+      return new H2ConnectionManager(uri.toString(), configuration, properties, keys);
 
     } catch (Exception e) {
       throw DbException.wrap(e);

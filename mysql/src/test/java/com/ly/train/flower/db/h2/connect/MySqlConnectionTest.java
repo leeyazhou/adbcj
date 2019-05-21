@@ -39,7 +39,7 @@ public class MySqlConnectionTest {
 
   @Test
   public void testMySQL() throws InterruptedException {
-    final int n = 1;
+    final int n = 20;
     final String url = "asyncdb:mysql://10.100.216.147/asyncdb";
     final String username = "root", password = "UJ9FeAm3Yc@#E%IH8dLj6guyr5K&u#J3";
     final long tms = System.currentTimeMillis();
@@ -64,16 +64,29 @@ public class MySqlConnectionTest {
             @Override
             public void onComplete(ResultSet result, DbException failure) {
               List<? extends Field> fs = result.getFields();
-              System.err.println("结果属性：" + fs+"\n");
+              System.err.println("结果属性：" + fs + "\n");
               for (Row row : result) {
-                System.err.println("结果： " + row.get("id") + " : " + row.get("name"));
+                log.info("结果： " + row.get("id") + " : " + row.get("name"));
               }
               if (failure != null) {
                 failure.printStackTrace();
               }
             }
           });
-
+          c.executeQuery("select version()", new DbCallback<ResultSet>() {
+            
+            @Override
+            public void onComplete(ResultSet result, DbException failure) {
+              List<? extends Field> fs = result.getFields();
+              System.err.println("结果属性：" + fs + "\n");
+              for (Row row : result) {
+                log.info("结果： " + row.get("id") + " : " + row.get("name"));
+              }
+              if (failure != null) {
+                failure.printStackTrace();
+              }
+            }
+          });
         }).thenCompose((c) -> {
           log.debug("connection is open? {}", c.isOpen());
           return c.close();
@@ -81,20 +94,12 @@ public class MySqlConnectionTest {
           success.incrementAndGet();
           log.debug("<<< connection closed");
         });
-        // cm.connect((c, e) -> {
-        // cnlat.countDown();
-        // if(e == null) {
-        // throw new RuntimeException("error test");
-        // //return;
-        // }
-        // log.warn("connct error: {}", e);
-        // });
       }
       cnlat.await();
     } catch (final Throwable cause) {
       log.warn("fatal error", cause);
     } finally {
-      Thread.sleep(5000);
+      Thread.sleep(15000);
       if (connectionManager != null) {
         connectionManager.close().whenComplete((r, e) -> {
           if (e == null) {

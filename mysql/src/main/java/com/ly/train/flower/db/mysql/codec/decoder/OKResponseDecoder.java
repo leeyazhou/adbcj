@@ -22,12 +22,12 @@ import com.ly.train.flower.db.mysql.codec.packets.response.ErrorResponse;
 import com.ly.train.flower.db.mysql.codec.packets.response.OKRegularResponse;
 
 
-public class ExpectOKDecoder<T> extends AbstractResponseDecoder {
+public class OKResponseDecoder<T> extends AbstractResponseDecoder {
 
   protected final DbCallback<T> callback;
   private final StackTraceElement[] entry;
 
-  public ExpectOKDecoder(MySqlConnection connection, DbCallback<T> callback, StackTraceElement[] entry) {
+  public OKResponseDecoder(MySqlConnection connection, DbCallback<T> callback, StackTraceElement[] entry) {
     super(connection);
     this.callback = sandboxCallback(callback);
     this.entry = entry;

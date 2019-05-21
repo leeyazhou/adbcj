@@ -106,16 +106,15 @@ public class MySqlClientDecoder {
     final int packetNumber = IOUtil.safeRead(input);
     final BoundedInputStream inputStream = new BoundedInputStream(input, length);
     logger.debug("Decoding in state {}", decoder);
-    final ResponseWrapper stateAndResult = decoder.decode(length, packetNumber, inputStream, channel);
-    final AbstractDecoder nextDecoder = stateAndResult.getNewDecoder();
-    this.setDecoder(nextDecoder);
+    final ResponseWrapper responseWrapper = decoder.decode(length, packetNumber, inputStream, channel);
+    this.setDecoder(responseWrapper.getNewDecoder());
     final int rem = inputStream.getRemaining();
     if (rem > 0) {
       final String message =
           "Didn't read all input. Maybe this input belongs to a failed request. " + "Remaining bytes: " + rem;
       return new FailedToParseInputResponse(length, packetNumber, new IllegalStateException(message));
     }
-    return stateAndResult.getResult();
+    return responseWrapper.getResult();
   }
 
   /**

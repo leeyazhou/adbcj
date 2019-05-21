@@ -24,7 +24,7 @@ import com.ly.train.flower.db.mysql.codec.model.ResponseWrapper;
 import com.ly.train.flower.db.mysql.codec.packets.response.OKRegularResponse;
 
 
-public class ExpectUpdateResultDecoder<T> extends ExpectOKDecoder<T> {
+public class ExpectUpdateResultDecoder<T> extends OKResponseDecoder<T> {
 
   private final OneArgFunction<MysqlResult, T> transformation;
 

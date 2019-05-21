@@ -32,15 +32,15 @@ public final class StandardProperties {
    */
   public final static String MAX_QUEUE_LENGTH = "asyncdb.maxQueueLength";
 
-  public final static long DEFAULT_QUEUE_LENGTH = 64;
+  public final static long DEFAULT_QUEUE_LENGTH = 256;
 
   /**
    * asyncdb allows you to capture the stack trace of the location which issues a
    * request. However this is a expensive operation, so it's optional. You can
    * force a driver to capture this stack by setting this option.
    *
-   * If not set, the JVM global property 'org.asyncdb.debug' set to true will force
-   * capturing stack trace.
+   * If not set, the JVM global property 'org.asyncdb.debug' set to true will
+   * force capturing stack trace.
    *
    * This is disabled by default
    */
@@ -50,7 +50,6 @@ public final class StandardProperties {
   /**
    * When set to true, enables the default confection pool. If a driver does not
    * support a connection pool, it should throw a {@link DbException}.
-   *
    *
    */
   public final static String CONNECTION_POOL_ENABLE = "org.asyncdb.connectionpool.enable";

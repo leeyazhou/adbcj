@@ -32,10 +32,9 @@ public class ConnectedDecoder extends AbstractResponseDecoder {
   private final DbCallback<Connection> connected;
   private final StackTraceElement[] entry;
 
-  public ConnectedDecoder(DbCallback<Connection> connected, StackTraceElement[] entry,
-      MySqlConnection connectionToBuild) {
-    super(connectionToBuild);
-    this.connected = sandboxCallback(connected);
+  public ConnectedDecoder(DbCallback<Connection> callback, StackTraceElement[] entry, MySqlConnection connection) {
+    super(connection);
+    this.connected = sandboxCallback(callback);
     this.entry = entry;
   }
 

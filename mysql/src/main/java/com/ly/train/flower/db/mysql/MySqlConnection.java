@@ -16,8 +16,6 @@
 package com.ly.train.flower.db.mysql;
 
 import java.util.ArrayDeque;
-import java.util.EnumSet;
-import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ly.train.flower.db.api.CloseMode;
@@ -34,11 +32,9 @@ import com.ly.train.flower.db.api.StandardProperties;
 import com.ly.train.flower.db.api.support.CloseOnce;
 import com.ly.train.flower.db.api.support.LoginCredentials;
 import com.ly.train.flower.db.api.support.stacktracing.StackTracingOptions;
-import com.ly.train.flower.db.mysql.codec.model.ClientCapability;
-import com.ly.train.flower.db.mysql.codec.model.ClientCapabilityExtend;
 import com.ly.train.flower.db.mysql.codec.model.MySqlRequest;
 import com.ly.train.flower.db.mysql.codec.util.MySqlRequestUtil;
-import io.netty.channel.Channel;
+import com.ly.train.flower.db.mysql.netty.NettyChannel;
 
 public class MySqlConnection implements Connection {
 
@@ -47,7 +43,7 @@ public class MySqlConnection implements Connection {
   private final LoginCredentials login;
   private final int maxQueueSize;
   private final MysqlConnectionManager connectionManager;
-  private final Channel channel;
+  private final NettyChannel channel;
 
   protected final int id;
   final StackTracingOptions strackTraces;
@@ -59,14 +55,13 @@ public class MySqlConnection implements Connection {
   private volatile boolean isInTransaction = false;
 
   public MySqlConnection(LoginCredentials login, int maxQueueSize, MysqlConnectionManager connectionManager,
-      Channel channel, StackTracingOptions strackTraces) {
+      NettyChannel channel, StackTracingOptions strackTraces) {
     this.login = login;
     this.maxQueueSize = maxQueueSize;
     this.connectionManager = connectionManager;
     this.channel = channel;
     this.id = connectionManager.nextId();
     this.strackTraces = strackTraces;
-
     synchronized (lock) {
       requestQueue = new ArrayDeque<>(maxQueueSize + 1);
     }
@@ -177,7 +172,7 @@ public class MySqlConnection implements Connection {
               if (this.connectionManager.isClosed()) {
                 doActualClose(closeMode, entry);
               } else {
-                channel.pipeline().remove(MysqlConnectionManager.DECODER);
+                channel.removeHandler(MysqlConnectionManager.DECODER);
                 connectionManager.getConnectionPool().release(login, channel);
                 callback.onComplete(result, null);
               }
@@ -207,9 +202,8 @@ public class MySqlConnection implements Connection {
   }
 
   private void realClose(final StackTraceElement[] entry) {
-    final Channel ch = channel;
-    ch.close().addListener((f) -> {
-      logger.debug("Real close channel#{}", ch.id());
+    channel.realClose(entry).addListener((f) -> {
+      logger.debug("Real close channel#{}", channel.channelId());
       final DbException failure;
       if (f.cause() == null) {
         failure = null;
@@ -240,22 +234,6 @@ public class MySqlConnection implements Connection {
     }
   }
 
-  private static final Set<ClientCapability> clientCapabilities =
-      EnumSet.of(ClientCapability.LONG_PASSWORD, ClientCapability.FOUND_ROWS, ClientCapability.LONG_COLUMN_FLAG,
-          ClientCapability.CONNECT_WITH_DB, ClientCapability.LOCAL_FILES, ClientCapability.PROTOCOL_4_1,
-          ClientCapability.TRANSACTIONS, ClientCapability.SECURE_CONNECTION);
-
-  public static Set<ClientCapability> getClientCapabilities() {
-    return clientCapabilities;
-  }
-
-  private static final Set<ClientCapabilityExtend> clientCapabilityExtends =
-      EnumSet.of(ClientCapabilityExtend.MULTI_RESULTS);
-
-  public static Set<ClientCapabilityExtend> getExtendedClientCapabilities() {
-    return clientCapabilityExtends;
-  }
-
   boolean failIfQueueFull(MySqlRequest<?> request) {
     synchronized (lock) {
       int requestsPending = requestQueue.size();
@@ -274,7 +252,7 @@ public class MySqlConnection implements Connection {
   MySqlRequest<?> forceQueRequest(MySqlRequest<?> request) {
     synchronized (lock) {
       this.requestQueue.add(request);
-      this.channel.writeAndFlush(request.getRequest());
+      this.channel.sendRequest(request.getRequest());
       return request;
     }
   }

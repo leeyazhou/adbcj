@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ly.train.flower.db.api.CloseMode;
+import com.ly.train.flower.db.api.Configuration;
 import com.ly.train.flower.db.api.Connection;
 import com.ly.train.flower.db.api.DbCallback;
 import com.ly.train.flower.db.api.DbException;
@@ -28,12 +29,12 @@ import com.ly.train.flower.db.api.support.AbstractConnectionManager;
 import com.ly.train.flower.db.api.support.ConnectionPool;
 import com.ly.train.flower.db.api.support.LoginCredentials;
 import com.ly.train.flower.db.mysql.codec.decoder.AcceptNextResponseDecoder;
-import com.ly.train.flower.db.mysql.codec.decoder.ConnectingDecoder;
+import com.ly.train.flower.db.mysql.codec.decoder.HandshakeDecoder;
+import com.ly.train.flower.db.mysql.netty.NettyChannel;
 import com.ly.train.flower.db.mysql.netty.NettyClientHandler;
 import com.ly.train.flower.db.mysql.netty.NettyDecoder;
 import com.ly.train.flower.db.mysql.netty.NettyEncoder;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
@@ -47,25 +48,24 @@ import io.netty.util.concurrent.DefaultThreadFactory;
 public class MysqlConnectionManager extends AbstractConnectionManager {
   private static final Logger logger = LoggerFactory.getLogger(MysqlConnectionManager.class);
   private static final String ENCODER = MysqlConnectionManager.class.getName() + ".encoder";
-  static final String DECODER = MysqlConnectionManager.class.getName() + ".decoder";
+  public static final String DECODER = MysqlConnectionManager.class.getName() + ".decoder";
   private final LoginCredentials loginCredentials;
 
   private final Bootstrap bootstrap;
   private final AtomicInteger idCounter = new AtomicInteger();
   private final NioEventLoopGroup eventLoop;
 
-  private final ConnectionPool<LoginCredentials, Channel> connectionPool;
+  private final ConnectionPool<LoginCredentials, NettyChannel> connectionPool;
 
-  public MysqlConnectionManager(String host, int port, String username, String password, String schema,
-      Map<String, String> properties) {
+  public MysqlConnectionManager(Configuration configuration, Map<String, String> properties) {
     super(properties);
-    this.loginCredentials = new LoginCredentials(username, password, schema);
-    this.eventLoop = new NioEventLoopGroup(0, new DefaultThreadFactory("db-io"));
+    this.loginCredentials = new LoginCredentials(configuration);
+    this.eventLoop = new NioEventLoopGroup(0, new DefaultThreadFactory("asyncdb-io"));
     this.bootstrap = new Bootstrap().group(eventLoop).channel(NioSocketChannel.class);
     this.bootstrap.option(ChannelOption.TCP_NODELAY, true);
     this.bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
     this.bootstrap.option(ChannelOption.AUTO_READ, false);
-    this.bootstrap.remoteAddress(new InetSocketAddress(host, port));
+    this.bootstrap.remoteAddress(new InetSocketAddress(configuration.getHost(), configuration.getPort()));
     this.bootstrap.handler(new ChannelInitializer<NioSocketChannel>() {
 
       @Override
@@ -85,7 +85,7 @@ public class MysqlConnectionManager extends AbstractConnectionManager {
     }
   }
 
-  public ConnectionPool<LoginCredentials, Channel> getConnectionPool() {
+  public ConnectionPool<LoginCredentials, NettyChannel> getConnectionPool() {
     return connectionPool;
   }
 
@@ -104,13 +104,14 @@ public class MysqlConnectionManager extends AbstractConnectionManager {
     final MySqlHandler mySqlHandler = new MySqlHandler();
     final NettyClientHandler nettyClientHandler = new NettyClientHandler(loginCredentials, mySqlHandler);
 
+
     if (connectionPool != null) {
-      Channel channel = connectionPool.tryAquire(loginCredentials);
+      NettyChannel channel = connectionPool.tryAquire(loginCredentials);
       if (channel != null) {
         MySqlConnection connection =
             new MySqlConnection(loginCredentials, maxQueueLength(), this, channel, getStackTracingOption());
-        channel.pipeline().addLast(DECODER, new NettyDecoder(new AcceptNextResponseDecoder(connection), connection));
-        channel.pipeline().addLast("handler", nettyClientHandler);
+        channel.addLast(DECODER, new NettyDecoder(new AcceptNextResponseDecoder(connection), connection));
+        channel.addLast("handler", nettyClientHandler);
         connected.onComplete(connection, null);
         return;
       }
@@ -122,7 +123,7 @@ public class MysqlConnectionManager extends AbstractConnectionManager {
     channelFuture.addListener((ChannelFutureListener) future -> {
       logger.debug("Physical connect completed");
 
-      Channel channel = future.channel();
+      NettyChannel channel = new NettyChannel(future.channel());
 
       if (!future.isSuccess()) {
         if (future.cause() != null) {
@@ -131,15 +132,12 @@ public class MysqlConnectionManager extends AbstractConnectionManager {
         }
         return;
       }
-
       MySqlConnection connection = new MySqlConnection(loginCredentials, maxQueueLength(), MysqlConnectionManager.this,
           channel, getStackTracingOption());
       addConnection(connection);
-      channel.pipeline().addLast(DECODER,
-          new NettyDecoder(new ConnectingDecoder(connected, entry, connection), connection));
-      channel.pipeline().addLast("handler", nettyClientHandler);
-      channel.config().setAutoRead(true);
-      channel.read();
+      channel.addLast(DECODER, new NettyDecoder(new HandshakeDecoder(connected, entry, connection), connection));
+      channel.addLast("handler", nettyClientHandler);
+      channel.autoRead();
     });
   }
 

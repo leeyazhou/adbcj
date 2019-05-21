@@ -41,9 +41,9 @@ import io.netty.channel.Channel;
  * 
  * @author lee
  */
-public class ConnectingDecoder extends AbstractDecoder {
+public class HandshakeDecoder extends AbstractDecoder {
 
-  private final static Logger log = LoggerFactory.getLogger(ConnectingDecoder.class);
+  private final static Logger log = LoggerFactory.getLogger(HandshakeDecoder.class);
 
   /**
    * The salt size in a server greeting
@@ -60,12 +60,12 @@ public class ConnectingDecoder extends AbstractDecoder {
    */
   public static final int GREETING_UNUSED_SIZE = 13;
 
-  private final DbCallback<Connection> connectedCallback;
+  private final DbCallback<Connection> callback;
   private final StackTraceElement[] entry;
   private final MySqlConnection connection;
 
-  public ConnectingDecoder(DbCallback<Connection> callback, StackTraceElement[] entry, MySqlConnection connection) {
-    this.connectedCallback = sandboxCallback(callback);
+  public HandshakeDecoder(DbCallback<Connection> callback, StackTraceElement[] entry, MySqlConnection connection) {
+    this.callback = sandboxCallback(callback);
     this.entry = entry;
     this.connection = connection;
   }
@@ -89,16 +89,17 @@ public class ConnectingDecoder extends AbstractDecoder {
         if (e != null) {
           log.warn("Close connection abnormally", e);
         }
-        connectedCallback.onComplete(null, errorResponse.toException(entry));
+        callback.onComplete(null, errorResponse.toException(entry));
       });
       return resultWrapper(new AcceptNextResponseDecoder(connection), errorResponse);
     }
     // end error packet handler when connecting
-    HandshakeResponse handshakeResponse = decodeServerGreeting(in, length, packetNumber);
-    return resultWrapper(new ConnectedDecoder(connectedCallback, entry, connection), handshakeResponse);
+    HandshakeResponse handshakeResponse = decodeHandshakeResponse(in, length, packetNumber);
+    AbstractDecoder decoder = new ConnectedDecoder(callback, entry, connection);
+    return resultWrapper(decoder, handshakeResponse);
   }
 
-  private HandshakeResponse decodeServerGreeting(BoundedInputStream in, int length, int packetNumber)
+  private HandshakeResponse decodeHandshakeResponse(BoundedInputStream in, int length, int packetNumber)
       throws IOException {
     final int protocolVersion = IOUtil.safeRead(in);
     final String mysqlServerVersion = IOUtil.readNullTerminatedString(in, StandardCharsets.US_ASCII);
@@ -129,6 +130,6 @@ public class ConnectingDecoder extends AbstractDecoder {
 
   @Override
   public String toString() {
-    return "CONNECTING";
+    return "HandshakeDecoder";
   }
 }

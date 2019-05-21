@@ -25,8 +25,8 @@ import java.util.ServiceLoader;
 import com.ly.train.flower.db.api.support.ConnectionManagerFactory;
 
 /**
- * The connection manager provider is the entry point for asyncdb. It looks up the
- * driver in the classpath and returns you the connection manager.
+ * The connection manager provider is the entry point for asyncdb. It looks up
+ * the driver in the classpath and returns you the connection manager.
  */
 public final class ConnectionManagerProvider {
 
@@ -99,7 +99,7 @@ public final class ConnectionManagerProvider {
 
   private static Map<String, String> addStandardSettings(Map<String, String> userProperties) {
     HashMap<String, String> newMap = new HashMap<String, String>();
-    newMap.put(StandardProperties.MAX_QUEUE_LENGTH, "64");
+    newMap.put(StandardProperties.MAX_QUEUE_LENGTH, String.valueOf(StandardProperties.DEFAULT_QUEUE_LENGTH));
     for (Map.Entry<String, String> entry : userProperties.entrySet()) {
       newMap.put(entry.getKey(), entry.getValue());
     }

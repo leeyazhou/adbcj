@@ -20,19 +20,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.EnumSet;
 import java.util.HashMap;
+import org.junit.Test;
 import org.testng.Assert;
-import org.testng.annotations.Test;
+import com.ly.train.flower.db.api.Configuration;
 import com.ly.train.flower.db.api.support.DbCompletableFuture;
 import com.ly.train.flower.db.api.support.LoginCredentials;
 import com.ly.train.flower.db.api.support.stacktracing.StackTracingOptions;
 import com.ly.train.flower.db.mysql.MySqlConnection;
 import com.ly.train.flower.db.mysql.MysqlConnectionManager;
-import com.ly.train.flower.db.mysql.codec.MySqlClientDecoder;
-import com.ly.train.flower.db.mysql.codec.decoder.ConnectingDecoder;
+import com.ly.train.flower.db.mysql.codec.decoder.HandshakeDecoder;
 import com.ly.train.flower.db.mysql.codec.model.ClientCapability;
 import com.ly.train.flower.db.mysql.codec.model.MysqlCharacterSet;
 import com.ly.train.flower.db.mysql.codec.model.ServerStatus;
 import com.ly.train.flower.db.mysql.codec.packets.response.HandshakeResponse;
+import com.ly.train.flower.db.mysql.netty.NettyChannel;
 import io.netty.channel.embedded.EmbeddedChannel;
 
 public class GreetingDecodeTest {
@@ -60,11 +61,12 @@ public class GreetingDecodeTest {
 
   private final LoginCredentials login = new LoginCredentials("sa", "sa", "test");
 
+
   @Test
   public void decodeGreeting1() throws IOException {
     InputStream in = new ByteArrayInputStream(GREETING1);
     MySqlClientDecoder decoder =
-        new MySqlClientDecoder(new ConnectingDecoder(new DbCompletableFuture<>(), null, createMockConnection()));
+        new MySqlClientDecoder(new HandshakeDecoder(new DbCompletableFuture<>(), null, createMockConnection()));
     HandshakeResponse greeting = castToServerGreeting(in, decoder);
 
     Assert.assertEquals(greeting.getPacketLength(), 64);
@@ -109,7 +111,7 @@ public class GreetingDecodeTest {
   public void decodeGreeting2() throws IOException {
     InputStream in = new ByteArrayInputStream(GREETING2);
     MySqlClientDecoder decoder =
-        new MySqlClientDecoder(new ConnectingDecoder(new DbCompletableFuture<>(), null, createMockConnection()));
+        new MySqlClientDecoder(new HandshakeDecoder(new DbCompletableFuture<>(), null, createMockConnection()));
     HandshakeResponse greeting = castToServerGreeting(in, decoder);
 
     Assert.assertEquals(greeting.getPacketLength(), 74);
@@ -133,9 +135,14 @@ public class GreetingDecodeTest {
   }
 
   private MySqlConnection createMockConnection() {
-    return new MySqlConnection(login, 64,
-        new MysqlConnectionManager("localhost", 42, "sa", "sa", "test", new HashMap<String, String>()),
-        new EmbeddedChannel(), StackTracingOptions.GLOBAL_DEFAULT);
+    Configuration configuration = new Configuration();
+    configuration.setHost("localhost");
+    configuration.setPassword("sa");
+    configuration.setUsername("sa");
+    configuration.setDatabase("test");
+    configuration.setPort(42);
+    return new MySqlConnection(login, 64, new MysqlConnectionManager(configuration, new HashMap<String, String>()),
+        new NettyChannel(new EmbeddedChannel()), StackTracingOptions.GLOBAL_DEFAULT);
   }
 
 }

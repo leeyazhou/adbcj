@@ -53,11 +53,11 @@ public abstract class AbstractDecoder {
    * 包装 新解码器和 结果
    * 
    * @param newDecoder 新解码器
-   * @param result 响应结果
+   * @param response 响应结果
    * @return
    */
-  public ResponseWrapper resultWrapper(AbstractDecoder newDecoder, AbstractResponse result) {
-    return new ResponseWrapper(newDecoder, result);
+  public ResponseWrapper resultWrapper(AbstractDecoder newDecoder, AbstractResponse response) {
+    return new ResponseWrapper(newDecoder, response);
   }
 
   protected EofResponse decodeEofResponse(InputStream in, int length, int packetNumber, EofResponse.Type type)

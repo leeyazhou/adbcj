@@ -18,6 +18,7 @@ package com.ly.train.flower.db.mysql;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
+import com.ly.train.flower.db.api.Configuration;
 import com.ly.train.flower.db.api.ConnectionManager;
 import com.ly.train.flower.db.api.DbException;
 import com.ly.train.flower.db.api.support.ConnectionManagerFactory;
@@ -49,7 +50,14 @@ public class MySqlConnectionManagerFactory implements ConnectionManagerFactory {
       }
       String schema = path.substring(1);
 
-      return new MysqlConnectionManager(host, port, username, password, schema, properties);
+      Configuration configuration = new Configuration();
+      configuration.setHost(host);
+      configuration.setUsername(username);
+      configuration.setPort(port);
+      configuration.setPassword(password);
+      configuration.setDatabase(schema);
+
+      return new MysqlConnectionManager(configuration, properties);
     } catch (URISyntaxException e) {
       throw new DbException("Could not create connection to " + url, e);
     }

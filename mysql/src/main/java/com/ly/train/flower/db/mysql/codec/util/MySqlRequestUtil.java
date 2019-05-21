@@ -23,7 +23,7 @@ import com.ly.train.flower.db.mysql.MySqlConnection;
 import com.ly.train.flower.db.mysql.MySqlPreparedStatement;
 import com.ly.train.flower.db.mysql.codec.MysqlResult;
 import com.ly.train.flower.db.mysql.codec.decoder.AcceptNextResponseDecoder;
-import com.ly.train.flower.db.mysql.codec.decoder.ExpectOKDecoder;
+import com.ly.train.flower.db.mysql.codec.decoder.OKResponseDecoder;
 import com.ly.train.flower.db.mysql.codec.decoder.ExpectPreparQueryDecoder;
 import com.ly.train.flower.db.mysql.codec.decoder.ExpectQueryResultDecoder;
 import com.ly.train.flower.db.mysql.codec.decoder.ExpectStatementResultDecoder;
@@ -47,7 +47,7 @@ public final class MySqlRequestUtil {
             StackTraceElement[] entry) {
         return new MySqlRequest<>(
                 "Close",
-                new ExpectOKDecoder<>(connection, callback, entry),
+                new OKResponseDecoder<>(connection, callback, entry),
                 new CommandRequest(Command.QUIT),
                 callback);
     }

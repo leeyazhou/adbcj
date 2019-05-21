@@ -33,17 +33,27 @@
 */
 package com.ly.train.flower.db.api.support;
 
+import com.ly.train.flower.db.api.Configuration;
+
 public final class LoginCredentials {
 
   private final String userName;
   private final String password;
   private final String database;
 
+  public LoginCredentials(Configuration configuration) {
+    this.userName = configuration.getUsername();
+    this.password = configuration.getPassword();
+    this.database = configuration.getDatabase();
+  }
+
   public LoginCredentials(String userName, String password, String database) {
     this.userName = userName;
     this.password = password;
     this.database = database;
   }
+
+
 
   public String getDatabase() {
     return database;

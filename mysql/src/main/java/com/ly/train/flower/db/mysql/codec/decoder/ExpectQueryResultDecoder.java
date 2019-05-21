@@ -40,8 +40,8 @@ public class ExpectQueryResultDecoder<T> extends AbstractResponseDecoder {
   private final StackTraceElement[] entry;
   private DbException failure;
 
-  public ExpectQueryResultDecoder(MySqlConnection connection, RowDecoder.RowDecodingType decodingType, ResultHandler<T> eventHandler,
-      T accumulator, DbCallback<T> callback, StackTraceElement[] entry) {
+  public ExpectQueryResultDecoder(MySqlConnection connection, RowDecoder.RowDecodingType decodingType,
+      ResultHandler<T> eventHandler, T accumulator, DbCallback<T> callback, StackTraceElement[] entry) {
     super(connection);
     this.decodingType = decodingType;
     this.eventHandler = eventHandler;
@@ -78,9 +78,8 @@ public class ExpectQueryResultDecoder<T> extends AbstractResponseDecoder {
     } catch (Exception any) {
       failure = DbException.wrap(any, entry);
     }
-    return resultWrapper(
-        new FieldDecodingStateDecoder<T>(connection, decodingType, expectedFieldPackets, new ArrayList<>(), eventHandler,
-            accumulator, callback, entry, failure),
-        new ResultSetResponse(length, packetNumber, expectedFieldPackets, extra));
+    AbstractDecoder decoder = new FieldDecodingStateDecoder<T>(connection, decodingType, expectedFieldPackets,
+        new ArrayList<>(), eventHandler, accumulator, callback, entry, failure);
+    return resultWrapper(decoder, new ResultSetResponse(length, packetNumber, expectedFieldPackets, extra));
   }
 }

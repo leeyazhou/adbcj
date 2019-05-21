@@ -30,7 +30,7 @@ public class DefaultResultSet extends AbstractList<Row> implements ResultSet {
   private final Map<Object, Field> fieldMapping = new HashMap<Object, Field>();
 
   public DefaultResultSet() {
-    fields = new ArrayList<Field>();
+    this.fields = new ArrayList<Field>();
   }
 
   @Override

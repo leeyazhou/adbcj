@@ -23,7 +23,7 @@ import java.util.EnumSet;
 import org.junit.Test;
 import com.ly.train.flower.db.api.support.DbCompletableFuture;
 import com.ly.train.flower.db.mysql.codec.MySqlClientDecoder;
-import com.ly.train.flower.db.mysql.codec.decoder.ExpectOKDecoder;
+import com.ly.train.flower.db.mysql.codec.decoder.OKResponseDecoder;
 import com.ly.train.flower.db.mysql.codec.model.ServerStatus;
 import com.ly.train.flower.db.mysql.codec.packets.response.OKRegularResponse;
 import io.netty.channel.embedded.EmbeddedChannel;
@@ -48,7 +48,7 @@ public class OkResponseDecodeTest {
   public void okRepsonseWithMessage() throws Exception {
     InputStream in = new ByteArrayInputStream(OK_RESPONSE_WITH_MESSAGE);
     MySqlClientDecoder decoder =
-        new MySqlClientDecoder(new ExpectOKDecoder<Void>(null, new DbCompletableFuture<Void>(), null));
+        new MySqlClientDecoder(new OKResponseDecoder<Void>(null, new DbCompletableFuture<Void>(), null));
     OKRegularResponse response = castToOk(in, decoder);
 
 
@@ -72,7 +72,7 @@ public class OkResponseDecodeTest {
   public void okResponseOneAffectedRow() throws Exception {
     InputStream in = new ByteArrayInputStream(OK_RESPONSE_ONE_AFFECTED_ROW);
     MySqlClientDecoder decoder =
-        new MySqlClientDecoder(new ExpectOKDecoder<Void>(null, new DbCompletableFuture<Void>(), null));
+        new MySqlClientDecoder(new OKResponseDecoder<Void>(null, new DbCompletableFuture<Void>(), null));
     OKRegularResponse response = castToOk(in, decoder);
 
     assertEquals(response.getPacketLength(), 7);

@@ -44,24 +44,27 @@ public class H2ConnectionManager extends AbstractConnectionManager {
   private final NioEventLoopGroup eventLoop;
   final ConnectionPool<LoginCredentials, Channel> connectionPool;
 
-  public H2ConnectionManager(String url, String host, int port, LoginCredentials credentials,
-      Map<String, String> properties, Map<String, String> keys) {
+  public H2ConnectionManager(String url, Configuration configuration, Map<String, String> properties,
+      Map<String, String> keys) {
     super(properties);
     this.url = url;
-    this.defaultCredentials = credentials;
+    this.defaultCredentials =
+        new LoginCredentials(configuration.getUsername(), configuration.getPassword(), configuration.getDatabase());
     this.keys = keys;
 
-    eventLoop = new NioEventLoopGroup();
-    bootstrap = new Bootstrap().group(eventLoop).channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, true)
-        .option(ChannelOption.SO_KEEPALIVE, true).remoteAddress(new InetSocketAddress(host, port))
-        .handler(new ChannelInitializer() {
+    this.eventLoop = new NioEventLoopGroup();
+    this.bootstrap = new Bootstrap().group(eventLoop).channel(NioSocketChannel.class);
+    this.bootstrap.option(ChannelOption.TCP_NODELAY, true);
+    this.bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
+    this.bootstrap.remoteAddress(new InetSocketAddress(configuration.getHost(), configuration.getPort()));
+    this.bootstrap.handler(new ChannelInitializer<NioSocketChannel>() {
 
-          @Override
-          public void initChannel(Channel ch) throws Exception {
-            ch.pipeline().addLast(ENCODER, new Encoder());
-            ch.pipeline().addLast("handler", new Handler());
-          }
-        });
+      @Override
+      public void initChannel(NioSocketChannel ch) throws Exception {
+        ch.pipeline().addLast(ENCODER, new Encoder());
+        ch.pipeline().addLast("handler", new Handler());
+      }
+    });
 
     if (useConnectionPool) {
       connectionPool = new ConnectionPool<>();
