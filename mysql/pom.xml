@@ -3,23 +3,22 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.adbcj</groupId>
-    <artifactId>adbcj</artifactId>
+    <groupId>com.ly.train</groupId>
+    <artifactId>flower.asyncdb.parent</artifactId>
     <version>0.10-SNAPSHOT</version>
   </parent>
 
-  <artifactId>mysql-async-driver</artifactId>
+  <artifactId>flower.asyncdb.mysql</artifactId>
   <packaging>jar</packaging>
-  <name>ADBCJ - MySQL Async Driver based on Netty</name>
 
   <dependencies>
     <dependency>
-      <groupId>org.adbcj</groupId>
-      <artifactId>adbcj-api</artifactId>
+      <groupId>com.ly.train</groupId>
+      <artifactId>flower.asyncdb.api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.adbcj</groupId>
-      <artifactId>h2-async-driver</artifactId>
+      <groupId>com.ly.train</groupId>
+      <artifactId>flower.asyncdb.h2</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

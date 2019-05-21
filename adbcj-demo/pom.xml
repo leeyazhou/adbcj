@@ -2,18 +2,16 @@
 
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.adbcj</groupId>
-    <artifactId>adbcj</artifactId>
+    <groupId>com.ly.train</groupId>
+    <artifactId>flower.asyncdb.parent</artifactId>
     <version>0.10-SNAPSHOT</version>
   </parent>
-  <artifactId>demo-project</artifactId>
+  <artifactId>flower.asyncdb.demo</artifactId>
   <packaging>jar</packaging>
-  <name>ADBCJ - Demo Project</name>
 
 
   <properties>
     <slf4j.version>1.7.2</slf4j.version>
-    <adbcj.version>0.9</adbcj.version>
   </properties>
 
   <dependencies>
@@ -27,12 +25,12 @@
       <artifactId>logback-classic</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.adbcj</groupId>
-      <artifactId>adbcj-api</artifactId>
+      <groupId>com.ly.train</groupId>
+      <artifactId>flower.asyncdb.api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.adbcj</groupId>
-      <artifactId>h2-async-driver</artifactId>
+      <groupId>com.ly.train</groupId>
+      <artifactId>flower.asyncdb.h2</artifactId>
     </dependency>
     <!-- Demo server -->
     <dependency>

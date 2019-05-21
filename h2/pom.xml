@@ -3,19 +3,18 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.adbcj</groupId>
-        <artifactId>adbcj</artifactId>
+        <groupId>com.ly.train</groupId>
+        <artifactId>flower.asyncdb.parent</artifactId>
         <version>0.10-SNAPSHOT</version>
     </parent>
 
-    <artifactId>h2-async-driver</artifactId>
+    <artifactId>flower.asyncdb.h2</artifactId>
     <packaging>jar</packaging>
-    <name>ADBCJ - H2 Async Driver based on Netty</name>
 
     <dependencies>
         <dependency>
-            <groupId>org.adbcj</groupId>
-            <artifactId>adbcj-api</artifactId>
+            <groupId>com.ly.train</groupId>
+            <artifactId>flower.asyncdb.api</artifactId>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
