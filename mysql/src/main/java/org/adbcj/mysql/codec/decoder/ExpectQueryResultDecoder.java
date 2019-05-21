@@ -9,7 +9,7 @@ import org.adbcj.mysql.MySqlConnection;
 import org.adbcj.mysql.codec.BoundedInputStream;
 import org.adbcj.mysql.codec.model.ResponseWrapper;
 import org.adbcj.mysql.codec.packets.response.ErrorResponse;
-import org.adbcj.mysql.codec.packets.response.OkResponse;
+import org.adbcj.mysql.codec.packets.response.OKRegularResponse;
 import org.adbcj.mysql.codec.packets.response.ResultSetResponse;
 import org.adbcj.mysql.codec.util.IOUtil;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ public class ExpectQueryResultDecoder<T> extends AbstractResponseDecoder {
   }
 
   @Override
-  protected ResponseWrapper handleOk(OkResponse.RegularOK regularOK) {
+  protected ResponseWrapper handleOk(OKRegularResponse oKRegularResponse) {
     throw new Error("Not supported for query results");
   }
 

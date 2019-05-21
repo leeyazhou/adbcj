@@ -23,7 +23,7 @@ public class MySqlConnectionTest {
   final static Logger log = LoggerFactory.getLogger(MySqlConnectionTest.class);
 
   @Test
-  public void test() throws InterruptedException {
+  public void testMySQL() throws InterruptedException {
     final int n = 1;
     final String url = "adbcj:mysql://10.100.216.147/adbcjtck";
     final String username = "root", password = "UJ9FeAm3Yc@#E%IH8dLj6guyr5K&u#J3";
@@ -49,7 +49,7 @@ public class MySqlConnectionTest {
             @Override
             public void onComplete(ResultSet result, DbException failure) {
               List<? extends Field> fs = result.getFields();
-              System.err.println("结果属性：" + fs);
+              System.err.println("结果属性：" + fs+"\n");
               for (Row row : result) {
                 System.err.println("结果： " + row.get("id") + " : " + row.get("name"));
               }

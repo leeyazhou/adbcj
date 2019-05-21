@@ -10,18 +10,18 @@ import org.adbcj.mysql.codec.BoundedInputStream;
 import org.adbcj.mysql.codec.model.MysqlType;
 import org.adbcj.mysql.codec.model.ResponseWrapper;
 import org.adbcj.mysql.codec.packets.response.EofResponse;
-import org.adbcj.mysql.codec.packets.response.PreparedStatementToBuildResponse;
+import org.adbcj.mysql.codec.packets.response.PreparedStatementResponse;
 import org.adbcj.mysql.codec.packets.response.StatementPreparedEOFResponse;
 import io.netty.channel.Channel;
 
 
 abstract class FinishPrepareStatementDecoder extends AbstractDecoder {
 
-  protected final PreparedStatementToBuildResponse statement;
+  protected final PreparedStatementResponse statement;
   protected final DbCallback<MySqlPreparedStatement> callback;
   protected final MySqlConnection connection;
 
-  FinishPrepareStatementDecoder(MySqlConnection connection, PreparedStatementToBuildResponse statement,
+  FinishPrepareStatementDecoder(MySqlConnection connection, PreparedStatementResponse statement,
       DbCallback<MySqlPreparedStatement> callback) {
     this.statement = statement;
     this.callback = sandboxCallback(callback);
@@ -32,21 +32,21 @@ abstract class FinishPrepareStatementDecoder extends AbstractDecoder {
     in.readFully(new byte[in.getRemaining()]);
   }
 
-  public static AbstractDecoder create(MySqlConnection connection, PreparedStatementToBuildResponse statement,
+  public static AbstractDecoder create(MySqlConnection connection, PreparedStatementResponse statement,
       DbCallback<MySqlPreparedStatement> toComplete) {
     if (statement.getParams() > 0) {
-      return new ReadParameters(connection, statement.getParams(), statement, toComplete);
+      return new ReadParametersDecoder(connection, statement.getParams(), statement, toComplete);
     } else if (statement.getColumns() > 0) {
-      return new ReadColumns(connection, statement.getColumns(), statement, toComplete);
+      return new ReadColumnsDecoder(connection, statement.getColumns(), statement, toComplete);
     } else {
       return new AcceptNextResponseDecoder(connection);
     }
   }
 
-  private static class ReadParameters extends FinishPrepareStatementDecoder {
+  private static class ReadParametersDecoder extends FinishPrepareStatementDecoder {
     private final int parametersToParse;
 
-    public ReadParameters(MySqlConnection connection, int parametersToParse, PreparedStatementToBuildResponse statement,
+    public ReadParametersDecoder(MySqlConnection connection, int parametersToParse, PreparedStatementResponse statement,
         DbCallback<MySqlPreparedStatement> callback) {
       super(connection, statement, callback);
 
@@ -61,13 +61,13 @@ abstract class FinishPrepareStatementDecoder extends AbstractDecoder {
       List<MysqlType> types = new ArrayList<MysqlType>(typesCount + 1);
       types.addAll(statement.getParametersTypes());
       types.add(newType);
-      PreparedStatementToBuildResponse newStatement =
-          new PreparedStatementToBuildResponse(length, packetNumber, statement.getPreparedStatement(), types);
+      PreparedStatementResponse newStatement =
+          new PreparedStatementResponse(length, packetNumber, statement.getPreparedStatement(), types);
       int restOfParams = parametersToParse - 1;
       if (restOfParams > 0) {
-        return resultWrapper(new ReadParameters(connection, restOfParams, newStatement, callback), statement);
+        return resultWrapper(new ReadParametersDecoder(connection, restOfParams, newStatement, callback), statement);
       } else {
-        return resultWrapper(new EofAndColumns(connection, newStatement, callback), statement);
+        return resultWrapper(new EofAndColumnsDecoder(connection, newStatement, callback), statement);
       }
     }
 
@@ -77,9 +77,9 @@ abstract class FinishPrepareStatementDecoder extends AbstractDecoder {
     }
   }
 
-  private static class EofAndColumns extends FinishPrepareStatementDecoder {
+  private static class EofAndColumnsDecoder extends FinishPrepareStatementDecoder {
 
-    public EofAndColumns(MySqlConnection connection, PreparedStatementToBuildResponse statement,
+    public EofAndColumnsDecoder(MySqlConnection connection, PreparedStatementResponse statement,
         DbCallback<MySqlPreparedStatement> toComplete) {
       super(connection, statement, toComplete);
     }
@@ -94,7 +94,7 @@ abstract class FinishPrepareStatementDecoder extends AbstractDecoder {
           callback.onComplete(new MySqlPreparedStatement(connection, preparedEOF), null);
           return resultWrapper(new AcceptNextResponseDecoder(connection), preparedEOF);
         } else {
-          return resultWrapper(new ReadColumns(connection, statement.getColumns(), statement, callback), statement);
+          return resultWrapper(new ReadColumnsDecoder(connection, statement.getColumns(), statement, callback), statement);
         }
       } else {
         throw new IllegalStateException("Did not expect a EOF from the server");
@@ -107,10 +107,10 @@ abstract class FinishPrepareStatementDecoder extends AbstractDecoder {
     }
   }
 
-  private static class ReadColumns extends FinishPrepareStatementDecoder {
+  private static class ReadColumnsDecoder extends FinishPrepareStatementDecoder {
     private final int restOfColumns;
 
-    public ReadColumns(MySqlConnection connection, int restOfColumns, PreparedStatementToBuildResponse statement,
+    public ReadColumnsDecoder(MySqlConnection connection, int restOfColumns, PreparedStatementResponse statement,
         DbCallback<MySqlPreparedStatement> callback) {
       super(connection, statement, callback);
       this.restOfColumns = restOfColumns;
@@ -122,9 +122,9 @@ abstract class FinishPrepareStatementDecoder extends AbstractDecoder {
       readAllAndIgnore(in);
       int restOfParams = restOfColumns - 1;
       if (restOfParams > 0) {
-        return resultWrapper(new ReadColumns(connection, restOfParams, statement, callback), statement);
+        return resultWrapper(new ReadColumnsDecoder(connection, restOfParams, statement, callback), statement);
       } else {
-        return resultWrapper(new EofStatement(connection, statement, callback), statement);
+        return resultWrapper(new EofStatementDecoder(connection, statement, callback), statement);
       }
     }
 
@@ -134,9 +134,9 @@ abstract class FinishPrepareStatementDecoder extends AbstractDecoder {
     }
   }
 
-  private static class EofStatement extends FinishPrepareStatementDecoder {
+  private static class EofStatementDecoder extends FinishPrepareStatementDecoder {
 
-    public EofStatement(MySqlConnection connection, PreparedStatementToBuildResponse statement,
+    public EofStatementDecoder(MySqlConnection connection, PreparedStatementResponse statement,
         DbCallback<MySqlPreparedStatement> toComplete) {
       super(connection, statement, toComplete);
     }

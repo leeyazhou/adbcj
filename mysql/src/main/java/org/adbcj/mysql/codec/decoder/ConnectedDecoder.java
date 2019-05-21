@@ -6,13 +6,19 @@ import org.adbcj.DbException;
 import org.adbcj.mysql.MySqlConnection;
 import org.adbcj.mysql.codec.model.ResponseWrapper;
 import org.adbcj.mysql.codec.packets.response.ErrorResponse;
-import org.adbcj.mysql.codec.packets.response.OkResponse;
+import org.adbcj.mysql.codec.packets.response.OKRegularResponse;
 
-public class FinishLoginDecoder extends AbstractResponseDecoder {
+/**
+ * 连接成功解码器
+ * 
+ * @author lee
+ */
+public class ConnectedDecoder extends AbstractResponseDecoder {
   private final DbCallback<Connection> connected;
   private final StackTraceElement[] entry;
 
-  public FinishLoginDecoder(DbCallback<Connection> connected, StackTraceElement[] entry, MySqlConnection connectionToBuild) {
+  public ConnectedDecoder(DbCallback<Connection> connected, StackTraceElement[] entry,
+      MySqlConnection connectionToBuild) {
     super(connectionToBuild);
     this.connected = sandboxCallback(connected);
     this.entry = entry;
@@ -25,9 +31,9 @@ public class FinishLoginDecoder extends AbstractResponseDecoder {
   }
 
   @Override
-  protected ResponseWrapper handleOk(OkResponse.RegularOK regularOK) {
+  protected ResponseWrapper handleOk(OKRegularResponse oKRegularResponse) {
     connected.onComplete(connection, null);
-    return new ResponseWrapper(acceptNextResponse(), regularOK);
+    return new ResponseWrapper(acceptNextResponse(), oKRegularResponse);
   }
 
   protected AcceptNextResponseDecoder acceptNextResponse() {

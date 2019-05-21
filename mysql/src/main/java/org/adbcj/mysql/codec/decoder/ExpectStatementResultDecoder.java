@@ -4,7 +4,7 @@ import org.adbcj.DbCallback;
 import org.adbcj.ResultHandler;
 import org.adbcj.mysql.MySqlConnection;
 import org.adbcj.mysql.codec.model.ResponseWrapper;
-import org.adbcj.mysql.codec.packets.response.OkResponse;
+import org.adbcj.mysql.codec.packets.response.OKRegularResponse;
 import org.adbcj.support.OneArgFunction;
 
 
@@ -17,7 +17,7 @@ public class ExpectStatementResultDecoder<T> extends ExpectQueryResultDecoder<T>
 
 
   @Override
-  protected ResponseWrapper handleOk(OkResponse.RegularOK regularOK) {
-    return ExpectUpdateResultDecoder.handleUpdateResult(connection, regularOK, callback, OneArgFunction.ID_FUNCTION);
+  protected ResponseWrapper handleOk(OKRegularResponse oKRegularResponse) {
+    return ExpectUpdateResultDecoder.handleUpdateResult(connection, oKRegularResponse, callback, OneArgFunction.ID_FUNCTION);
   }
 }

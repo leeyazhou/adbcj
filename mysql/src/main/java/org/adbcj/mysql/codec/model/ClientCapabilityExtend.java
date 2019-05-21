@@ -18,22 +18,35 @@
 */
 package org.adbcj.mysql.codec.model;
 
-// TODO Document ClientCapabilities class
-public enum ClientCapabilities {
-	LONG_PASSWORD,
-	FOUND_ROWS,
-	LONG_COLUMN_FLAG,
-	CONNECT_WITH_DB,
-	NO_SCHEMA,
-	COMPRESS,
-	ODBC_CLIENT,
-	LOCAL_FILES,
-	IGNORE_SPACES,
-	PROTOCOL_4_1,
-	INTERACTIVE,
-	SSL,
-	IGNORE_SIGPIPE,
-	TRANSACTIONS,
-	PROTOCOL_4_1_OLD,
-	SECURE_AUTHENTICATION,
+/**
+ * 客户端功能
+ * 
+ * @author lee
+ */
+public enum ClientCapabilityExtend {
+
+  /**
+   * Enable/disable multi-stmt support
+   */
+  MULTI_STATEMENTS(1 << 16),
+
+  /**
+   * Enable/disable multi-results
+   */
+  MULTI_RESULTS(1 << 17),
+
+  /**
+   * Multi-results in PS-protocol
+   */
+  PS_MULTI_RESULTS(1 << 18);
+
+  int code;
+
+  private ClientCapabilityExtend(int code) {
+    this.code = code;
+  }
+
+  public int getCode() {
+    return code;
+  }
 }

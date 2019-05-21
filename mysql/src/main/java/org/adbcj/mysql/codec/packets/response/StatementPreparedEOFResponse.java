@@ -9,7 +9,7 @@ public final class StatementPreparedEOFResponse extends AbstractResponse {
     private final int colums;
     private List<MysqlType> parametersTypes;
 
-    public StatementPreparedEOFResponse(int packetLength, int packetNumber, PreparedStatementToBuildResponse preparedStatement) {
+    public StatementPreparedEOFResponse(int packetLength, int packetNumber, PreparedStatementResponse preparedStatement) {
         super(packetLength, packetNumber);
         this.handlerId = preparedStatement.getHandlerId();
         this.colums = preparedStatement.getColumns();

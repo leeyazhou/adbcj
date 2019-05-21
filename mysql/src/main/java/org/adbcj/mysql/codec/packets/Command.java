@@ -19,43 +19,71 @@
 package org.adbcj.mysql.codec.packets;
 
 public enum Command {
-	SLEEP(0x00),
-	QUIT(0x01),
-	INIT_DB(0x02),
-	QUERY(0x03),
-	FIELD_LIST(0x04),
-	CREATE_DB(0x05),
-	DROP_DB(0x06),
-	REFRESH(0x07),
-	SHUTDOWN(0x08),
-	STATISTICS(0x09),
-	PROCESS_INFO(0x0a),
-	CONNECT(0x0b),
-	PROCESS_KILL(0x0c),
-	DEBUG(0x0c),
-	PING(0x0d),
-	TIME(0x0e),
-	DELAYED_INSERT(0x0f),
-	CHANGED_USER(0x10),
-	BINLOG_DUMP(0x11),
-	TABLE_DUMP(0x12),
-	CONNECT_OUT(0x13),
-	REGISTER_SLAVE(0x14),
-	STATEMENT_PREPARE(0x16),
-	STATEMENT_EXECUTE(0x17 ),
-	STATEMENT_SEND_LONG_DATA(0x18),
-	STATEMENT_CLOSE(0x19),
-	STATEMENT_RESET(0x1a),
-	SET_OPTION(0x1b),
-	STATEMENT_FETCH(0x1c);
+  SLEEP(0x00),
 
-	private int commandCode;
+  QUIT(0x01),
 
-	Command(int commandCode) {
-		this.commandCode = commandCode;
-	}
+  INIT_DB(0x02),
 
-	public int getCommandCode() {
-		return commandCode;
-	}
+  QUERY(0x03),
+
+  FIELD_LIST(0x04),
+
+  CREATE_DB(0x05),
+
+  DROP_DB(0x06),
+
+  REFRESH(0x07),
+
+  SHUTDOWN(0x08),
+
+  STATISTICS(0x09),
+
+  PROCESS_INFO(0x0a),
+
+  CONNECT(0x0b),
+
+  PROCESS_KILL(0x0c),
+
+  DEBUG(0x0c),
+
+  PING(0x0d),
+
+  TIME(0x0e),
+
+  DELAYED_INSERT(0x0f),
+
+  CHANGED_USER(0x10),
+
+  BINLOG_DUMP(0x11),
+
+  TABLE_DUMP(0x12),
+
+  CONNECT_OUT(0x13),
+
+  REGISTER_SLAVE(0x14),
+
+  STATEMENT_PREPARE(0x16),
+
+  STATEMENT_EXECUTE(0x17),
+
+  STATEMENT_SEND_LONG_DATA(0x18),
+
+  STATEMENT_CLOSE(0x19),
+
+  STATEMENT_RESET(0x1a),
+
+  SET_OPTION(0x1b),
+
+  STATEMENT_FETCH(0x1c);
+
+  private int code;
+
+  private Command(int code) {
+    this.code = code;
+  }
+
+  public int getCode() {
+    return code;
+  }
 }

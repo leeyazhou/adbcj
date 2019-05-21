@@ -7,13 +7,13 @@ import org.adbcj.mysql.codec.packets.request.AbstractRequest;
 
 public class MySqlRequest<T> {
   private final String description;
-  private final AbstractDecoder startDecoder;
+  private final AbstractDecoder decoder;
   private final AbstractRequest request;
   private final DbCallback<T> callback;
 
-  public MySqlRequest(String description, AbstractDecoder startState, AbstractRequest request, DbCallback<T> callback) {
+  public MySqlRequest(String description, AbstractDecoder decoder, AbstractRequest request, DbCallback<T> callback) {
     this.description = description;
-    this.startDecoder = startState;
+    this.decoder = decoder;
     this.request = request;
     this.callback = callback;
   }
@@ -33,8 +33,8 @@ public class MySqlRequest<T> {
   /**
    * @return the startState
    */
-  public AbstractDecoder getStartState() {
-    return startDecoder;
+  public AbstractDecoder getDecoder() {
+    return decoder;
   }
 
   /**

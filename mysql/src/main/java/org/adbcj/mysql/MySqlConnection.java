@@ -14,8 +14,8 @@ import org.adbcj.PreparedUpdate;
 import org.adbcj.Result;
 import org.adbcj.ResultHandler;
 import org.adbcj.StandardProperties;
-import org.adbcj.mysql.codec.model.ClientCapabilities;
-import org.adbcj.mysql.codec.model.ExtendedClientCapabilities;
+import org.adbcj.mysql.codec.model.ClientCapability;
+import org.adbcj.mysql.codec.model.ClientCapabilityExtend;
 import org.adbcj.mysql.codec.model.MySqlRequest;
 import org.adbcj.mysql.codec.util.MySqlRequestUtil;
 import org.adbcj.support.CloseOnce;
@@ -225,20 +225,20 @@ public class MySqlConnection implements Connection {
     }
   }
 
-  private static final Set<ClientCapabilities> CLIENT_CAPABILITIES =
-      EnumSet.of(ClientCapabilities.LONG_PASSWORD, ClientCapabilities.FOUND_ROWS, ClientCapabilities.LONG_COLUMN_FLAG,
-          ClientCapabilities.CONNECT_WITH_DB, ClientCapabilities.LOCAL_FILES, ClientCapabilities.PROTOCOL_4_1,
-          ClientCapabilities.TRANSACTIONS, ClientCapabilities.SECURE_AUTHENTICATION);
+  private static final Set<ClientCapability> clientCapabilities =
+      EnumSet.of(ClientCapability.LONG_PASSWORD, ClientCapability.FOUND_ROWS, ClientCapability.LONG_COLUMN_FLAG,
+          ClientCapability.CONNECT_WITH_DB, ClientCapability.LOCAL_FILES, ClientCapability.PROTOCOL_4_1,
+          ClientCapability.TRANSACTIONS, ClientCapability.SECURE_CONNECTION);
 
-  public Set<ClientCapabilities> getClientCapabilities() {
-    return CLIENT_CAPABILITIES;
+  public static Set<ClientCapability> getClientCapabilities() {
+    return clientCapabilities;
   }
 
-  private static final Set<ExtendedClientCapabilities> EXTENDED_CLIENT_CAPABILITIES =
-      EnumSet.of(ExtendedClientCapabilities.MULTI_RESULTS);
+  private static final Set<ClientCapabilityExtend> clientCapabilityExtends =
+      EnumSet.of(ClientCapabilityExtend.MULTI_RESULTS);
 
-  public Set<ExtendedClientCapabilities> getExtendedClientCapabilities() {
-    return EXTENDED_CLIENT_CAPABILITIES;
+  public static Set<ClientCapabilityExtend> getExtendedClientCapabilities() {
+    return clientCapabilityExtends;
   }
 
   boolean failIfQueueFull(MySqlRequest<?> request) {

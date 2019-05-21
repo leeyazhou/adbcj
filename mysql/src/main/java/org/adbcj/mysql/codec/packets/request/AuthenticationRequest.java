@@ -18,20 +18,24 @@
 */
 package org.adbcj.mysql.codec.packets.request;
 
-import org.adbcj.mysql.codec.*;
-import org.adbcj.mysql.codec.model.ClientCapabilities;
-import org.adbcj.mysql.codec.model.ExtendedClientCapabilities;
-import org.adbcj.mysql.codec.model.MysqlCharacterSet;
-import org.adbcj.mysql.codec.util.IOUtil;
-import org.adbcj.mysql.codec.util.PasswordEncryption;
-import org.adbcj.support.LoginCredentials;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Set;
+import org.adbcj.mysql.codec.model.ClientCapability;
+import org.adbcj.mysql.codec.model.ClientCapabilityExtend;
+import org.adbcj.mysql.codec.model.MysqlCharacterSet;
+import org.adbcj.mysql.codec.util.IOUtil;
+import org.adbcj.mysql.codec.util.PasswordEncryption;
+import org.adbcj.support.LoginCredentials;
 
 
-public class LoginRequest extends AbstractRequest {
+/**
+ * 认证信息
+ * 
+ * @author lee
+ */
+public class AuthenticationRequest extends AbstractRequest {
 
   public static final int MAX_PACKET_SIZE = 0x00ffffff;
 
@@ -39,14 +43,14 @@ public class LoginRequest extends AbstractRequest {
   public static final int PASSWORD_LENGTH = 20;
 
   private final LoginCredentials credentials;
-  private final Set<ClientCapabilities> capabilities;
-  private final Set<ExtendedClientCapabilities> extendedCapabilities;
+  private final Set<ClientCapability> capabilities;
+  private final Set<ClientCapabilityExtend> extendedCapabilities;
   private final MysqlCharacterSet charset;
 
   private final byte[] salt;
 
-  public LoginRequest(LoginCredentials credentials, Set<ClientCapabilities> capabilities,
-      Set<ExtendedClientCapabilities> extendedCapabilities, MysqlCharacterSet charset, byte[] salt) {
+  public AuthenticationRequest(LoginCredentials credentials, Set<ClientCapability> capabilities,
+      Set<ClientCapabilityExtend> extendedCapabilities, MysqlCharacterSet charset, byte[] salt) {
     super();
     this.credentials = credentials;
     this.capabilities = capabilities;
@@ -80,7 +84,7 @@ public class LoginRequest extends AbstractRequest {
     IOUtil.writeEnumSetShort(out, getExtendedCapabilities());
     IOUtil.writeInt(out, getMaxPacketSize());
     out.write(getCharSet().getId());
-    out.write(new byte[LoginRequest.FILLER_LENGTH]);
+    out.write(new byte[AuthenticationRequest.FILLER_LENGTH]);
 
     out.write(getCredentials().getUserName().getBytes(MysqlCharacterSet.UTF8_UNICODE_CI.getCharsetName()));
     out.write(0); // null-terminate username
@@ -114,11 +118,11 @@ public class LoginRequest extends AbstractRequest {
     return "LoginRequest{" + "credentials=" + credentials + '}';
   }
 
-  public Set<ClientCapabilities> getCapabilities() {
+  public Set<ClientCapability> getCapabilities() {
     return capabilities;
   }
 
-  public Set<ExtendedClientCapabilities> getExtendedCapabilities() {
+  public Set<ClientCapabilityExtend> getExtendedCapabilities() {
     return extendedCapabilities;
   }
 

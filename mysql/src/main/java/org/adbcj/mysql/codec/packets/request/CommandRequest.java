@@ -31,7 +31,7 @@ public class CommandRequest extends AbstractRequest {
 
   @Override
   public final void writeToOutputStream(OutputStream out) throws IOException {
-    out.write(command.getCommandCode());
+    out.write(command.getCode());
     if (hasPayload()) {
       writePayLoad(out);
     }

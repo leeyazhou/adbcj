@@ -10,20 +10,22 @@ import org.adbcj.Connection;
 import org.adbcj.DbCallback;
 import org.adbcj.mysql.MySqlConnection;
 import org.adbcj.mysql.codec.BoundedInputStream;
-import org.adbcj.mysql.codec.model.ClientCapabilities;
+import org.adbcj.mysql.codec.model.ClientCapability;
 import org.adbcj.mysql.codec.model.MysqlCharacterSet;
 import org.adbcj.mysql.codec.model.ResponseWrapper;
 import org.adbcj.mysql.codec.model.ServerStatus;
-import org.adbcj.mysql.codec.packets.request.LoginRequest;
 import org.adbcj.mysql.codec.packets.response.ErrorResponse;
-import org.adbcj.mysql.codec.packets.response.ServerGreetingResponse;
+import org.adbcj.mysql.codec.packets.response.HandshakeResponse;
 import org.adbcj.mysql.codec.util.IOUtil;
-import org.adbcj.support.LoginCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.netty.channel.Channel;
 
-
+/**
+ * 连接解码器
+ * 
+ * @author lee
+ */
 public class ConnectingDecoder extends AbstractDecoder {
 
   private final static Logger log = LoggerFactory.getLogger(ConnectingDecoder.class);
@@ -43,17 +45,14 @@ public class ConnectingDecoder extends AbstractDecoder {
    */
   public static final int GREETING_UNUSED_SIZE = 13;
 
-  private final DbCallback<Connection> connected;
+  private final DbCallback<Connection> connectedCallback;
   private final StackTraceElement[] entry;
   private final MySqlConnection connection;
-  private final LoginCredentials loginCredentials;
 
-  public ConnectingDecoder(DbCallback<Connection> connected, StackTraceElement[] entry, MySqlConnection connection,
-      LoginCredentials loginWith) {
-    this.connected = sandboxCallback(connected);
+  public ConnectingDecoder(DbCallback<Connection> callback, StackTraceElement[] entry, MySqlConnection connection) {
+    this.connectedCallback = sandboxCallback(callback);
     this.entry = entry;
     this.connection = connection;
-    this.loginCredentials = loginWith;
   }
 
   @Override
@@ -70,29 +69,25 @@ public class ConnectingDecoder extends AbstractDecoder {
     }
     if (initError) {
       in.read(); // Skip error field count
-      final ErrorResponse error = decodeErrorResponse(in, length, packetNumber);
+      final ErrorResponse errorResponse = decodeErrorResponse(in, length, packetNumber);
       connection.close(CloseMode.CLOSE_FORCIBLY, (r, e) -> {
         if (e != null) {
           log.warn("Close connection abnormally", e);
         }
-        connected.onComplete(null, error.toException(entry));
+        connectedCallback.onComplete(null, errorResponse.toException(entry));
       });
-      return resultWrapper(new AcceptNextResponseDecoder(connection), error);
+      return resultWrapper(new AcceptNextResponseDecoder(connection), errorResponse);
     }
     // end error packet handler when connecting
-    ServerGreetingResponse serverGreeting = decodeServerGreeting(in, length, packetNumber);
-    LoginRequest loginRequest = new LoginRequest(loginCredentials, connection.getClientCapabilities(),
-        connection.getExtendedClientCapabilities(), MysqlCharacterSet.UTF8_UNICODE_CI, serverGreeting.getSalt());
-    channel.writeAndFlush(loginRequest);
-    log.info("收到MySQL响应，现发送登录消息。Login : {}", loginCredentials);
-    return resultWrapper(new FinishLoginDecoder(connected, entry, connection), serverGreeting);
+    HandshakeResponse handshakeResponse = decodeServerGreeting(in, length, packetNumber);
+    return resultWrapper(new ConnectedDecoder(connectedCallback, entry, connection), handshakeResponse);
   }
 
-  private ServerGreetingResponse decodeServerGreeting(BoundedInputStream in, int length, int packetNumber)
+  private HandshakeResponse decodeServerGreeting(BoundedInputStream in, int length, int packetNumber)
       throws IOException {
-    int protocol = IOUtil.safeRead(in);
-    String version = IOUtil.readNullTerminatedString(in, StandardCharsets.US_ASCII);
-    int threadId = IOUtil.readInt(in);
+    final int protocolVersion = IOUtil.safeRead(in);
+    final String mysqlServerVersion = IOUtil.readNullTerminatedString(in, StandardCharsets.US_ASCII);
+    final int threadId = IOUtil.readInt(in);
 
     byte[] salt = new byte[SALT_SIZE + SALT2_SIZE];
     in.readFully(salt, 0, SALT_SIZE);
@@ -101,20 +96,20 @@ public class ConnectingDecoder extends AbstractDecoder {
       throw new EOFException("Unexpected EOF. Expected to read 1 more byte");
     }
 
-    Set<ClientCapabilities> serverCapabilities = IOUtil.readEnumSetShort(in, ClientCapabilities.class);
+    Set<ClientCapability> serverCapabilities = IOUtil.readEnumSetShort(in, ClientCapability.class);
     MysqlCharacterSet charSet = MysqlCharacterSet.findById(in.read());
     Set<ServerStatus> serverStatus = IOUtil.readEnumSetShort(in, ServerStatus.class);
     safeSkip(in, GREETING_UNUSED_SIZE);
 
-    in.readFully(salt, SALT_SIZE, SALT2_SIZE);
+    in.readFully(salt, SALT_SIZE, SALT2_SIZE);// 挑战随机数
     // skip all plugin data for now
     in.readFully(new byte[in.getRemaining() - 1]);
     if (in.read() < 0) {
       throw new EOFException("Unexpected EOF. Expected to read 1 more byte");
     }
 
-    return new ServerGreetingResponse(length, packetNumber, protocol, version, threadId, salt, serverCapabilities,
-        charSet, serverStatus);
+    return new HandshakeResponse(length, packetNumber, protocolVersion, mysqlServerVersion, threadId, salt,
+        serverCapabilities, charSet, serverStatus);
   }
 
   @Override

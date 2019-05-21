@@ -22,39 +22,39 @@ import org.adbcj.mysql.codec.exception.MysqlException;
 
 public class ErrorResponse extends AbstractResponse {
 
-	private final int errorNumber;
-	private final String sqlState;
-	private final String message;
+  private final int errorNumber;
+  private final String sqlState;
+  private final String message;
 
-	public ErrorResponse(int length, int packetNumber, int errorNumber, String sqlState, String message) {
-		super(length, packetNumber);
-		this.errorNumber = errorNumber;
-		this.sqlState = sqlState;
-		this.message = message;
-	}
+  public ErrorResponse(int length, int packetNumber, int errorNumber, String sqlState, String message) {
+    super(length, packetNumber);
+    this.errorNumber = errorNumber;
+    this.sqlState = sqlState;
+    this.message = message;
+  }
 
-	public int getErrorNumber() {
-		return errorNumber;
-	}
+  public int getErrorNumber() {
+    return errorNumber;
+  }
 
-	public String getSqlState() {
-		return sqlState;
-	}
+  public String getSqlState() {
+    return sqlState;
+  }
 
-	public String getMessage() {
-		return message;
-	}
+  public String getMessage() {
+    return message;
+  }
 
-    public MysqlException toException(StackTraceElement[] entry){
-    	// Error format adjustment as mysql command reporting.
-    	// @since 2017-09-01 little-pan
-        return new MysqlException(toString(), null, entry);
-    }
-    
-    @Override
-    public String toString() {
-    	final String format= "ERROR %d (%s): %s";
-    	return (String.format(format, errorNumber, sqlState, message));
-    }
+  public MysqlException toException(StackTraceElement[] entry) {
+    // Error format adjustment as mysql command reporting.
+    // @since 2017-09-01 little-pan
+    return new MysqlException(toString(), null, entry);
+  }
+
+  @Override
+  public String toString() {
+    final String format = "ERROR %d (%s): %s";
+    return (String.format(format, errorNumber, sqlState, message));
+  }
 
 }

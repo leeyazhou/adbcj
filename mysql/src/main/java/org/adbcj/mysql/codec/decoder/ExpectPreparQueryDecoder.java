@@ -7,8 +7,9 @@ import org.adbcj.mysql.MySqlPreparedStatement;
 import org.adbcj.mysql.codec.BoundedInputStream;
 import org.adbcj.mysql.codec.model.ResponseWrapper;
 import org.adbcj.mysql.codec.packets.response.ErrorResponse;
+import org.adbcj.mysql.codec.packets.response.OKPreparedStatementResponse;
 import org.adbcj.mysql.codec.packets.response.OkResponse;
-import org.adbcj.mysql.codec.packets.response.PreparedStatementToBuildResponse;
+import org.adbcj.mysql.codec.packets.response.PreparedStatementResponse;
 import org.adbcj.mysql.codec.packets.response.StatementPreparedEOFResponse;
 import io.netty.channel.Channel;
 
@@ -41,9 +42,9 @@ public class ExpectPreparQueryDecoder extends AbstractDecoder {
   }
 
   private ResponseWrapper handlePrepareQuery(int length, int packetNumber,
-      OkResponse.PreparedStatementOK preparedStatement) {
-    final PreparedStatementToBuildResponse statement =
-        new PreparedStatementToBuildResponse(length, packetNumber, preparedStatement);
+      OKPreparedStatementResponse preparedStatement) {
+    final PreparedStatementResponse statement =
+        new PreparedStatementResponse(length, packetNumber, preparedStatement);
     final AbstractDecoder decoderState = FinishPrepareStatementDecoder.create(connection, statement, callback);
     if (decoderState instanceof AcceptNextResponseDecoder) {
       final StatementPreparedEOFResponse eof = new StatementPreparedEOFResponse(length, packetNumber, statement);

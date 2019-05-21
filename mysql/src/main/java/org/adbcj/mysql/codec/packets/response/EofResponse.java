@@ -23,41 +23,35 @@ import org.adbcj.mysql.codec.model.ServerStatus;
 
 public class EofResponse extends AbstractResponse {
 
-	public enum Type {
-		FIELD,
-		ROW,
-        STATEMENT,
-	}
+  public enum Type {
+    FIELD, ROW, STATEMENT,
+  }
 
-	private final int warnings;
-	private final Set<ServerStatus> serverStatus;
-	private final Type type;
+  private final int warnings;
+  private final Set<ServerStatus> serverStatus;
+  private final Type type;
 
-	public EofResponse(int packetLength, int packetNumber, int warnings, Set<ServerStatus> serverStatus, Type type) {
-		super(packetLength, packetNumber);
-		this.warnings = warnings;
-		this.serverStatus = serverStatus;
-		this.type = type;
-	}
+  public EofResponse(int packetLength, int packetNumber, int warnings, Set<ServerStatus> serverStatus, Type type) {
+    super(packetLength, packetNumber);
+    this.warnings = warnings;
+    this.serverStatus = serverStatus;
+    this.type = type;
+  }
 
-	public int getWarnings() {
-		return warnings;
-	}
+  public int getWarnings() {
+    return warnings;
+  }
 
-	public Set<ServerStatus> getServerStatus() {
-		return serverStatus;
-	}
+  public Set<ServerStatus> getServerStatus() {
+    return serverStatus;
+  }
 
-	public Type getType() {
-		return type;
-	}
+  public Type getType() {
+    return type;
+  }
 
-    @Override
-    public String toString() {
-        return "EofResponse{"  +
-                "type=" + type +
-                ", warnings=" + warnings +
-                ", serverStatus=" + serverStatus +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "EofResponse{" + "type=" + type + ", warnings=" + warnings + ", serverStatus=" + serverStatus + '}';
+  }
 }

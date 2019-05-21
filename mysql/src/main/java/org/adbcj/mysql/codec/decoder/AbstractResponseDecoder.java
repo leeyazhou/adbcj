@@ -5,6 +5,7 @@ import org.adbcj.mysql.MySqlConnection;
 import org.adbcj.mysql.codec.BoundedInputStream;
 import org.adbcj.mysql.codec.model.ResponseWrapper;
 import org.adbcj.mysql.codec.packets.response.ErrorResponse;
+import org.adbcj.mysql.codec.packets.response.OKRegularResponse;
 import org.adbcj.mysql.codec.packets.response.OkResponse;
 import io.netty.channel.Channel;
 
@@ -34,7 +35,7 @@ public abstract class AbstractResponseDecoder extends AbstractDecoder {
 
   protected abstract ResponseWrapper handleError(ErrorResponse errorResponse);
 
-  protected abstract ResponseWrapper handleOk(OkResponse.RegularOK regularOK);
+  protected abstract ResponseWrapper handleOk(OKRegularResponse oKRegularResponse);
 
   @Override
   public String toString() {

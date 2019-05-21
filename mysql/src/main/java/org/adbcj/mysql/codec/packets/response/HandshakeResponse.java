@@ -18,23 +18,23 @@
 */
 package org.adbcj.mysql.codec.packets.response;
 
-import org.adbcj.mysql.codec.model.ClientCapabilities;
+import org.adbcj.mysql.codec.model.ClientCapability;
 import org.adbcj.mysql.codec.model.MysqlCharacterSet;
 import org.adbcj.mysql.codec.model.ServerStatus;
 import java.util.Collections;
 import java.util.Set;
 
-public class ServerGreetingResponse extends AbstractResponse {
+public class HandshakeResponse extends AbstractResponse {
   private final int protocol;
   private final String version;
   private final int threadId;
   private final byte[] salt;
-  private final Set<ClientCapabilities> serverCapabilities;
+  private final Set<ClientCapability> serverCapabilities;
   private final MysqlCharacterSet characterSet;
   private final Set<ServerStatus> serverStatus;
 
-  public ServerGreetingResponse(int length, int packetNumber, int protocol, String version, int threadId, byte[] salt,
-      Set<ClientCapabilities> serverCapabilities, MysqlCharacterSet characterSet, Set<ServerStatus> serverStatus) {
+  public HandshakeResponse(int length, int packetNumber, int protocol, String version, int threadId, byte[] salt,
+      Set<ClientCapability> serverCapabilities, MysqlCharacterSet characterSet, Set<ServerStatus> serverStatus) {
     super(length, packetNumber);
     this.protocol = protocol;
     this.version = version;
@@ -61,7 +61,7 @@ public class ServerGreetingResponse extends AbstractResponse {
     return salt;
   }
 
-  public Set<ClientCapabilities> getServerCapabilities() {
+  public Set<ClientCapability> getServerCapabilities() {
     return Collections.unmodifiableSet(serverCapabilities);
   }
 

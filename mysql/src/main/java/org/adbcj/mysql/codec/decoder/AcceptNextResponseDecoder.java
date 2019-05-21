@@ -24,6 +24,6 @@ public class AcceptNextResponseDecoder extends AbstractDecoder {
     if (logger.isDebugEnabled()) {
       logger.debug("Start parsing request: {}", request);
     }
-    return request.getStartState().decode(length, packetNumber, in, channel);
+    return request.getDecoder().decode(length, packetNumber, in, channel);
   }
 }

@@ -15,35 +15,58 @@
 	along with ADBCJ.  If not, see <http://www.gnu.org/licenses/>.
 
 	Copyright 2008  Mike Heath
- */
+*/
 package org.adbcj.mysql.codec.model;
 
 /**
- *
- * @author Mike Heath <mheath@apache.org>
+ * 客户端功能 https://github.com/google/mysql/blob/master/include/mysql_com.h
+ * 
+ * @author lee
  */
-// TODO Document ServerStatus and what each bit means
-public enum ServerStatus {
-  IN_TRANSACTION(0x0001),
+// TODO Document ClientCapabilities class
+public enum ClientCapability {
 
-  AUTOCOMMIT(0x0002),
-  // MORE_RESULTS_EXISTS(0x008),
-  // MULTI_QUERY,
-  // BAD_INDEX,
-  // NO_INDEX,
-  CURSOR_EXISTS(0x0040),
+  LONG_PASSWORD(1),
 
-  LAST_ROW_SENT(0x0080),
+  FOUND_ROWS(2),
 
-  DATABASE_DROPPED(0x0100),
+  LONG_COLUMN_FLAG(4),
 
-  NO_BACKSLASH_ESCAPES(0x0200),
+  CONNECT_WITH_DB(8),
 
-  METADATA_CHANGED(0x0400);
+  NO_SCHEMA(16),
+
+  COMPRESS(32),
+
+  ODBC_CLIENT(64),
+
+  LOCAL_FILES(128),
+
+  IGNORE_SPACES(256),
+
+  PROTOCOL_4_1(512),
+
+  INTERACTIVE(1024),
+
+  SSL(2048),
+
+  IGNORE_SIGPIPE(4096),
+
+  TRANSACTIONS(8192),
+
+  /**
+   * Old flag for 4.1 protocol
+   */
+  CLIENT_RESERVED(16384),
+
+  /**
+   * New 4.1 authentication
+   */
+  SECURE_CONNECTION(32768);
 
   private int code;
 
-  private ServerStatus(int code) {
+  private ClientCapability(int code) {
     this.code = code;
   }
 

@@ -58,7 +58,7 @@ public class MysqlConnectionManager extends AbstractConnectionManager {
         ch.config().setAutoRead(false);
         ch.pipeline().addLast("loggingHandler", new LoggingHandler(LogLevel.DEBUG));
         ch.pipeline().addLast(ENCODER, new NettyEncoder());
-//        ch.pipeline().addLast("handler", new NettyClientHandler());
+        // ch.pipeline().addLast("handler", new NettyClientHandler());
 
       }
     });
@@ -82,19 +82,20 @@ public class MysqlConnectionManager extends AbstractConnectionManager {
   @Override
   public void connect(String user, String password, DbCallback<Connection> connected) {
     StackTraceElement[] entry = entryPointStack();
-    LoginCredentials credentials = new LoginCredentials(user, password, loginCredentials.getDatabase());
-
     if (isClosed()) {
       throw new DbException("Connection manager closed");
     }
     logger.debug("Starting connection");
+    final MySqlHandler mySqlHandler = new MySqlHandler();
+    final NettyClientHandler nettyClientHandler = new NettyClientHandler(loginCredentials, mySqlHandler);
 
     if (connectionPool != null) {
-      Channel channel = connectionPool.tryAquire(credentials);
+      Channel channel = connectionPool.tryAquire(loginCredentials);
       if (channel != null) {
         MySqlConnection connection =
-            new MySqlConnection(credentials, maxQueueLength(), this, channel, getStackTracingOption());
+            new MySqlConnection(loginCredentials, maxQueueLength(), this, channel, getStackTracingOption());
         channel.pipeline().addLast(DECODER, new NettyDecoder(new AcceptNextResponseDecoder(connection), connection));
+        channel.pipeline().addLast("handler", nettyClientHandler);
         connected.onComplete(connection, null);
         return;
       }
@@ -116,12 +117,12 @@ public class MysqlConnectionManager extends AbstractConnectionManager {
         return;
       }
 
-      MySqlConnection connection = new MySqlConnection(credentials, maxQueueLength(), MysqlConnectionManager.this,
+      MySqlConnection connection = new MySqlConnection(loginCredentials, maxQueueLength(), MysqlConnectionManager.this,
           channel, getStackTracingOption());
       addConnection(connection);
       channel.pipeline().addLast(DECODER,
-          new NettyDecoder(new ConnectingDecoder(connected, entry, connection, credentials), connection));
-      channel.pipeline().addLast("handler", new NettyClientHandler());
+          new NettyDecoder(new ConnectingDecoder(connected, entry, connection), connection));
+      channel.pipeline().addLast("handler", nettyClientHandler);
       channel.config().setAutoRead(true);
       channel.read();
     });

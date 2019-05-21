@@ -4,7 +4,7 @@ import org.adbcj.DbCallback;
 import org.adbcj.mysql.MySqlConnection;
 import org.adbcj.mysql.codec.model.ResponseWrapper;
 import org.adbcj.mysql.codec.packets.response.ErrorResponse;
-import org.adbcj.mysql.codec.packets.response.OkResponse;
+import org.adbcj.mysql.codec.packets.response.OKRegularResponse;
 
 
 public class ExpectOKDecoder<T> extends AbstractResponseDecoder {
@@ -25,8 +25,8 @@ public class ExpectOKDecoder<T> extends AbstractResponseDecoder {
   }
 
   @Override
-  protected ResponseWrapper handleOk(OkResponse.RegularOK regularOK) {
+  protected ResponseWrapper handleOk(OKRegularResponse oKRegularResponse) {
     callback.onComplete(null, null);
-    return new ResponseWrapper(new AcceptNextResponseDecoder(connection), regularOK);
+    return new ResponseWrapper(new AcceptNextResponseDecoder(connection), oKRegularResponse);
   }
 }

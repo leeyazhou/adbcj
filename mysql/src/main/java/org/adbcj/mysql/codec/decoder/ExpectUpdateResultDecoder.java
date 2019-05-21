@@ -5,7 +5,7 @@ import org.adbcj.DbCallback;
 import org.adbcj.mysql.MySqlConnection;
 import org.adbcj.mysql.codec.MysqlResult;
 import org.adbcj.mysql.codec.model.ResponseWrapper;
-import org.adbcj.mysql.codec.packets.response.OkResponse;
+import org.adbcj.mysql.codec.packets.response.OKRegularResponse;
 import org.adbcj.support.OneArgFunction;
 
 
@@ -24,18 +24,18 @@ public class ExpectUpdateResultDecoder<T> extends ExpectOKDecoder<T> {
   }
 
   @Override
-  protected ResponseWrapper handleOk(OkResponse.RegularOK regularOK) {
-    return handleUpdateResult(connection, regularOK, callback, transformation);
+  protected ResponseWrapper handleOk(OKRegularResponse oKRegularResponse) {
+    return handleUpdateResult(connection, oKRegularResponse, callback, transformation);
   }
 
-  static <TFutureType> ResponseWrapper handleUpdateResult(MySqlConnection connection, OkResponse.RegularOK regularOK,
+  static <TFutureType> ResponseWrapper handleUpdateResult(MySqlConnection connection, OKRegularResponse oKRegularResponse,
       DbCallback<TFutureType> futureToComplete, OneArgFunction<MysqlResult, TFutureType> transformation) {
-    ArrayList<String> warnings = new ArrayList<String>(regularOK.getWarningCount());
-    for (int i = 0; i < regularOK.getWarningCount(); i++) {
-      warnings.add(regularOK.getMessage());
+    ArrayList<String> warnings = new ArrayList<String>(oKRegularResponse.getWarningCount());
+    for (int i = 0; i < oKRegularResponse.getWarningCount(); i++) {
+      warnings.add(oKRegularResponse.getMessage());
     }
-    MysqlResult result = new MysqlResult(regularOK.getAffectedRows(), warnings, regularOK.getInsertId());
+    MysqlResult result = new MysqlResult(oKRegularResponse.getAffectedRows(), warnings, oKRegularResponse.getInsertId());
     futureToComplete.onComplete(transformation.apply(result), null);
-    return new ResponseWrapper(new AcceptNextResponseDecoder(connection), regularOK);
+    return new ResponseWrapper(new AcceptNextResponseDecoder(connection), oKRegularResponse);
   }
 }
