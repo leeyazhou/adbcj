@@ -1,3 +1,18 @@
+/**
+ * Copyright © 2019 yazhou.li (lee_yazhou@163.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.ly.train.flower.db.h2.connect;
 
 import java.util.HashMap;
@@ -25,7 +40,7 @@ public class MySqlConnectionTest {
   @Test
   public void testMySQL() throws InterruptedException {
     final int n = 1;
-    final String url = "asyncdb:mysql://10.100.216.147/asyncdbtck";
+    final String url = "asyncdb:mysql://10.100.216.147/asyncdb";
     final String username = "root", password = "UJ9FeAm3Yc@#E%IH8dLj6guyr5K&u#J3";
     final long tms = System.currentTimeMillis();
     final AtomicInteger success = new AtomicInteger(0);

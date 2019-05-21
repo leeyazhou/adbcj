@@ -6,4 +6,4 @@ DROP TABLE IF EXISTS supporteddatatypes;
 DROP TABLE IF EXISTS textcontent;
 DROP TABLE IF EXISTS tableWithAutoId;
 
-DROP USER IF EXISTS 'ADBCJ-OTHER-USER'@'localhost';
+DROP USER IF EXISTS 'ASYNCDB-OTHER-USER'@'localhost';

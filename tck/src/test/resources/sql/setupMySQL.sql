@@ -1,7 +1,7 @@
-DROP USER IF EXISTS 'ADBCJ-OTHER-USER'@'localhost';
-CREATE USER 'ADBCJ-OTHER-USER'@'localhost' IDENTIFIED BY  'adbcj-other-user';
-GRANT USAGE ON adbcjtck.* TO 'ADBCJ-OTHER-USER'@'localhost';
-GRANT ALL PRIVILEGES ON *.* TO  'ADBCJ-OTHER-USER'@'localhost';
+DROP USER IF EXISTS 'ASYNCDB-OTHER-USER'@'localhost';
+CREATE USER 'ASYNCDB-OTHER-USER'@'localhost' IDENTIFIED BY  'asyncdb-other-user';
+GRANT USAGE ON asyncdb.* TO 'ASYNCDB-OTHER-USER'@'localhost';
+GRANT ALL PRIVILEGES ON *.* TO  'ASYNCDB-OTHER-USER'@'localhost';
 
 DROP TABLE IF EXISTS simple_values;
 
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS supporteddatatypes (
 )  ENGINE=InnoDB  DEFAULT CHARSET=UTF8;
 
 
-INSERT INTO adbcjtck.supporteddatatypes (
+INSERT INTO asyncdb.supporteddatatypes (
   intColumn,
   varCharColumn,
   bigIntColumn,
