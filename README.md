@@ -29,12 +29,12 @@ Add you're dependencies now. For MySQL:
 
     <dependency>
         <groupId>org.asyncdb</groupId>
-        <artifactId>asyncdb-api</artifactId>
+        <artifactId>flower.asyncdb.api</artifactId>
         <version>0.9</version>
     </dependency>
     <dependency>
         <groupId>org.asyncdb</groupId>
-        <artifactId>mysql-async-driver</artifactId>
+        <artifactId>flower.asyncdb.mysql</artifactId>
         <version>0.9</version>
     </dependency>
     
@@ -42,12 +42,12 @@ Or for H2:
 
     <dependency>
         <groupId>org.asyncdb</groupId>
-        <artifactId>asyncdb-api</artifactId>
+        <artifactId>flower.asyncdb.api</artifactId>
         <version>0.9</version>
     </dependency>
     <dependency>
         <groupId>org.asyncdb</groupId>
-        <artifactId>h2-async-driver</artifactId>
+        <artifactId>flower.asyncdb.h2</artifactId>
         <version>0.9</version>
     </dependency>
 
