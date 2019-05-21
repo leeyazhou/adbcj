@@ -22,7 +22,7 @@ package com.ly.train.flower.db.api;
  * Each method accepts an accumulator that may be used for holding the parsing
  * state.
  * 
- * @author Mike Heath
+ * @author leeyazhou
  *
  * @param <T> The accumulator type.
  */

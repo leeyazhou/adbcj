@@ -13,24 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
-	This file is part of asyncdb.
-
-	asyncdb is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
-
-	asyncdb is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with asyncdb.  If not, see <http://www.gnu.org/licenses/>.
-
-	Copyright 2008  Mike Heath
- */
 package com.ly.train.flower.db.mysql.codec;
 
 import java.io.IOException;
@@ -48,7 +30,7 @@ import io.netty.channel.Channel;
  * Client stateful decoder. Being stateful, each client connection must have its
  * own decoder instance to function properly.
  *
- * @author Mike Heath <mheath@apache.org>
+ * @author leeyazhou
  */
 public class MySqlClientDecoder {
   private static final Logger logger = LoggerFactory.getLogger(MySqlClientDecoder.class);

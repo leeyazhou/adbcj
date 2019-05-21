@@ -19,7 +19,7 @@ package com.ly.train.flower.db.api;
 /**
  * Stores the column data type and other meta-data for a particular column.
  * 
- * @author Mike Heath
+ * @author leeyazhou
  * @see ResultSet
  */
 public interface Field {

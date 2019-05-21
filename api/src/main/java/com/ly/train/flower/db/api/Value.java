@@ -22,7 +22,7 @@ import java.util.Date;
  * Holds a field value. The {@code Value} methods attempt to convert the field
  * value to Java types.
  *
- * @author Mike Heath
+ * @author leeyazhou
  */
 public interface Value {
 

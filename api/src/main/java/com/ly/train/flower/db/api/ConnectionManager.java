@@ -27,7 +27,7 @@ import com.ly.train.flower.db.api.support.DbCompletableFuture;
  * pools together in one place. You typically create one connection manager for
  * you're application.
  *
- * @author Mike Heath
+ * @author leeyazhou
  */
 public interface ConnectionManager extends AsyncCloseable {
 

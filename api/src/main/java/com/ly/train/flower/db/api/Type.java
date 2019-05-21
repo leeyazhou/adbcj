@@ -19,7 +19,7 @@ import java.sql.Types;
 
 /**
  * 
- * @author Mike Heath
+ * @author leeyazhou
  */
 public enum Type {
   ARRAY(Types.ARRAY), BIGINT(Types.BIGINT), BINARY(Types.BINARY), BIT(Types.BIT), BLOB(Types.BLOB), BOOLEAN(

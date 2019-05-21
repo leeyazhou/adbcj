@@ -13,39 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
-	This file is part of asyncdb.
-
-	asyncdb is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
-
-	asyncdb is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with asyncdb.  If not, see <http://www.gnu.org/licenses/>.
-
-	Copyright 2008  Mike Heath
- */
 package com.ly.train.flower.db.mysql.codec.model;
 
 /**
  *
- * @author Mike Heath <mheath@apache.org>
+ * @author leeyazhou
  */
 // TODO Document ServerStatus and what each bit means
 public enum ServerStatus {
   IN_TRANSACTION(0x0001),
 
   AUTOCOMMIT(0x0002),
-  // MORE_RESULTS_EXISTS(0x008),
-  // MULTI_QUERY,
-  // BAD_INDEX,
-  // NO_INDEX,
+
+  MORE_RESULTS_EXISTS(0x008),
+
+  QUERY_NO_GOOD_INDEX_USED(0x010),
+
+  QUERY_NO_INDEX_USED(0x020),
+
   CURSOR_EXISTS(0x0040),
 
   LAST_ROW_SENT(0x0080),
@@ -54,7 +39,13 @@ public enum ServerStatus {
 
   NO_BACKSLASH_ESCAPES(0x0200),
 
-  METADATA_CHANGED(0x0400);
+  METADATA_CHANGED(0x0400),
+
+  QUERY_WAS_SLOW(0x0800),
+
+  PS_OUT_PARAMS(0x1000),
+
+  IN_TRANS_READONLY(0x2000);
 
   private int code;
 
