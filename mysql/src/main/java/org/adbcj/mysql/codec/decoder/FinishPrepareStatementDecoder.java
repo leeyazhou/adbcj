@@ -65,9 +65,9 @@ abstract class FinishPrepareStatementDecoder extends AbstractDecoder {
           new PreparedStatementToBuildResponse(length, packetNumber, statement.getPreparedStatement(), types);
       int restOfParams = parametersToParse - 1;
       if (restOfParams > 0) {
-        return result(new ReadParameters(connection, restOfParams, newStatement, callback), statement);
+        return resultWrapper(new ReadParameters(connection, restOfParams, newStatement, callback), statement);
       } else {
-        return result(new EofAndColumns(connection, newStatement, callback), statement);
+        return resultWrapper(new EofAndColumns(connection, newStatement, callback), statement);
       }
     }
 
@@ -92,9 +92,9 @@ abstract class FinishPrepareStatementDecoder extends AbstractDecoder {
         if (statement.getColumns() == 0) {
           final StatementPreparedEOFResponse preparedEOF = new StatementPreparedEOFResponse(packetNumber, packetNumber, statement);
           callback.onComplete(new MySqlPreparedStatement(connection, preparedEOF), null);
-          return result(new AcceptNextResponseDecoder(connection), preparedEOF);
+          return resultWrapper(new AcceptNextResponseDecoder(connection), preparedEOF);
         } else {
-          return result(new ReadColumns(connection, statement.getColumns(), statement, callback), statement);
+          return resultWrapper(new ReadColumns(connection, statement.getColumns(), statement, callback), statement);
         }
       } else {
         throw new IllegalStateException("Did not expect a EOF from the server");
@@ -122,9 +122,9 @@ abstract class FinishPrepareStatementDecoder extends AbstractDecoder {
       readAllAndIgnore(in);
       int restOfParams = restOfColumns - 1;
       if (restOfParams > 0) {
-        return result(new ReadColumns(connection, restOfParams, statement, callback), statement);
+        return resultWrapper(new ReadColumns(connection, restOfParams, statement, callback), statement);
       } else {
-        return result(new EofStatement(connection, statement, callback), statement);
+        return resultWrapper(new EofStatement(connection, statement, callback), statement);
       }
     }
 
@@ -149,7 +149,7 @@ abstract class FinishPrepareStatementDecoder extends AbstractDecoder {
 
         final StatementPreparedEOFResponse preparedEOF = new StatementPreparedEOFResponse(packetNumber, packetNumber, statement);
         callback.onComplete(new MySqlPreparedStatement(connection, preparedEOF), null);
-        return result(new AcceptNextResponseDecoder(connection), preparedEOF);
+        return resultWrapper(new AcceptNextResponseDecoder(connection), preparedEOF);
       } else {
         throw new IllegalStateException("Did not expect a EOF from the server");
       }

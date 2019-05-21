@@ -13,6 +13,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<AbstractResp
   @Override
   protected void channelRead0(ChannelHandlerContext ctx, AbstractResponse msg) throws Exception {
     logger.info("收到消息：{}", msg);
+    
   }
 
 }

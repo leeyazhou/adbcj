@@ -91,7 +91,7 @@ public final class MySqlRequestUtil {
             StackTraceElement[] entry) {
 
         return new MySqlRequest<>("Prepare-Query: " + sql,
-                new ExpectPreparQuery(connection, callback, entry),
+                new ExpectPreparQueryDecoder(connection, callback, entry),
                 new StringCommandRequest(Command.STATEMENT_PREPARE, sql),
                 callback);
     }

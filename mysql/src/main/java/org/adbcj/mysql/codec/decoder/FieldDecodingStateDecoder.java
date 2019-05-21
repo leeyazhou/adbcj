@@ -72,10 +72,10 @@ public class FieldDecodingStateDecoder<T> extends AbstractDecoder {
     }
 
     if (expectedAmountOfFields > (fieldNo + 1)) {
-      return result(new FieldDecodingStateDecoder<T>(connection, decodingType, expectedAmountOfFields, newFields, eventHandler,
+      return resultWrapper(new FieldDecodingStateDecoder<T>(connection, decodingType, expectedAmountOfFields, newFields, eventHandler,
           accumulator, callback, entry, failure), resultSetFieldResponse);
     } else {
-      return result(
+      return resultWrapper(
           new FieldEofDecoder<T>(connection, decodingType, newFields, eventHandler, accumulator, callback, entry, failure),
           resultSetFieldResponse);
     }

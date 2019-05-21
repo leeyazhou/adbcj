@@ -35,7 +35,6 @@ public class NettyDecoder extends ByteToMessageDecoder {
       if (log.isDebugEnabled() && null != obj) {
         log.debug("Decoded message: {}", obj);
       }
-      System.err.println("解码消息 : " + obj);
       if (obj != null) {
         out.add(obj);
       }

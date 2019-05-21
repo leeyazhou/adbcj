@@ -13,6 +13,7 @@ import org.adbcj.DbCallback;
 import org.adbcj.DbException;
 import org.adbcj.Field;
 import org.adbcj.ResultSet;
+import org.adbcj.Row;
 import org.adbcj.StandardProperties;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -48,8 +49,11 @@ public class MySqlConnectionTest {
             @Override
             public void onComplete(ResultSet result, DbException failure) {
               List<? extends Field> fs = result.getFields();
-              System.out.println("结果属性：" + fs);
-              if(failure!=null) {
+              System.err.println("结果属性：" + fs);
+              for (Row row : result) {
+                System.err.println("结果： " + row.get("id") + " : " + row.get("name"));
+              }
+              if (failure != null) {
                 failure.printStackTrace();
               }
             }

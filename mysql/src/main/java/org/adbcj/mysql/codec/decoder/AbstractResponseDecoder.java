@@ -8,18 +8,18 @@ import org.adbcj.mysql.codec.packets.response.ErrorResponse;
 import org.adbcj.mysql.codec.packets.response.OkResponse;
 import io.netty.channel.Channel;
 
-public abstract class AbstractResponseStartDecoder extends AbstractDecoder {
+public abstract class AbstractResponseDecoder extends AbstractDecoder {
 
   protected final MySqlConnection connection;
 
-  protected AbstractResponseStartDecoder(MySqlConnection connection) {
+  protected AbstractResponseDecoder(MySqlConnection connection) {
     this.connection = connection;
   }
 
   @Override
-  public ResponseWrapper decode(int length, int packetNumber, BoundedInputStream in, Channel channel) throws IOException {
+  public ResponseWrapper decode(int length, int packetNumber, BoundedInputStream in, Channel channel)
+      throws IOException {
     int fieldCount = in.read();
-    System.err.println("消息内容：" + fieldCount + ", " + (fieldCount== RESPONSE_OK));
     if (fieldCount == RESPONSE_OK) {
       return handleOk(OkResponse.interpretAsRegularOk(length, packetNumber, in));
     }

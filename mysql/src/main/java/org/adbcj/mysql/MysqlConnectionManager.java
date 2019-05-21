@@ -25,6 +25,8 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.concurrent.DefaultThreadFactory;
 
 public class MysqlConnectionManager extends AbstractConnectionManager {
@@ -54,9 +56,9 @@ public class MysqlConnectionManager extends AbstractConnectionManager {
       @Override
       public void initChannel(NioSocketChannel ch) throws Exception {
         ch.config().setAutoRead(false);
-        // ch.pipeline().addLast("loggingHandler", new LoggingHandler(LogLevel.DEBUG));
+        ch.pipeline().addLast("loggingHandler", new LoggingHandler(LogLevel.DEBUG));
         ch.pipeline().addLast(ENCODER, new NettyEncoder());
-        ch.pipeline().addLast("handler", new NettyClientHandler());
+//        ch.pipeline().addLast("handler", new NettyClientHandler());
 
       }
     });
@@ -119,7 +121,7 @@ public class MysqlConnectionManager extends AbstractConnectionManager {
       addConnection(connection);
       channel.pipeline().addLast(DECODER,
           new NettyDecoder(new ConnectingDecoder(connected, entry, connection, credentials), connection));
-
+      channel.pipeline().addLast("handler", new NettyClientHandler());
       channel.config().setAutoRead(true);
       channel.read();
     });

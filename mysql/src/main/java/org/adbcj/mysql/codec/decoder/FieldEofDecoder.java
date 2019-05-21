@@ -51,7 +51,7 @@ class FieldEofDecoder<T> extends AbstractDecoder {
       throw new IllegalStateException("Expected an EOF response from the server");
     }
     EofResponse fieldEof = decodeEofResponse(in, length, packetNumber, EofResponse.Type.FIELD);
-    return result(new RowDecoder<T>(connection, decodingType, fields, eventHandler, accumulator, callback, entry, failure),
+    return resultWrapper(new RowDecoder<T>(connection, decodingType, fields, eventHandler, accumulator, callback, entry, failure),
         fieldEof);
   }
 

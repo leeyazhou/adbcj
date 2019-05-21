@@ -8,7 +8,7 @@ import org.adbcj.mysql.codec.model.ResponseWrapper;
 import org.adbcj.mysql.codec.packets.response.ErrorResponse;
 import org.adbcj.mysql.codec.packets.response.OkResponse;
 
-public class FinishLoginDecoder extends AbstractResponseStartDecoder {
+public class FinishLoginDecoder extends AbstractResponseDecoder {
   private final DbCallback<Connection> connected;
   private final StackTraceElement[] entry;
 

@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class ExpectQueryResultDecoder<T> extends AbstractResponseStartDecoder {
+public class ExpectQueryResultDecoder<T> extends AbstractResponseDecoder {
   private static final Logger logger = LoggerFactory.getLogger(ExpectQueryResultDecoder.class);
   private final ResultHandler<T> eventHandler;
   private final T accumulator;
@@ -63,7 +63,7 @@ public class ExpectQueryResultDecoder<T> extends AbstractResponseStartDecoder {
     } catch (Exception any) {
       failure = DbException.wrap(any, entry);
     }
-    return result(
+    return resultWrapper(
         new FieldDecodingStateDecoder<T>(connection, decodingType, expectedFieldPackets, new ArrayList<>(), eventHandler,
             accumulator, callback, entry, failure),
         new ResultSetResponse(length, packetNumber, expectedFieldPackets, extra));

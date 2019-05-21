@@ -21,11 +21,28 @@ public abstract class AbstractDecoder {
   public static final int RESPONSE_EOF = 0xfe;
   public static final int RESPONSE_OK = 0x00;
 
+  /**
+   * 解码器
+   * 
+   * @param length
+   * @param packetNumber
+   * @param in
+   * @param channel
+   * @return
+   * @throws IOException
+   */
   public abstract ResponseWrapper decode(int length, int packetNumber, BoundedInputStream in, Channel channel)
       throws IOException;
 
-  public ResponseWrapper result(AbstractDecoder newState, AbstractResponse result) {
-    return new ResponseWrapper(newState, result);
+  /**
+   * 包装 新解码器和 结果
+   * 
+   * @param newDecoder 新解码器
+   * @param result 响应结果
+   * @return
+   */
+  public ResponseWrapper resultWrapper(AbstractDecoder newDecoder, AbstractResponse result) {
+    return new ResponseWrapper(newDecoder, result);
   }
 
   protected EofResponse decodeEofResponse(InputStream in, int length, int packetNumber, EofResponse.Type type)
@@ -78,15 +95,15 @@ public abstract class AbstractDecoder {
    * Sand-boxing the DbCallback for protecting ADBCJ kernel from being destroyed
    * when the exception occurs in user DbCallback.onComplete() code.
    *
-   * @param cb the database callback
+   * @param callback the database callback
    * @return the sand-boxed callback
    * @since 2017-09-02 little-pan
    */
-  public <T> DbCallback<T> sandboxCallback(final DbCallback<T> cb) {
-    if (cb.getClass() == SandboxDbCallback.class) {
-      return cb;
+  public <T> DbCallback<T> sandboxCallback(final DbCallback<T> callback) {
+    if (callback.getClass() == SandboxDbCallback.class) {
+      return callback;
     }
-    return (new SandboxDbCallback<T>(cb));
+    return (new SandboxDbCallback<T>(callback));
   }
 
 

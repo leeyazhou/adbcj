@@ -59,7 +59,7 @@ public class RowDecoder<T> extends AbstractDecoder {
         callback.onComplete(null, failure);
       }
       EofResponse rowEof = decodeEofResponse(in, length, packetNumber, EofResponse.Type.ROW);
-      return result(new AcceptNextResponseDecoder(connection), rowEof);
+      return resultWrapper(new AcceptNextResponseDecoder(connection), rowEof);
     }
 
     Value[] values = rowDecoding.decode(in, fieldCount, this);
@@ -73,7 +73,7 @@ public class RowDecoder<T> extends AbstractDecoder {
     } catch (Exception ex) {
       failure = DbException.attachSuppressedOrWrap(ex, entry, failure);
     }
-    return result(
+    return resultWrapper(
         new RowDecoder<T>(connection, rowDecoding, fields, eventHandler, accumulator, callback, entry, failure),
         new ResultSetRowResponse(length, packetNumber, values));
 

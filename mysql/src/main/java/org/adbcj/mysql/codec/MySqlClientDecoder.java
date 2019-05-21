@@ -18,18 +18,16 @@
  */
 package org.adbcj.mysql.codec;
 
+import java.io.IOException;
+import java.io.InputStream;
 import org.adbcj.mysql.codec.decoder.AbstractDecoder;
 import org.adbcj.mysql.codec.model.ResponseWrapper;
 import org.adbcj.mysql.codec.packets.FailedToParseInputResponse;
 import org.adbcj.mysql.codec.packets.response.AbstractResponse;
 import org.adbcj.mysql.codec.util.IOUtil;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
-import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.IOException;
-import java.io.InputStream;
+import io.netty.channel.Channel;
 
 /**
  * Client stateful decoder. Being stateful, each client connection must have its
@@ -39,10 +37,7 @@ import java.io.InputStream;
  */
 public class MySqlClientDecoder {
   private static final Logger logger = LoggerFactory.getLogger(MySqlClientDecoder.class);
-
-
   private AbstractDecoder decoder;
-
   public MySqlClientDecoder(AbstractDecoder decoder) {
     this.decoder = decoder;
   }
@@ -94,32 +89,11 @@ public class MySqlClientDecoder {
       }
     }
     final int packetNumber = IOUtil.safeRead(input);
-    // Dump packet for debug
-    // @since 2017-08-29 little-pan
-    final boolean debug;
-    if (debug = logger.isDebugEnabled()) {
-      ByteBuf dumpBuf = null;
-      try {
-        input.mark(Integer.MAX_VALUE);
-        dumpBuf = channel.alloc().buffer(length + 4).writeMedium(length).writeByte(packetNumber);
-        dumpBuf.writeBytes(input, length);
-        logger.debug("Received packet: \n{}", ByteBufUtil.prettyHexDump(dumpBuf));
-      } finally {
-        if (dumpBuf != null) {
-          dumpBuf.release();
-        }
-        input.reset();
-      }
-    }
-    // Dump packet for debug
     final BoundedInputStream inputStream = new BoundedInputStream(input, length);
-    logger.trace("Decoding in state {}", decoder);
+    logger.debug("Decoding in state {}", decoder);
     final ResponseWrapper stateAndResult = decoder.decode(length, packetNumber, inputStream, channel);
     final AbstractDecoder nextDecoder = stateAndResult.getNewDecoder();
-    if (debug && (decoder != nextDecoder)) {
-      logger.debug("New state of the decoding is: {}", nextDecoder);
-    }
-    this.decoder = nextDecoder;
+    this.setDecoder(nextDecoder);
     final int rem = inputStream.getRemaining();
     if (rem > 0) {
       final String message =
@@ -127,15 +101,12 @@ public class MySqlClientDecoder {
       return new FailedToParseInputResponse(length, packetNumber, new IllegalStateException(message));
     }
     return stateAndResult.getResult();
-
   }
-
-
 
   /**
    * Sets the state, used for testing.
    */
-  void setState(AbstractDecoder state) {
-    this.decoder = state;
+  void setDecoder(AbstractDecoder newDecoder) {
+    this.decoder = newDecoder;
   }
 }

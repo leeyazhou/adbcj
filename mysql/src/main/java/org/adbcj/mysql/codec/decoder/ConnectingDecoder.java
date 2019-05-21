@@ -26,7 +26,7 @@ import io.netty.channel.Channel;
 
 public class ConnectingDecoder extends AbstractDecoder {
 
-  protected final static Logger log = LoggerFactory.getLogger(ConnectingDecoder.class);
+  private final static Logger log = LoggerFactory.getLogger(ConnectingDecoder.class);
 
   /**
    * The salt size in a server greeting
@@ -46,18 +46,19 @@ public class ConnectingDecoder extends AbstractDecoder {
   private final DbCallback<Connection> connected;
   private final StackTraceElement[] entry;
   private final MySqlConnection connection;
-  private final LoginCredentials loginWith;
+  private final LoginCredentials loginCredentials;
 
   public ConnectingDecoder(DbCallback<Connection> connected, StackTraceElement[] entry, MySqlConnection connection,
       LoginCredentials loginWith) {
     this.connected = sandboxCallback(connected);
     this.entry = entry;
     this.connection = connection;
-    this.loginWith = loginWith;
+    this.loginCredentials = loginWith;
   }
 
   @Override
-  public ResponseWrapper decode(int length, int packetNumber, BoundedInputStream in, Channel channel) throws IOException {
+  public ResponseWrapper decode(int length, int packetNumber, BoundedInputStream in, Channel channel)
+      throws IOException {
     // try-to-parse error packet such 'Too many connections' when connecting.
     // @since 2017-09-01 little-pan
     final boolean initError;
@@ -76,18 +77,19 @@ public class ConnectingDecoder extends AbstractDecoder {
         }
         connected.onComplete(null, error.toException(entry));
       });
-      return result(new AcceptNextResponseDecoder(connection), error);
+      return resultWrapper(new AcceptNextResponseDecoder(connection), error);
     }
     // end error packet handler when connecting
     ServerGreetingResponse serverGreeting = decodeServerGreeting(in, length, packetNumber);
-    LoginRequest loginRequest = new LoginRequest(loginWith, connection.getClientCapabilities(),
+    LoginRequest loginRequest = new LoginRequest(loginCredentials, connection.getClientCapabilities(),
         connection.getExtendedClientCapabilities(), MysqlCharacterSet.UTF8_UNICODE_CI, serverGreeting.getSalt());
     channel.writeAndFlush(loginRequest);
-    log.info("收到MySQL响应，现发送登录消息。Login : {}", loginWith);
-    return result(new FinishLoginDecoder(connected, entry, connection), serverGreeting);
+    log.info("收到MySQL响应，现发送登录消息。Login : {}", loginCredentials);
+    return resultWrapper(new FinishLoginDecoder(connected, entry, connection), serverGreeting);
   }
 
-  private ServerGreetingResponse decodeServerGreeting(BoundedInputStream in, int length, int packetNumber) throws IOException {
+  private ServerGreetingResponse decodeServerGreeting(BoundedInputStream in, int length, int packetNumber)
+      throws IOException {
     int protocol = IOUtil.safeRead(in);
     String version = IOUtil.readNullTerminatedString(in, StandardCharsets.US_ASCII);
     int threadId = IOUtil.readInt(in);
@@ -111,8 +113,8 @@ public class ConnectingDecoder extends AbstractDecoder {
       throw new EOFException("Unexpected EOF. Expected to read 1 more byte");
     }
 
-    return new ServerGreetingResponse(length, packetNumber, protocol, version, threadId, salt, serverCapabilities, charSet,
-        serverStatus);
+    return new ServerGreetingResponse(length, packetNumber, protocol, version, threadId, salt, serverCapabilities,
+        charSet, serverStatus);
   }
 
   @Override

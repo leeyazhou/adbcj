@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 public class SandboxDbCallback<T> implements DbCallback<T> {
   private static final Logger logger = LoggerFactory.getLogger(SandboxDbCallback.class);
-  final DbCallback<T> callback;
+  private final DbCallback<T> callback;
 
   public SandboxDbCallback(final DbCallback<T> callback) {
     this.callback = callback;

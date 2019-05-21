@@ -7,7 +7,7 @@ import org.adbcj.mysql.codec.packets.response.ErrorResponse;
 import org.adbcj.mysql.codec.packets.response.OkResponse;
 
 
-public class ExpectOKDecoder<T> extends AbstractResponseStartDecoder {
+public class ExpectOKDecoder<T> extends AbstractResponseDecoder {
 
   protected final DbCallback<T> callback;
   private final StackTraceElement[] entry;

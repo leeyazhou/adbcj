@@ -13,14 +13,13 @@ import org.adbcj.mysql.codec.packets.response.StatementPreparedEOFResponse;
 import io.netty.channel.Channel;
 
 
-public class ExpectPreparQuery extends AbstractDecoder {
+public class ExpectPreparQueryDecoder extends AbstractDecoder {
   private final MySqlConnection connection;
   private final DbCallback<MySqlPreparedStatement> callback;
   private final StackTraceElement[] entry;
 
-  public ExpectPreparQuery(MySqlConnection connection, DbCallback<MySqlPreparedStatement> callback,
+  public ExpectPreparQueryDecoder(MySqlConnection connection, DbCallback<MySqlPreparedStatement> callback,
       StackTraceElement[] entry) {
-    super();
     this.callback = sandboxCallback(callback);
     this.entry = entry;
     this.connection = connection;
@@ -30,11 +29,11 @@ public class ExpectPreparQuery extends AbstractDecoder {
   public ResponseWrapper decode(int length, int packetNumber, BoundedInputStream in, Channel channel)
       throws IOException {
     int fieldCount = in.read();
-    if (fieldCount == AbstractResponseStartDecoder.RESPONSE_OK) {
+    if (fieldCount == AbstractResponseDecoder.RESPONSE_OK) {
       return handlePrepareQuery(length, packetNumber,
           OkResponse.interpretAsPreparedStatement(length, packetNumber, in));
     }
-    if (fieldCount == AbstractResponseStartDecoder.RESPONSE_ERROR) {
+    if (fieldCount == AbstractResponseDecoder.RESPONSE_ERROR) {
       return handleError(decodeErrorResponse(in, length, packetNumber));
     } else {
       throw new IllegalStateException("Did not expect this response from the server");
