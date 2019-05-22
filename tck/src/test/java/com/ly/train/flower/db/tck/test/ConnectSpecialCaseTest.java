@@ -34,9 +34,11 @@ public class ConnectSpecialCaseTest {
   @Test(timeOut = 60000)
   public void testConnectBadCredentials(String url, String user, String password) throws InterruptedException {
     final CountDownLatch latch = new CountDownLatch(1);
-
-    ConnectionManager connectionManager =
-        ConnectionManagerProvider.createConnectionManager(url, user, "__BADPASSWORD__");
+    Configuration configuration = new Configuration();
+    configuration.setUrl(url);
+    configuration.setUsername(user);
+    configuration.setPassword(password);
+    ConnectionManager connectionManager = ConnectionManagerProvider.createConnectionManager(configuration);
     try {
       CompletableFuture<Connection> connectFuture = connectionManager.connect();
 

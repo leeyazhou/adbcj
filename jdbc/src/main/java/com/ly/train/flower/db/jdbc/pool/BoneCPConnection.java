@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ly.train.flower.db.jdbc.connectionpools;
+package com.ly.train.flower.db.jdbc.pool;
 
 import com.jolbox.bonecp.BoneCP;
 import com.ly.train.flower.db.jdbc.JDBCConnectionProvider;

@@ -15,14 +15,15 @@
  */
 package com.ly.train.flower.db.tck.test;
 
+import java.util.concurrent.ExecutionException;
 import org.testng.Assert;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
+import com.ly.train.flower.db.api.Configuration;
 import com.ly.train.flower.db.api.Connection;
 import com.ly.train.flower.db.api.ConnectionManager;
 import com.ly.train.flower.db.api.ConnectionManagerProvider;
 import com.ly.train.flower.db.api.DbException;
-import java.util.concurrent.ExecutionException;
 
 
 public class ConnectionErrorsTest {
@@ -31,8 +32,11 @@ public class ConnectionErrorsTest {
   public void expectTimeoutWhenDatabaseNotAvailable(String url) throws Exception {
     assumeIsOnLocalhost(url);
     String unconnectableUrl = unconnectableURL(url);
-    ConnectionManager connectionManager =
-        ConnectionManagerProvider.createConnectionManager(unconnectableUrl, "root", "");
+    Configuration configuration = new Configuration();
+    configuration.setUrl(unconnectableUrl);
+    configuration.setUsername("root");
+    configuration.setPassword("");
+    ConnectionManager connectionManager = ConnectionManagerProvider.createConnectionManager(configuration);
     try {
       Connection connection = connectionManager.connect().get();
       Assert.fail("should not be able to connect, but got" + connection);
@@ -48,8 +52,11 @@ public class ConnectionErrorsTest {
   public void expectErrorWithWrongSchema(String url, String user, String pwd) throws Exception {
     assumeIsOnLocalhost(url);
     String unconnectableUrl = wrongSchema(url);
-    ConnectionManager connectionManager =
-        ConnectionManagerProvider.createConnectionManager(unconnectableUrl, user, pwd);
+    Configuration configuration = new Configuration();
+    configuration.setUrl(unconnectableUrl);
+    configuration.setUsername(user);
+    configuration.setPassword(pwd);
+    ConnectionManager connectionManager = ConnectionManagerProvider.createConnectionManager(configuration);
     try {
       Connection connection = connectionManager.connect().get();
       Assert.fail("should not be able to connect, but got" + connection);

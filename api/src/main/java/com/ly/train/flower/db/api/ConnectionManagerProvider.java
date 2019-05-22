@@ -18,9 +18,6 @@ package com.ly.train.flower.db.api;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ServiceLoader;
 import com.ly.train.flower.db.api.support.ConnectionManagerFactory;
 
@@ -39,48 +36,25 @@ public final class ConnectionManagerProvider {
    * See
    * {@link ConnectionManagerProvider#createConnectionManager(String, String, String, java.util.Map)}
    *
-   * @param url The url to the database. It has the usual format:
-   *        asyncdb:your-database-type://host:port/database. Example
-   *        asyncdb:mysql:localhost:3306/database
-   * @param username username
-   * @param password password
+   * @param configuration {@link Configuration}
    * @return the connection manager, which creates new connections to your
    *         database.
    * @throws DbException if it cannot find the driver in the classpath, or one of
    *         the connection parameters is wrong
    */
-  public static ConnectionManager createConnectionManager(String url, String username, String password)
-      throws DbException {
-    return createConnectionManager(url, username, password, Collections.emptyMap());
-  }
-
-  /**
-   * Creates a new connection manager.
-   *
-   * @param url The url to the database. It has the usual format:
-   *        asyncdb:your-database-type://host:port/database. Example
-   *        asyncdb:mysql:localhost:3306/database
-   * @param username username
-   * @param password password
-   * @param properties additional properties for the driver and connection
-   * @return the connection manager, which creates new connections to your
-   *         database.
-   * @throws DbException if it cannot find the driver in the classpath, or one of
-   *         the connection parameters is wrong
-   */
-  public static ConnectionManager createConnectionManager(String url, String username, String password,
-      final Map<String, String> properties) throws DbException {
-    if (url == null) {
+  public static ConnectionManager createConnectionManager(Configuration configuration) throws DbException {
+    if (configuration.getUrl() == null) {
       throw new IllegalArgumentException("Connection url can not be null");
     }
 
-    Map<String, String> propertiesWithStandard = addStandardSettings(properties);
+    configuration.addProperty(StandardProperties.MAX_QUEUE_LENGTH,
+        String.valueOf(StandardProperties.DEFAULT_QUEUE_LENGTH));
 
     try {
-      URI uri = new URI(url);
+      URI uri = new URI(configuration.getUrl());
       String asyncdbProtocol = uri.getScheme();
       if (!asyncdb_PROTOCOL.equals(asyncdbProtocol) && !DBCJ_PROTOCOL.equals(asyncdbProtocol)) {
-        throw new DbException("Invalid connection URL: " + url);
+        throw new DbException("Invalid connection URL: " + configuration.getUrl());
       }
       URI driverUri = new URI(uri.getSchemeSpecificPart());
       String protocol = driverUri.getScheme();
@@ -88,22 +62,13 @@ public final class ConnectionManagerProvider {
       ServiceLoader<ConnectionManagerFactory> serviceLoader = ServiceLoader.load(ConnectionManagerFactory.class);
       for (ConnectionManagerFactory factory : serviceLoader) {
         if (factory.canHandle(protocol)) {
-          return factory.createConnectionManager(url, username, password, propertiesWithStandard);
+          return factory.createConnectionManager(configuration);
         }
       }
       throw new DbException("Could not find ConnectionManagerFactory for protocol '" + protocol + "'");
     } catch (URISyntaxException e) {
-      throw new DbException("Invalid connection URL: " + url);
+      throw new DbException("Invalid connection URL: " + configuration.getUrl());
     }
-  }
-
-  private static Map<String, String> addStandardSettings(Map<String, String> userProperties) {
-    HashMap<String, String> newMap = new HashMap<String, String>();
-    newMap.put(StandardProperties.MAX_QUEUE_LENGTH, String.valueOf(StandardProperties.DEFAULT_QUEUE_LENGTH));
-    for (Map.Entry<String, String> entry : userProperties.entrySet()) {
-      newMap.put(entry.getKey(), entry.getValue());
-    }
-    return newMap;
   }
 
 }

@@ -32,7 +32,6 @@ public class CheckConstructionManager implements ConnectionManager {
   private final Map<String, String> properties;
 
   public CheckConstructionManager(String url, String username, String password, Map<String, String> properties) {
-
     this.url = url;
     this.username = username;
     this.password = password;

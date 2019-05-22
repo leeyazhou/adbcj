@@ -16,20 +16,21 @@
 package com.ly.train.flower.db.demo;
 
 import org.h2.tools.Server;
+import com.ly.train.flower.db.api.Configuration;
 import com.ly.train.flower.db.api.ConnectionManager;
 import com.ly.train.flower.db.api.ConnectionManagerProvider;
+import com.ly.train.flower.db.api.StandardProperties;
 
 public class TutorialFirstConnectionAsync {
 
     public static void main(String[] args) {
         // First, let's start a demo H2 database server
         Server demoH2Db = DemoServer.startServer();
-
-        final ConnectionManager connectionManager = ConnectionManagerProvider.createConnectionManager(
-                "asyncdb:h2://localhost:14242/mem:db1;DB_CLOSE_DELAY=-1;MVCC=TRUE",
-                "asyncdb",
-                "password1234"
-        );
+        Configuration configuration = new Configuration();
+        configuration.setUrl("asyncdb:h2://localhost:14242/mem:db1;DB_CLOSE_DELAY=-1;MVCC=TRUE");
+        configuration.setUsername("asyncdb");
+        configuration.setPassword("password1234");
+        final ConnectionManager connectionManager = ConnectionManagerProvider.createConnectionManager(configuration);
 
         // Aysync with raw callbacks.
         connectionManager.connect((connection, connectionFailure) -> {

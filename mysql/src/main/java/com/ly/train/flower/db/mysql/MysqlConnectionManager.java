@@ -57,8 +57,8 @@ public class MysqlConnectionManager extends AbstractConnectionManager {
 
   private final ConnectionPool<LoginCredentials, NettyChannel> connectionPool;
 
-  public MysqlConnectionManager(Configuration configuration, Map<String, String> properties) {
-    super(properties);
+  public MysqlConnectionManager(Configuration configuration) {
+    super(configuration.getProperties());
     this.loginCredentials = new LoginCredentials(configuration);
     this.eventLoop = new NioEventLoopGroup(0, new DefaultThreadFactory("asyncdb-io"));
     this.bootstrap = new Bootstrap().group(eventLoop).channel(NioSocketChannel.class);

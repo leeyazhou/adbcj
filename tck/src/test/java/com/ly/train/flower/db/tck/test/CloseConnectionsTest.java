@@ -36,7 +36,11 @@ public class CloseConnectionsTest extends AbstractWithConnectionManagerTest {
   @Parameters({"url", "user", "password"})
   @Test
   public void closingManagerClosesConnections(String url, String user, String password) throws Exception {
-    final ConnectionManager manager = ConnectionManagerProvider.createConnectionManager(url, user, password);
+    Configuration configuration = new Configuration();
+    configuration.setUrl(url);
+    configuration.setUsername(user);
+    configuration.setPassword(password);
+    final ConnectionManager manager = ConnectionManagerProvider.createConnectionManager(configuration);
     final Connection c1 = manager.connect().get();
     final Future<ResultSet> runningQuery = c1.executeQuery("SELECT SLEEP(2)");
     final Future<ResultSet> runningQuery2 = c1.executeQuery("SELECT SLEEP(2)");
@@ -51,7 +55,11 @@ public class CloseConnectionsTest extends AbstractWithConnectionManagerTest {
   @Parameters({"url", "user", "password"})
   @Test
   public void foreClosingManagerClosesConnections(String url, String user, String password) throws Exception {
-    final ConnectionManager manager = ConnectionManagerProvider.createConnectionManager(url, user, password);
+    Configuration configuration = new Configuration();
+    configuration.setUrl(url);
+    configuration.setUsername(user);
+    configuration.setPassword(password);
+    final ConnectionManager manager = ConnectionManagerProvider.createConnectionManager(configuration);
     final Connection c1 = manager.connect().get();
     final Connection c2 = manager.connect().get();
     c2.beginTransaction();

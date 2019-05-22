@@ -16,6 +16,7 @@
 package com.ly.train.flower.db.tck;
 
 import java.util.Random;
+import com.ly.train.flower.db.api.Configuration;
 import com.ly.train.flower.db.api.Connection;
 import com.ly.train.flower.db.api.ConnectionManager;
 import com.ly.train.flower.db.api.ConnectionManagerProvider;
@@ -26,10 +27,17 @@ import com.ly.train.flower.db.api.ConnectionManagerProvider;
 public class PopulateLarge {
 
   public static void main(String[] args) throws Exception {
-    ConnectionManager mysqlCM = ConnectionManagerProvider
-        .createConnectionManager("asyncdb:mysqlnetty://localhost/asyncdb", "asyncdb", "asyncdb");
-    ConnectionManager pgCM = ConnectionManagerProvider
-        .createConnectionManager("asyncdb:postgresql-netty://localhost/asyncdb", "asyncdb", "asyncdb");
+    Configuration configuration = new Configuration();
+    configuration.setUrl("asyncdb:mysqlnetty://localhost/asyncdb");
+    configuration.setUsername("asyncdb");
+    configuration.setPassword("asyncdb");
+    Configuration configuration2 = new Configuration();
+    configuration2.setUrl("asyncdb:postgresql-netty://localhost/asyncdb");
+    configuration2.setUsername("asyncdb");
+    configuration2.setPassword("asyncdb");
+
+    ConnectionManager mysqlCM = ConnectionManagerProvider.createConnectionManager(configuration);
+    ConnectionManager pgCM = ConnectionManagerProvider.createConnectionManager(configuration2);
 
     Connection mysql = mysqlCM.connect().get();
     Connection pg = pgCM.connect().get();

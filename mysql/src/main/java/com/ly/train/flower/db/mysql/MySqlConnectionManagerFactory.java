@@ -29,14 +29,10 @@ public class MySqlConnectionManagerFactory implements ConnectionManagerFactory {
   public static final int DEFAULT_PORT = 3306;
 
   @Override
-  public ConnectionManager createConnectionManager(String url, String username, String password,
-      Map<String, String> properties) throws DbException {
+  public ConnectionManager createConnectionManager(Configuration configuration)
+      throws DbException {
     try {
-      /*
-       * Parse URL
-       */
-      URI uri = new URI(url);
-      // Throw away the 'asyncdb' protocol part of the URL
+      URI uri = new URI(configuration.getUrl());
       uri = new URI(uri.getSchemeSpecificPart());
 
       String host = uri.getHost();
@@ -50,16 +46,13 @@ public class MySqlConnectionManagerFactory implements ConnectionManagerFactory {
       }
       String schema = path.substring(1);
 
-      Configuration configuration = new Configuration();
-      configuration.setHost(host);
-      configuration.setUsername(username);
-      configuration.setPort(port);
-      configuration.setPassword(password);
       configuration.setDatabase(schema);
+      configuration.setHost(host);
+      configuration.setPort(port);
 
-      return new MysqlConnectionManager(configuration, properties);
+      return new MysqlConnectionManager(configuration);
     } catch (URISyntaxException e) {
-      throw new DbException("Could not create connection to " + url, e);
+      throw new DbException("Could not create connection to " + configuration.getUrl(), e);
     }
   }
 

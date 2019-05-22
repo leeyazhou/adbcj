@@ -28,10 +28,9 @@ public class H2ConnectionManagerFactory implements ConnectionManagerFactory {
   private static final int DEFAULT_PORT = 8082;
 
   @Override
-  public ConnectionManager createConnectionManager(String url, String username, String password,
-      Map<String, String> properties) throws DbException {
+  public ConnectionManager createConnectionManager(Configuration configuration) throws DbException {
     try {
-      URI uri = new URI(url);
+      URI uri = new URI(configuration.getUrl());
       uri = new URI(uri.getSchemeSpecificPart());
 
       String host = uri.getHost();
@@ -47,15 +46,12 @@ public class H2ConnectionManagerFactory implements ConnectionManagerFactory {
       if (schema.contains(";")) {
         schema = schema.split(";")[0];
       }
-      Configuration configuration = new Configuration();
-      configuration.setHost(host);
-      configuration.setUsername(username);
-      configuration.setPort(port);
-      configuration.setPassword(password);
       configuration.setDatabase(schema);
+      configuration.setHost(host);
+      configuration.setPort(port);
 
-      Map<String, String> keys = parsKeys(url);
-      return new H2ConnectionManager(uri.toString(), configuration, properties, keys);
+      Map<String, String> keys = parsKeys(configuration.getUrl());
+      return new H2ConnectionManager(configuration, configuration.getProperties(), keys);
 
     } catch (Exception e) {
       throw DbException.wrap(e);

@@ -16,8 +16,6 @@
 package com.ly.train.flower.db.h2.connect;
 
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -27,6 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.ly.train.flower.db.api.Configuration;
 import com.ly.train.flower.db.api.Connection;
 import com.ly.train.flower.db.api.ConnectionManager;
 import com.ly.train.flower.db.api.ConnectionManagerProvider;
@@ -40,17 +39,19 @@ public class ConnectTest {
   public void test() throws InterruptedException {
     final int n = 1;
     // h2 url schema - asyncdb:h2://host:port/db, no "tcp:" after "h2:"
-    final String url = "asyncdb:h2://localhost:9092/test;DB_CLOSE_DELAY=-1";
-    final String username = "sa", password = "";
+
+    Configuration configuration = new Configuration();
+    configuration.setUrl("asyncdb:h2://localhost:9092/test;DB_CLOSE_DELAY=-1");
+    configuration.setUsername("sa");
+    configuration.setPassword("");
     final long tms = System.currentTimeMillis();
     final AtomicInteger success = new AtomicInteger(0);
     final CountDownLatch cnlat = new CountDownLatch(n);
     final CountDownLatch colat = new CountDownLatch(1);
     ConnectionManager cm = null;
     try {
-      final Map<String, String> props = new HashMap<>();
-      props.put(StandardProperties.CONNECTION_POOL_ENABLE, "false");
-      cm = ConnectionManagerProvider.createConnectionManager(url, username, password, props);
+      configuration.addProperty(StandardProperties.CONNECTION_POOL_ENABLE, "false");
+      cm = ConnectionManagerProvider.createConnectionManager(configuration);
       for (int i = 0; i < n; ++i) {
         log.debug("connecting-{} pending", i);
         CompletableFuture<Connection> cf = cm.connect();

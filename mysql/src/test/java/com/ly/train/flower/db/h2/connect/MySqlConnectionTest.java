@@ -15,15 +15,14 @@
  */
 package com.ly.train.flower.db.h2.connect;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.ly.train.flower.db.api.Configuration;
 import com.ly.train.flower.db.api.Connection;
 import com.ly.train.flower.db.api.ConnectionManager;
 import com.ly.train.flower.db.api.ConnectionManagerProvider;
@@ -39,18 +38,20 @@ public class MySqlConnectionTest {
 
   @Test
   public void testMySQL() throws InterruptedException {
-    final int n = 20;
-    final String url = "asyncdb:mysql://10.100.216.147/asyncdb";
-    final String username = "root", password = "UJ9FeAm3Yc@#E%IH8dLj6guyr5K&u#J3";
+    final int n = 1;
+    Configuration configuration = new Configuration();
+    configuration.setUrl("asyncdb:mysql://10.100.216.147/asyncdb");
+    configuration.setUsername("root");
+    configuration.setPassword("UJ9FeAm3Yc@#E%IH8dLj6guyr5K&u#J3");
+
     final long tms = System.currentTimeMillis();
     final AtomicInteger success = new AtomicInteger(0);
     final CountDownLatch cnlat = new CountDownLatch(n);
     final CountDownLatch colat = new CountDownLatch(1);
     ConnectionManager connectionManager = null;
     try {
-      final Map<String, String> props = new HashMap<>();
-      props.put(StandardProperties.CONNECTION_POOL_ENABLE, "false");
-      connectionManager = ConnectionManagerProvider.createConnectionManager(url, username, password, props);
+      configuration.addProperty(StandardProperties.CONNECTION_POOL_ENABLE, "false");
+      connectionManager = ConnectionManagerProvider.createConnectionManager(configuration);
       for (int i = 0; i < n; ++i) {
         log.debug("connecting-{} pending", i);
         CompletableFuture<Connection> cf = connectionManager.connect();
@@ -59,7 +60,7 @@ public class MySqlConnectionTest {
           if (e != null) {
             log.warn("<<< connect error", e);
           }
-          c.executeQuery("select * from user", new DbCallback<ResultSet>() {
+          c.executeQuery("select * from user where id = 10", new DbCallback<ResultSet>() {
 
             @Override
             public void onComplete(ResultSet result, DbException failure) {
@@ -74,13 +75,13 @@ public class MySqlConnectionTest {
             }
           });
           c.executeQuery("select version()", new DbCallback<ResultSet>() {
-            
+
             @Override
             public void onComplete(ResultSet result, DbException failure) {
               List<? extends Field> fs = result.getFields();
               System.err.println("结果属性：" + fs + "\n");
               for (Row row : result) {
-                log.info("结果： " + row.get("id") + " : " + row.get("name"));
+                log.info("结果： " + row.get("version()") + " : " + row.get("name"));
               }
               if (failure != null) {
                 failure.printStackTrace();

@@ -15,17 +15,18 @@
  */
 package com.ly.train.flower.db.tck.test;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Parameters;
 import com.ly.train.flower.db.api.CloseMode;
+import com.ly.train.flower.db.api.Configuration;
 import com.ly.train.flower.db.api.ConnectionManager;
 import com.ly.train.flower.db.api.ConnectionManagerProvider;
 import com.ly.train.flower.db.api.StandardProperties;
 import com.ly.train.flower.db.tck.InitDatabase;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 
 public abstract class AbstractWithConnectionManagerTest {
@@ -34,16 +35,22 @@ public abstract class AbstractWithConnectionManagerTest {
 
   @Parameters({"jdbcUrl", "url", "user", "password", "setupClass", "connectionPool"})
   @BeforeClass
-  public void createConnectionManager(String jdbcUrl, String url, String user, String password, String setupClass,
+  public void createConnectionManager(String jdbcUrl, String url, String username, String password, String setupClass,
       boolean connectionPool) throws Exception {
     InitDatabase init = (InitDatabase) Class.forName(setupClass).newInstance();
-    init.prepareMySQL(jdbcUrl, user, password);
+    init.prepareMySQL(jdbcUrl, username, password);
     this.init = init;
-    Map<String, String> props = properties();
+
+    Configuration configuration = new Configuration();
+    configuration.setUrl(url);
+    configuration.setUsername(username);
+    configuration.setPassword(password);
     if (connectionPool) {
-      props.put(StandardProperties.CONNECTION_POOL_ENABLE, "true");
+      configuration.addProperty(StandardProperties.CONNECTION_POOL_ENABLE, "true");
     }
-    this.connectionManager = ConnectionManagerProvider.createConnectionManager(url, user, password, props);
+
+
+    this.connectionManager = ConnectionManagerProvider.createConnectionManager(configuration);
   }
 
   protected Map<String, String> properties() {

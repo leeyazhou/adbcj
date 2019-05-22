@@ -19,7 +19,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.EnumSet;
-import java.util.HashMap;
 import org.junit.Test;
 import org.testng.Assert;
 import com.ly.train.flower.db.api.Configuration;
@@ -136,12 +135,10 @@ public class GreetingDecodeTest {
 
   private MySqlConnection createMockConnection() {
     Configuration configuration = new Configuration();
-    configuration.setHost("localhost");
     configuration.setPassword("sa");
     configuration.setUsername("sa");
     configuration.setDatabase("test");
-    configuration.setPort(42);
-    return new MySqlConnection(login, 64, new MysqlConnectionManager(configuration, new HashMap<String, String>()),
+    return new MySqlConnection(login, 64, new MysqlConnectionManager(configuration),
         new NettyChannel(new EmbeddedChannel()), StackTracingOptions.GLOBAL_DEFAULT);
   }
 

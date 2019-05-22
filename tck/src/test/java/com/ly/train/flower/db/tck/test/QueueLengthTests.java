@@ -15,16 +15,19 @@
  */
 package com.ly.train.flower.db.tck.test;
 
-import org.testng.Assert;
-import org.testng.annotations.Parameters;
-import org.testng.annotations.Test;
-import com.ly.train.flower.db.api.*;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import org.testng.Assert;
+import org.testng.annotations.Parameters;
+import org.testng.annotations.Test;
+import com.ly.train.flower.db.api.Configuration;
+import com.ly.train.flower.db.api.Connection;
+import com.ly.train.flower.db.api.ConnectionManager;
+import com.ly.train.flower.db.api.ConnectionManagerProvider;
+import com.ly.train.flower.db.api.DbException;
+import com.ly.train.flower.db.api.StandardProperties;
 
 public class QueueLengthTests extends AbstractWithConnectionManagerTest {
 
@@ -51,9 +54,12 @@ public class QueueLengthTests extends AbstractWithConnectionManagerTest {
   @Test
   public void increaseQueueSize(String url, String user, String password) throws Exception {
     int limit = 512;
-    Map<String, String> props = new HashMap<>();
-    props.put(StandardProperties.MAX_QUEUE_LENGTH, String.valueOf(limit));
-    ConnectionManager connectionManager = ConnectionManagerProvider.createConnectionManager(url, user, password, props);
+    Configuration configuration = new Configuration();
+    configuration.setUrl(url);
+    configuration.setUsername(user);
+    configuration.setPassword(password);
+    configuration.addProperty(StandardProperties.MAX_QUEUE_LENGTH, String.valueOf(limit));
+    ConnectionManager connectionManager = ConnectionManagerProvider.createConnectionManager(configuration);
     Connection connection = connectionManager.connect().get();
 
     try {

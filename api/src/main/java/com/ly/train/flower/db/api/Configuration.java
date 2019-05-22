@@ -19,6 +19,8 @@
 package com.ly.train.flower.db.api;
 
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 
@@ -26,15 +28,17 @@ import java.nio.charset.Charset;
  */
 public class Configuration {
 
-  private String username;
+  private String url;
   private String host;
   private Integer port;
+  private String username;
   private String password;
   private String database;
   private Charset charset;
   private Integer connectionTimeout = 5000;
   private Integer testTimeout = 5000;
   private Integer queryTimeout = 5000;
+  private Map<String, String> properties = new HashMap<String, String>();
 
   /**
    * @return the username
@@ -50,32 +54,20 @@ public class Configuration {
     this.username = username;
   }
 
+
+
   /**
-   * @return the host
+   * @return the url
    */
-  public String getHost() {
-    return host;
+  public String getUrl() {
+    return url;
   }
 
   /**
-   * @param host the host to set
+   * @param url the url to set
    */
-  public void setHost(String host) {
-    this.host = host;
-  }
-
-  /**
-   * @return the port
-   */
-  public Integer getPort() {
-    return port;
-  }
-
-  /**
-   * @param port the port to set
-   */
-  public void setPort(Integer port) {
-    this.port = port;
+  public void setUrl(String url) {
+    this.url = url;
   }
 
   /**
@@ -163,4 +155,43 @@ public class Configuration {
   }
 
 
+  /**
+   * @return the host
+   */
+  public String getHost() {
+    return host;
+  }
+
+  /**
+   * @param host the host to set
+   */
+  public void setHost(String host) {
+    this.host = host;
+  }
+
+  /**
+   * @return the port
+   */
+  public Integer getPort() {
+    return port;
+  }
+
+  /**
+   * @param port the port to set
+   */
+  public void setPort(Integer port) {
+    this.port = port;
+  }
+
+
+  /**
+   * @return the properties
+   */
+  public Map<String, String> getProperties() {
+    return properties;
+  }
+
+  public void addProperty(String key, String value) {
+    this.properties.put(key, value);
+  }
 }

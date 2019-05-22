@@ -49,7 +49,7 @@ public class JdbcConnection implements Connection {
   final StackTracingOptions strackTraces;
 
   final Object lock = new Object();
-  private final ArrayDeque<Request> requestQueue;
+  private final ArrayDeque<Request<?>> requestQueue;
   private boolean isInTransaction;
   private final CloseOnce closer = new CloseOnce();
 
@@ -182,7 +182,7 @@ public class JdbcConnection implements Connection {
     closer.requestClose(callback, () -> {
       synchronized (lock) {
         if (closeMode == CloseMode.CANCEL_PENDING_OPERATIONS) {
-          Request pending = requestQueue.poll();
+          Request<?> pending = requestQueue.poll();
           while (pending != null) {
             pending.callback.onComplete(null,
                 new DbConnectionClosedException("This connection is closed", null, entry));
@@ -250,6 +250,7 @@ public class JdbcConnection implements Connection {
     }
   }
 
+  @SuppressWarnings({"unchecked", "rawtypes"})
   private void processRequests() {
     Request request;
     synchronized (lock) {
@@ -261,10 +262,10 @@ public class JdbcConnection implements Connection {
       synchronized (jdbcConnection) {
         try {
           Object result = request.toRun.apply(jdbcConnection);
-          request.callback.onComplete(result, null);
+          request.getCallback().onComplete(result, null);
         } catch (Exception e) {
           try {
-            request.callback.onComplete(null, DbException.wrap(e, request.entry));
+            request.getCallback().onComplete(null, DbException.wrap(e, request.entry));
           } catch (Exception omg) {
             LOGGER.error("Driver failure: Failed handlinge error", omg);
           }
@@ -278,14 +279,18 @@ public class JdbcConnection implements Connection {
   }
 
   class Request<T> {
-    final DbCallback<T> callback;
-    final JdbcJobResult<T> toRun;
-    final StackTraceElement[] entry;
+    private final DbCallback<T> callback;
+    private final JdbcJobResult<T> toRun;
+    private final StackTraceElement[] entry;
 
     public Request(DbCallback<T> callback, JdbcJobResult<T> toRun, StackTraceElement[] entry) {
       this.callback = callback;
       this.toRun = toRun;
       this.entry = entry;
+    }
+
+    public DbCallback<T> getCallback() {
+      return callback;
     }
   }
 }

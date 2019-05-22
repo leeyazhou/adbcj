@@ -16,19 +16,18 @@
 package com.ly.train.flower.db.api;
 
 import org.testng.annotations.Test;
-import com.ly.train.flower.db.api.ConnectionManager;
-import com.ly.train.flower.db.api.ConnectionManagerProvider;
-import com.ly.train.flower.db.api.StandardProperties;
-import java.util.HashMap;
-import java.util.Map;
 
 
 public class PassesStandardPropertiesTest {
 
   @Test
   public void standardPropertiesArePassed() {
-    final ConnectionManager connectionManager =
-        ConnectionManagerProvider.createConnectionManager("asyncdb:apimock:url", "sa", "pwd");
+
+    Configuration configuration = new Configuration();
+    configuration.setUrl("asyncdb:apimock:url");
+    configuration.setUsername("sa");
+    configuration.setPassword("pwd");
+    final ConnectionManager connectionManager = ConnectionManagerProvider.createConnectionManager(configuration);
     final CheckConstructionManager check = CheckConstructionMock.lastInstanceRequestedOnThisThread();
 
     check.assertURL("asyncdb:apimock:url");
@@ -40,10 +39,12 @@ public class PassesStandardPropertiesTest {
 
   @Test
   public void canOverrideProperty() {
-    Map<String, String> userProperties = new HashMap<String, String>();
-    userProperties.put(StandardProperties.MAX_QUEUE_LENGTH, "128");
-    final ConnectionManager connectionManager =
-        ConnectionManagerProvider.createConnectionManager("asyncdb:apimock:url", "sa", "pwd", userProperties);
+    Configuration configuration = new Configuration();
+    configuration.setUrl("asyncdb:apimock:url");
+    configuration.setUsername("sa");
+    configuration.setPassword("pwd");
+    configuration.addProperty(StandardProperties.MAX_QUEUE_LENGTH, "128");
+    final ConnectionManager connectionManager = ConnectionManagerProvider.createConnectionManager(configuration);
     final CheckConstructionManager check = CheckConstructionMock.lastInstanceRequestedOnThisThread();
 
     check.assertProperty(StandardProperties.MAX_QUEUE_LENGTH, "128");
@@ -52,13 +53,15 @@ public class PassesStandardPropertiesTest {
 
   @Test
   public void propertiesDoNotChange() {
-    Map<String, String> userProperties = new HashMap<String, String>();
-    userProperties.put(StandardProperties.MAX_QUEUE_LENGTH, "128");
-    final ConnectionManager connectionManager =
-        ConnectionManagerProvider.createConnectionManager("asyncdb:apimock:url", "sa", "pwd", userProperties);
+    Configuration configuration = new Configuration();
+    configuration.setUrl("asyncdb:apimock:url");
+    configuration.setUsername("sa");
+    configuration.setPassword("pwd");
+    configuration.addProperty(StandardProperties.MAX_QUEUE_LENGTH, "128");
+    final ConnectionManager connectionManager = ConnectionManagerProvider.createConnectionManager(configuration);
     final CheckConstructionManager check = CheckConstructionMock.lastInstanceRequestedOnThisThread();
 
-    userProperties.put(StandardProperties.MAX_QUEUE_LENGTH, "256");
+    configuration.addProperty(StandardProperties.MAX_QUEUE_LENGTH, "256");
     check.assertProperty(StandardProperties.MAX_QUEUE_LENGTH, "128");
 
   }

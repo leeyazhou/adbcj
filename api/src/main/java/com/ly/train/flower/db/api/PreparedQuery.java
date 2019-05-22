@@ -22,6 +22,7 @@ import com.ly.train.flower.db.api.support.DefaultResultSet;
 
 public interface PreparedQuery extends PreparedStatement {
 
+  @SuppressWarnings({"unchecked", "rawtypes"})
   default CompletableFuture<ResultSet> execute(Object... params) {
     DefaultResultEventsHandler handler = new DefaultResultEventsHandler();
     DefaultResultSet acc = new DefaultResultSet();

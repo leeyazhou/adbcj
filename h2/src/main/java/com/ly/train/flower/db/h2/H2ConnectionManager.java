@@ -44,10 +44,9 @@ public class H2ConnectionManager extends AbstractConnectionManager {
   private final NioEventLoopGroup eventLoop;
   final ConnectionPool<LoginCredentials, Channel> connectionPool;
 
-  public H2ConnectionManager(String url, Configuration configuration, Map<String, String> properties,
-      Map<String, String> keys) {
+  public H2ConnectionManager(Configuration configuration, Map<String, String> properties, Map<String, String> keys) {
     super(properties);
-    this.url = url;
+    this.url = configuration.getUrl();
     this.defaultCredentials =
         new LoginCredentials(configuration.getUsername(), configuration.getPassword(), configuration.getDatabase());
     this.keys = keys;

@@ -15,19 +15,19 @@
  */
 package com.ly.train.flower.db.api.support;
 
-import java.util.Map;
+import com.ly.train.flower.db.api.Configuration;
 import com.ly.train.flower.db.api.ConnectionManager;
 import com.ly.train.flower.db.api.DbException;
 
 /**
- * Entry point to find a driver. The {@link com.ly.train.flower.db.api.ConnectionManagerProvider}
- * loads the ConnectionManagerFactory's via {@link java.util.ServiceLoader}.
- * Then checks if can handle the given protocol at hand
+ * Entry point to find a driver. The
+ * {@link com.ly.train.flower.db.api.ConnectionManagerProvider} loads the
+ * ConnectionManagerFactory's via {@link java.util.ServiceLoader}. Then checks
+ * if can handle the given protocol at hand
  */
 public interface ConnectionManagerFactory {
 
-  ConnectionManager createConnectionManager(String url, String username, String password,
-      Map<String, String> properties) throws DbException;
+  ConnectionManager createConnectionManager(Configuration configuration) throws DbException;
 
   boolean canHandle(String protocol);
 

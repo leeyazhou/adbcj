@@ -17,9 +17,9 @@ package com.ly.train.flower.db.jdbc;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.ly.train.flower.db.api.Configuration;
 import com.ly.train.flower.db.api.ConnectionManager;
 import com.ly.train.flower.db.api.DbException;
 import com.ly.train.flower.db.api.support.ConnectionManagerFactory;
@@ -30,10 +30,10 @@ public class JdbcConnectionManagerFactory implements ConnectionManagerFactory {
 
   private static final String PROTOCOL = "jdbc";
 
-  public ConnectionManager createConnectionManager(String url, String username, String password,
-      Map<String, String> properties) throws DbException {
+  @Override
+  public ConnectionManager createConnectionManager(Configuration configuration) throws DbException {
     try {
-      URI uri = new URI(url);
+      URI uri = new URI(configuration.getUrl());
       // Throw away the 'asyncdb' protocol part of the URL
       uri = new URI(uri.getSchemeSpecificPart());
 
@@ -43,7 +43,8 @@ public class JdbcConnectionManagerFactory implements ConnectionManagerFactory {
       log.warn("It is very slow and should not be used in production");
       log.warn("DO NOT USE IN PRODUCTION!!!");
 
-      return new JdbcConnectionManager(new PlainJDBCConnection(jdbcUrl, username, password, properties), properties);
+      return new JdbcConnectionManager(new PlainJDBCConnection(jdbcUrl, configuration.getUsername(),
+          configuration.getPassword(), configuration.getProperties()), configuration.getProperties());
     } catch (URISyntaxException e) {
       throw DbException.wrap(e);
     }

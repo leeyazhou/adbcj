@@ -99,6 +99,7 @@ public interface Connection extends AsyncCloseable {
   boolean isInTransaction();
 
 
+  @SuppressWarnings({"rawtypes", "unchecked"})
   default CompletableFuture<ResultSet> executeQuery(String sql) {
     DefaultResultEventsHandler handler = new DefaultResultEventsHandler();
     DefaultResultSet accumulator = new DefaultResultSet();
@@ -114,6 +115,7 @@ public interface Connection extends AsyncCloseable {
     return result;
   }
 
+  @SuppressWarnings({"unchecked", "rawtypes"})
   default void executeQuery(String sql, DbCallback<ResultSet> callback) {
     DefaultResultEventsHandler handler = new DefaultResultEventsHandler();
     DefaultResultSet accumulator = new DefaultResultSet();
