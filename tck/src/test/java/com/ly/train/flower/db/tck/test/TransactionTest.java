@@ -15,11 +15,15 @@
  */
 package com.ly.train.flower.db.tck.test;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
-import com.ly.train.flower.db.api.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+import com.ly.train.flower.db.api.Connection;
+import com.ly.train.flower.db.api.DbException;
+import com.ly.train.flower.db.api.Result;
+import com.ly.train.flower.db.api.ResultSet;
+import com.ly.train.flower.db.api.Value;
 
 @Test(timeOut = 5000)
 public class TransactionTest extends AbstractWithConnectionManagerTest {

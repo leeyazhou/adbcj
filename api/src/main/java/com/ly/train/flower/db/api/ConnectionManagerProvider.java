@@ -47,8 +47,10 @@ public final class ConnectionManagerProvider {
       throw new IllegalArgumentException("Connection url can not be null");
     }
 
-    configuration.addProperty(StandardProperties.MAX_QUEUE_LENGTH,
-        String.valueOf(StandardProperties.DEFAULT_QUEUE_LENGTH));
+    if (!configuration.containsProperty(StandardProperties.MAX_QUEUE_LENGTH)) {
+      configuration.addProperty(StandardProperties.MAX_QUEUE_LENGTH,
+          String.valueOf(StandardProperties.DEFAULT_QUEUE_LENGTH));
+    }
 
     try {
       URI uri = new URI(configuration.getUrl());

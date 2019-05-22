@@ -15,13 +15,10 @@
  */
 package com.ly.train.flower.db.tck.test;
 
+import java.util.concurrent.CompletableFuture;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import com.ly.train.flower.db.api.Connection;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 
 public class VoidIsVoidTest extends AbstractWithConnectionManagerTest {

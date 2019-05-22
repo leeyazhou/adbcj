@@ -16,13 +16,8 @@
 package com.ly.train.flower.db.api;
 
 
-import org.testng.Assert;
-import com.ly.train.flower.db.api.CloseMode;
-import com.ly.train.flower.db.api.Connection;
-import com.ly.train.flower.db.api.ConnectionManager;
-import com.ly.train.flower.db.api.DbCallback;
-import com.ly.train.flower.db.api.DbException;
 import java.util.Map;
+import org.junit.Assert;
 
 
 public class CheckConstructionManager implements ConnectionManager {

@@ -16,8 +16,8 @@
 package com.ly.train.flower.db.api.support.stacktracing;
 
 import static com.ly.train.flower.db.api.support.stacktracing.StackTracingOptions.FORCED_BY_INSTANCE;
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 
 public class StackTraceCapturingTest {

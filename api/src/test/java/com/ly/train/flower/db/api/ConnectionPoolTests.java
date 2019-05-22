@@ -15,8 +15,8 @@
  */
 package com.ly.train.flower.db.api;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import org.junit.Assert;
+import org.junit.Test;
 import com.ly.train.flower.db.api.support.ConnectionPool;
 
 public class ConnectionPoolTests {

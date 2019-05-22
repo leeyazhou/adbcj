@@ -1,7 +1,3 @@
-DROP USER IF EXISTS 'ASYNCDB-OTHER-USER'@'localhost';
-CREATE USER 'ASYNCDB-OTHER-USER'@'localhost' IDENTIFIED BY  'asyncdb-other-user';
-GRANT USAGE ON asyncdb.* TO 'ASYNCDB-OTHER-USER'@'localhost';
-GRANT ALL PRIVILEGES ON *.* TO  'ASYNCDB-OTHER-USER'@'localhost';
 
 DROP TABLE IF EXISTS simple_values;
 

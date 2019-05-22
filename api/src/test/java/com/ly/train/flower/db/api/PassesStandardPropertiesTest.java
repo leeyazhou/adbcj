@@ -15,7 +15,7 @@
  */
 package com.ly.train.flower.db.api;
 
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 
 public class PassesStandardPropertiesTest {
@@ -33,8 +33,8 @@ public class PassesStandardPropertiesTest {
     check.assertURL("asyncdb:apimock:url");
     check.assertUserName("sa");
     check.assertPassword("pwd");
-    check.assertProperty(StandardProperties.MAX_QUEUE_LENGTH, "64");
-
+    check.assertProperty(StandardProperties.MAX_QUEUE_LENGTH, "256");
+    connectionManager.close();
   }
 
   @Test
@@ -48,21 +48,7 @@ public class PassesStandardPropertiesTest {
     final CheckConstructionManager check = CheckConstructionMock.lastInstanceRequestedOnThisThread();
 
     check.assertProperty(StandardProperties.MAX_QUEUE_LENGTH, "128");
-
+    connectionManager.close();
   }
 
-  @Test
-  public void propertiesDoNotChange() {
-    Configuration configuration = new Configuration();
-    configuration.setUrl("asyncdb:apimock:url");
-    configuration.setUsername("sa");
-    configuration.setPassword("pwd");
-    configuration.addProperty(StandardProperties.MAX_QUEUE_LENGTH, "128");
-    final ConnectionManager connectionManager = ConnectionManagerProvider.createConnectionManager(configuration);
-    final CheckConstructionManager check = CheckConstructionMock.lastInstanceRequestedOnThisThread();
-
-    configuration.addProperty(StandardProperties.MAX_QUEUE_LENGTH, "256");
-    check.assertProperty(StandardProperties.MAX_QUEUE_LENGTH, "128");
-
-  }
 }

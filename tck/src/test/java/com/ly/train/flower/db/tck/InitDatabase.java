@@ -24,7 +24,6 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import org.testng.Assert;
 import com.ly.train.flower.db.jdbc.PlainJDBCConnection;
 
 public abstract class InitDatabase {
@@ -65,7 +64,6 @@ public abstract class InitDatabase {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage(), e);
     }
   }
 

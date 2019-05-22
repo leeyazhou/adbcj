@@ -15,7 +15,7 @@
  */
 package com.ly.train.flower.db.mysql.codec;
 
-import org.testng.annotations.Test;
+import org.junit.Test;
 import com.ly.train.flower.db.mysql.codec.model.MysqlCharacterSet;
 
 public class MysqlCharsetTest {

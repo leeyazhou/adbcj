@@ -15,13 +15,13 @@
  */
 package com.ly.train.flower.db.tck.test;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 import org.testng.annotations.Test;
 import com.ly.train.flower.db.api.Connection;
 import com.ly.train.flower.db.api.Result;
 import com.ly.train.flower.db.api.ResultSet;
 import com.ly.train.flower.db.api.Value;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
 
 
 @Test(timeOut = 5000)

@@ -15,13 +15,13 @@
  */
 package com.ly.train.flower.db.tck.test;
 
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import com.ly.train.flower.db.api.Connection;
 import com.ly.train.flower.db.api.DbException;
 import com.ly.train.flower.db.api.StandardProperties;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 
 public class FailingOperationsTest extends AbstractWithConnectionManagerTest {

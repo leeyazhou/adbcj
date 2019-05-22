@@ -15,14 +15,15 @@
  */
 package com.ly.train.flower.db.tck.test;
 
+import java.util.Random;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import com.ly.train.flower.db.api.*;
-import java.util.Random;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicInteger;
+import com.ly.train.flower.db.api.Connection;
+import com.ly.train.flower.db.api.Row;
 
 /**
  * @author foooling@gmail.com

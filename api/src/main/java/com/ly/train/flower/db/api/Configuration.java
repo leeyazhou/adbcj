@@ -191,6 +191,10 @@ public class Configuration {
     return properties;
   }
 
+  public boolean containsProperty(String key) {
+    return this.properties.containsKey(key);
+  }
+
   public void addProperty(String key, String value) {
     this.properties.put(key, value);
   }

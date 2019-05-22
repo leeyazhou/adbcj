@@ -15,15 +15,16 @@
  */
 package com.ly.train.flower.db.tck.test;
 
-import org.testng.annotations.Test;
-import com.ly.train.flower.db.api.*;
+import static org.testng.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import static org.testng.Assert.assertTrue;
+import org.testng.annotations.Test;
+import com.ly.train.flower.db.api.Connection;
+import com.ly.train.flower.db.api.ResultSet;
 
 @Test(invocationCount = 5, threadPoolSize = 5, timeOut = 30000)
 public class ConnectTest extends AbstractWithConnectionManagerTest {

@@ -17,7 +17,9 @@ package com.ly.train.flower.db.tck.test;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import com.ly.train.flower.db.api.*;
+import com.ly.train.flower.db.api.Connection;
+import com.ly.train.flower.db.api.PreparedUpdate;
+import com.ly.train.flower.db.api.Result;
 
 
 public class InsertTest extends AbstractWithConnectionManagerTest {

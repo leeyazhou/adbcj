@@ -15,8 +15,8 @@
  */
 package com.ly.train.flower.db.mysql.codec;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import org.junit.Assert;
+import org.junit.Test;
 import com.ly.train.flower.db.mysql.codec.util.PasswordEncryption;
 
 public class TestPasswordEncryption {

@@ -15,16 +15,16 @@
  */
 package com.ly.train.flower.db.tck.test;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+import java.math.BigDecimal;
+import java.util.Date;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import com.ly.train.flower.db.api.Connection;
 import com.ly.train.flower.db.api.PreparedQuery;
 import com.ly.train.flower.db.api.ResultSet;
 import com.ly.train.flower.db.api.Row;
-import java.math.BigDecimal;
-import java.util.Date;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 public class SupportedDataTypesTest extends AbstractWithConnectionManagerTest {
 

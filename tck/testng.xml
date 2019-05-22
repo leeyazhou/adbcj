@@ -19,7 +19,7 @@
 
 
 <suite name="ASYNCDB-TCK" verbose="1">
-  <test name="MySQL-JDBC">
+  <!-- <test name="MySQL-JDBC">
     <parameter name="jdbcUrl" value="jdbc:mysql://10.100.216.147/asyncdb?characterEncoding=UTF-8" />
     <parameter name="url" value="asyncdb:jdbc:mysql://10.100.216.147/asyncdb?characterEncoding=UTF-8" />
     <parameter name="user" value="root" />
@@ -29,7 +29,7 @@
     <packages>
       <package name="com.ly.train.flower.db.tck.test" />
     </packages>
-  </test>
+  </test> -->
   <test name="MySQL">
     <parameter name="jdbcUrl" value="jdbc:mysql://10.100.216.147/asyncdb?characterEncoding=UTF-8" />
     <parameter name="url" value="asyncdb:mysql://10.100.216.147/asyncdb" />
@@ -41,7 +41,7 @@
       <package name="com.ly.train.flower.db.tck.test" />
     </packages>
   </test>
-  <test name="MySQL-ConnectionPool">
+ <!--  <test name="MySQL-ConnectionPool">
     <parameter name="jdbcUrl" value="jdbc:mysql://10.100.216.147/asyncdb?characterEncoding=UTF-8" />
     <parameter name="url" value="asyncdb:mysql://10.100.216.147/asyncdb" />
     <parameter name="user" value="root" />
@@ -84,5 +84,5 @@
     <packages>
       <package name="com.ly.train.flower.db.tck.test" />
     </packages>
-  </test>
+  </test> -->
 </suite>

@@ -16,7 +16,6 @@
 package com.ly.train.flower.db.tck.test;
 
 import org.testng.Assert;
-import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 import com.ly.train.flower.db.api.Connection;
 

@@ -15,14 +15,13 @@
  */
 package com.ly.train.flower.db.mysql.codec;
 
-import static org.testng.Assert.assertEquals;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.EnumSet;
+import org.junit.Assert;
 import org.junit.Test;
 import com.ly.train.flower.db.api.support.DbCompletableFuture;
-import com.ly.train.flower.db.mysql.codec.MySqlClientDecoder;
 import com.ly.train.flower.db.mysql.codec.decoder.OKResponseDecoder;
 import com.ly.train.flower.db.mysql.codec.model.ServerStatus;
 import com.ly.train.flower.db.mysql.codec.packets.response.OKRegularResponse;
@@ -52,11 +51,11 @@ public class OkResponseDecodeTest {
     OKRegularResponse response = castToOk(in, decoder);
 
 
-    assertEquals(response.getPacketLength(), 48);
-    assertEquals(response.getPacketNumber(), 1);
-    assertEquals(response.getAffectedRows(), 0);
-    assertEquals(response.getServerStatus(), EnumSet.of(ServerStatus.AUTOCOMMIT, ServerStatus.NO_BACKSLASH_ESCAPES));
-    assertEquals(response.getMessage(), "(Rows matched: 0  Changed: 0  Warnings: 0");
+    Assert.assertEquals(response.getPacketLength(), 48);
+    Assert. assertEquals(response.getPacketNumber(), 1);
+    Assert.assertEquals(response.getAffectedRows(), 0);
+    Assert.assertEquals(response.getServerStatus(), EnumSet.of(ServerStatus.AUTOCOMMIT, ServerStatus.CURSOR_EXISTS));
+    Assert.assertEquals(response.getMessage(), "(Rows matched: 0  Changed: 0  Warnings: 0");
   }
 
   // Packet length: 7
@@ -75,11 +74,11 @@ public class OkResponseDecodeTest {
         new MySqlClientDecoder(new OKResponseDecoder<Void>(null, new DbCompletableFuture<Void>(), null));
     OKRegularResponse response = castToOk(in, decoder);
 
-    assertEquals(response.getPacketLength(), 7);
-    assertEquals(response.getPacketNumber(), 1);
-    assertEquals(response.getAffectedRows(), 1);
-    assertEquals(response.getServerStatus(), EnumSet.of(ServerStatus.AUTOCOMMIT));
-    assertEquals(response.getMessage(), "");
+    Assert.assertEquals(response.getPacketLength(), 7);
+    Assert.assertEquals(response.getPacketNumber(), 1);
+    Assert.assertEquals(response.getAffectedRows(), 1);
+    Assert.assertEquals(response.getServerStatus(), EnumSet.of(ServerStatus.AUTOCOMMIT));
+    Assert.assertEquals(response.getMessage(), "");
   }
 
   private OKRegularResponse castToOk(InputStream in, MySqlClientDecoder decoder) throws IOException {
