@@ -17,7 +17,7 @@ package com.ly.train.flower.db.mysql.codec.decoder;
 
 import com.ly.train.flower.db.api.Connection;
 import com.ly.train.flower.db.api.DbCallback;
-import com.ly.train.flower.db.api.DbException;
+import com.ly.train.flower.db.api.exception.DbException;
 import com.ly.train.flower.db.mysql.MySqlConnection;
 import com.ly.train.flower.db.mysql.codec.model.ResponseWrapper;
 import com.ly.train.flower.db.mysql.codec.packets.response.ErrorResponse;
@@ -41,16 +41,16 @@ public class ConnectedDecoder extends AbstractResponseDecoder {
   @Override
   protected ResponseWrapper handleError(ErrorResponse errorResponse) {
     connected.onComplete(null, DbException.wrap(errorResponse.toException(entry), entry));
-    return new ResponseWrapper(acceptNextResponse(), errorResponse);
+    return new ResponseWrapper(acceptNextResponseDecoder(), errorResponse);
   }
 
   @Override
   protected ResponseWrapper handleOk(OKRegularResponse oKRegularResponse) {
     connected.onComplete(connection, null);
-    return new ResponseWrapper(acceptNextResponse(), oKRegularResponse);
+    return new ResponseWrapper(acceptNextResponseDecoder(), oKRegularResponse);
   }
 
-  protected AcceptNextResponseDecoder acceptNextResponse() {
+  protected AcceptNextResponseDecoder acceptNextResponseDecoder() {
     return new AcceptNextResponseDecoder(connection);
   }
 }

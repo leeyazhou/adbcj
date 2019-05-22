@@ -16,6 +16,7 @@
 package com.ly.train.flower.db.mysql;
 
 import com.ly.train.flower.db.api.*;
+import com.ly.train.flower.db.api.handler.ResultHandler;
 import com.ly.train.flower.db.api.support.CloseOnce;
 import com.ly.train.flower.db.api.support.DbCompletableFuture;
 import com.ly.train.flower.db.api.support.DefaultResultEventsHandler;
@@ -35,6 +36,7 @@ public class MySqlPreparedStatement implements PreparedQuery, PreparedUpdate {
     this.statementInfo = statementInfo;
   }
 
+  @Override
   public CompletableFuture execute(Object... params) {
     DbCompletableFuture<Result> future = new DbCompletableFuture<>();
     execute(future, params);

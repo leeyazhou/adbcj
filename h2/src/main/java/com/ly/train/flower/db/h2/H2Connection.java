@@ -15,14 +15,25 @@
  */
 package com.ly.train.flower.db.h2;
 
-import io.netty.channel.Channel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.ly.train.flower.db.api.*;
-import com.ly.train.flower.db.api.support.*;
-import com.ly.train.flower.db.api.support.stacktracing.StackTracingOptions;
 import java.util.ArrayDeque;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.ly.train.flower.db.api.CloseMode;
+import com.ly.train.flower.db.api.Connection;
+import com.ly.train.flower.db.api.DbCallback;
+import com.ly.train.flower.db.api.PreparedQuery;
+import com.ly.train.flower.db.api.PreparedUpdate;
+import com.ly.train.flower.db.api.Result;
+import com.ly.train.flower.db.api.StandardProperties;
+import com.ly.train.flower.db.api.exception.DbConnectionClosedException;
+import com.ly.train.flower.db.api.exception.DbException;
+import com.ly.train.flower.db.api.handler.ResultHandler;
+import com.ly.train.flower.db.api.support.CloseOnce;
+import com.ly.train.flower.db.api.support.LoginCredentials;
+import com.ly.train.flower.db.api.support.stacktracing.StackTracingOptions;
+import com.ly.train.flower.db.h2.datasource.H2DataSource;
+import io.netty.channel.Channel;
 
 
 public class H2Connection implements Connection {
@@ -31,7 +42,7 @@ public class H2Connection implements Connection {
   private final ArrayDeque<Request> requestQueue;
   private final LoginCredentials login;
   private final int maxQueueSize;
-  private final H2ConnectionManager manager;
+  private final H2DataSource manager;
   private final Channel channel;
   private final Object lock = new Object();
   final StackTracingOptions stackTraces;
@@ -49,7 +60,7 @@ public class H2Connection implements Connection {
 
   private final RequestCreator requestCreator = new RequestCreator(this);
 
-  public H2Connection(LoginCredentials login, int maxQueueSize, H2ConnectionManager manager, Channel channel,
+  public H2Connection(LoginCredentials login, int maxQueueSize, H2DataSource manager, Channel channel,
       StackTracingOptions stackTraces) {
     this.login = login;
     this.maxQueueSize = maxQueueSize;
@@ -61,7 +72,7 @@ public class H2Connection implements Connection {
 
 
   @Override
-  public H2ConnectionManager getConnectionManager() {
+  public H2DataSource getConnectionManager() {
     return manager;
   }
 
@@ -148,7 +159,7 @@ public class H2Connection implements Connection {
     StackTraceElement[] entry = stackTraces.captureStacktraceAtEntryPoint();
     synchronized (lock) {
       closer.requestClose(callback, () -> {
-        if (this.manager.connectionPool == null || manager.isClosed() || closeMode == CloseMode.CLOSE_FORCIBLY) {
+        if (this.manager.getConnectionPool() == null || manager.isClosed() || closeMode == CloseMode.CLOSE_FORCIBLY) {
           doActualClose(closeMode, entry);
         } else {
           doRollback(entry, (result, failure) -> {
@@ -156,8 +167,8 @@ public class H2Connection implements Connection {
               if (manager.isClosed()) {
                 doActualClose(closeMode, entry);
               } else {
-                channel.pipeline().remove(H2ConnectionManager.DECODER);
-                manager.connectionPool.release(login, channel);
+                channel.pipeline().remove(H2DataSource.DECODER);
+                manager.getConnectionPool().release(login, channel);
                 callback.onComplete(result, null);
               }
             } else {

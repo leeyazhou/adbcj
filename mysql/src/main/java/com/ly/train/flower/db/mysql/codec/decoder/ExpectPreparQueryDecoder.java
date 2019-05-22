@@ -29,7 +29,7 @@ import com.ly.train.flower.db.mysql.codec.packets.response.StatementPreparedEOFR
 import io.netty.channel.Channel;
 
 
-public class ExpectPreparQueryDecoder extends AbstractDecoder {
+public class ExpectPreparQueryDecoder<T> extends AbstractDecoder {
   private final MySqlConnection connection;
   private final DbCallback<MySqlPreparedStatement> callback;
   private final StackTraceElement[] entry;
@@ -58,15 +58,14 @@ public class ExpectPreparQueryDecoder extends AbstractDecoder {
 
   private ResponseWrapper handlePrepareQuery(int length, int packetNumber,
       OKPreparedStatementResponse preparedStatement) {
-    final PreparedStatementResponse statement =
-        new PreparedStatementResponse(length, packetNumber, preparedStatement);
-    final AbstractDecoder decoderState = FinishPrepareStatementDecoder.create(connection, statement, callback);
-    if (decoderState instanceof AcceptNextResponseDecoder) {
+    final PreparedStatementResponse statement = new PreparedStatementResponse(length, packetNumber, preparedStatement);
+    final AbstractDecoder decoder = FinishPrepareStatementDecoder.create(connection, statement, callback);
+    if (decoder instanceof AcceptNextResponseDecoder) {
       final StatementPreparedEOFResponse eof = new StatementPreparedEOFResponse(length, packetNumber, statement);
       callback.onComplete(new MySqlPreparedStatement(connection, eof), null);
-      return new ResponseWrapper(decoderState, eof);
+      return new ResponseWrapper(decoder, eof);
     } else {
-      return new ResponseWrapper(decoderState, preparedStatement);
+      return new ResponseWrapper(decoder, preparedStatement);
     }
   }
 

@@ -16,6 +16,9 @@
 package com.ly.train.flower.db.api;
 
 import java.util.concurrent.CompletableFuture;
+import com.ly.train.flower.db.api.datasource.DataSource;
+import com.ly.train.flower.db.api.exception.DbException;
+import com.ly.train.flower.db.api.handler.ResultHandler;
 import com.ly.train.flower.db.api.support.DbCompletableFuture;
 import com.ly.train.flower.db.api.support.DefaultResultEventsHandler;
 import com.ly.train.flower.db.api.support.DefaultResultSet;
@@ -99,13 +102,12 @@ public interface Connection extends AsyncCloseable {
   boolean isInTransaction();
 
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
   default CompletableFuture<ResultSet> executeQuery(String sql) {
-    DefaultResultEventsHandler handler = new DefaultResultEventsHandler();
+    DefaultResultEventsHandler<ResultSet> handler = new DefaultResultEventsHandler<>();
     DefaultResultSet accumulator = new DefaultResultSet();
-    DbCompletableFuture<DefaultResultSet> result = new DbCompletableFuture<>();
+    DbCompletableFuture<ResultSet> result = new DbCompletableFuture<>();
     executeQuery(sql, handler, accumulator, result);
-    return (CompletableFuture) result;
+    return (CompletableFuture<ResultSet>) result;
   }
 
 
@@ -115,11 +117,10 @@ public interface Connection extends AsyncCloseable {
     return result;
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
   default void executeQuery(String sql, DbCallback<ResultSet> callback) {
-    DefaultResultEventsHandler handler = new DefaultResultEventsHandler();
+    DefaultResultEventsHandler<ResultSet> handler = new DefaultResultEventsHandler<>();
     DefaultResultSet accumulator = new DefaultResultSet();
-    executeQuery(sql, handler, accumulator, (DbCallback) callback);
+    executeQuery(sql, handler, (ResultSet) accumulator, (DbCallback<ResultSet>) callback);
   }
 
   <T> void executeQuery(String sql, ResultHandler<T> eventHandler, T accumulator, DbCallback<T> callback);
@@ -193,5 +194,5 @@ public interface Connection extends AsyncCloseable {
    *
    * @return The connection manager instance that created this connection.
    */
-  ConnectionManager getConnectionManager();
+  DataSource getConnectionManager();
 }

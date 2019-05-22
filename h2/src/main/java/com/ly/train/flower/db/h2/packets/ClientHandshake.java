@@ -15,7 +15,7 @@
  */
 package com.ly.train.flower.db.h2.packets;
 
-import com.ly.train.flower.db.api.DbException;
+import com.ly.train.flower.db.api.exception.DbException;
 import com.ly.train.flower.db.api.support.SizeConstants;
 import com.ly.train.flower.db.h2.decoding.Constants;
 import com.ly.train.flower.db.h2.decoding.IoUtils;

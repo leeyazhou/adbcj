@@ -25,7 +25,7 @@ import com.ly.train.flower.db.api.Result;
 public class InsertTest extends AbstractWithConnectionManagerTest {
   @Test
   public void returnsAutoIncrement() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     Result result = connection.executeUpdate("INSERT INTO tableWithAutoId (textData) VALUES ('data')").get();
     Assert.assertEquals(result.getAffectedRows(), 1L);
     Assert.assertTrue(result.getGeneratedKeys().get(0).get(0).getLong() > 0);
@@ -35,7 +35,7 @@ public class InsertTest extends AbstractWithConnectionManagerTest {
 
   @Test
   public void returnsMutlitpleAutoIncrement() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     Result result = connection
         .executeUpdate("INSERT INTO tableWithAutoId (textData) " + "VALUES ('data1'),('data2'),('data3');").get();
     Assert.assertEquals(result.getAffectedRows(), 3L);
@@ -51,7 +51,7 @@ public class InsertTest extends AbstractWithConnectionManagerTest {
 
   @Test
   public void returnsAutoIncrementPreparedQuery() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     PreparedUpdate statement = connection.prepareUpdate("INSERT INTO tableWithAutoId (textData) " + "VALUES (?)").get();
     Result result = statement.execute("value prepared").get();
 

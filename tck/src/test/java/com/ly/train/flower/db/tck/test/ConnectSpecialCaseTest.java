@@ -27,14 +27,14 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 import com.ly.train.flower.db.api.Configuration;
 import com.ly.train.flower.db.api.Connection;
-import com.ly.train.flower.db.api.ConnectionManager;
-import com.ly.train.flower.db.api.ConnectionManagerProvider;
+import com.ly.train.flower.db.api.datasource.DataSourceFactoryProvider;
+import com.ly.train.flower.db.api.datasource.DataSource;
 
 /**
  *
  */
 public class ConnectSpecialCaseTest {
-  private ConnectionManager connectionManager;
+  private DataSource dataSource;
 
   @Parameters({"url", "user", "password"})
   @BeforeClass
@@ -43,7 +43,7 @@ public class ConnectSpecialCaseTest {
     configuration.setUrl(url);
     configuration.setUsername(user);
     configuration.setPassword(password);
-    this.connectionManager = ConnectionManagerProvider.createConnectionManager(configuration);
+    this.dataSource = DataSourceFactoryProvider.createDataSource(configuration);
   }
 
   @Test(timeOut = 60000)
@@ -51,7 +51,7 @@ public class ConnectSpecialCaseTest {
     final CountDownLatch latch = new CountDownLatch(1);
 
     try {
-      CompletableFuture<Connection> connectFuture = connectionManager.connect();
+      CompletableFuture<Connection> connectFuture = dataSource.connect();
 
       connectFuture.handle((res, err) -> {
         Assert.assertNotNull(err);
@@ -68,7 +68,7 @@ public class ConnectSpecialCaseTest {
       }
       assertTrue(latch.await(1, TimeUnit.SECONDS), "Callback was not invoked in time");
     } finally {
-      connectionManager.close();
+      dataSource.close();
     }
   }
 

@@ -13,25 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ly.train.flower.db.api;
+package com.ly.train.flower.db.api.datasource;
+
+import com.ly.train.flower.db.api.Configuration;
+import com.ly.train.flower.db.api.exception.DbException;
 
 /**
- * The connection to the database was closed
+ * Entry point to find a driver. The
+ * {@link com.ly.train.flower.db.api.datasource.DataSourceFactoryProvider} loads the
+ * ConnectionManagerFactory's via {@link java.util.ServiceLoader}. Then checks
+ * if can handle the given protocol at hand
  */
-public class DbConnectionClosedException extends DbException {
+public interface DataSourceFactory {
+  
+  DataSource createDataSource(Configuration configuration) throws DbException;
 
-  private static final long serialVersionUID = 1L;
-
-  public DbConnectionClosedException() {
-    super("This database connection has been closed");
-  }
-
-  public DbConnectionClosedException(String message) {
-    super(message);
-  }
-
-  public DbConnectionClosedException(String message, Throwable cause, StackTraceElement[] entry) {
-    super(message, cause, entry);
-  }
+  boolean canHandle(String protocol);
 
 }

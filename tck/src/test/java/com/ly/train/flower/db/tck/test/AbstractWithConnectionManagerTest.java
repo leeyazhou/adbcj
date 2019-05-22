@@ -23,14 +23,14 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Parameters;
 import com.ly.train.flower.db.api.CloseMode;
 import com.ly.train.flower.db.api.Configuration;
-import com.ly.train.flower.db.api.ConnectionManager;
-import com.ly.train.flower.db.api.ConnectionManagerProvider;
 import com.ly.train.flower.db.api.StandardProperties;
+import com.ly.train.flower.db.api.datasource.DataSourceFactoryProvider;
+import com.ly.train.flower.db.api.datasource.DataSource;
 import com.ly.train.flower.db.tck.InitDatabase;
 
 
 public abstract class AbstractWithConnectionManagerTest {
-  protected ConnectionManager connectionManager;
+  protected DataSource dataSource;
   private InitDatabase init;
 
   @Parameters({"jdbcUrl", "url", "user", "password", "setupClass", "connectionPool"})
@@ -50,7 +50,7 @@ public abstract class AbstractWithConnectionManagerTest {
     }
 
 
-    this.connectionManager = ConnectionManagerProvider.createConnectionManager(configuration);
+    this.dataSource = DataSourceFactoryProvider.createDataSource(configuration);
   }
 
   protected Map<String, String> properties() {
@@ -60,7 +60,7 @@ public abstract class AbstractWithConnectionManagerTest {
   @Parameters({"jdbcUrl", "user", "password",})
   @AfterClass
   public void closeConnectionManager(String jdbcUrl, String user, String password) throws Exception {
-    CompletableFuture<Void> closeFuture = connectionManager.close(CloseMode.CANCEL_PENDING_OPERATIONS);
+    CompletableFuture<Void> closeFuture = dataSource.close(CloseMode.CANCEL_PENDING_OPERATIONS);
     closeFuture.get();
     init.cleanUp(jdbcUrl, user, password);
   }

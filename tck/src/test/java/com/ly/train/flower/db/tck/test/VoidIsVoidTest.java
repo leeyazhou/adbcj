@@ -25,7 +25,7 @@ public class VoidIsVoidTest extends AbstractWithConnectionManagerTest {
 
   @Test
   public void testCommitTransaction() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     try {
       connection.beginTransaction();
       assertFutureIsVoid(connection.commit());
@@ -36,7 +36,7 @@ public class VoidIsVoidTest extends AbstractWithConnectionManagerTest {
 
   @Test
   public void testRollbackTransaction() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     try {
       connection.beginTransaction();
       assertFutureIsVoid(connection.rollback());
@@ -47,7 +47,7 @@ public class VoidIsVoidTest extends AbstractWithConnectionManagerTest {
 
   @Test
   public void testClose() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     try {
       final CompletableFuture<Void> future = connection.close();
       assertFutureIsVoid(future);

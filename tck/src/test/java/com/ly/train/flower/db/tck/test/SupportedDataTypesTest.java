@@ -31,7 +31,7 @@ public class SupportedDataTypesTest extends AbstractWithConnectionManagerTest {
 
   @Test
   public void supportedInSelect() throws Exception {
-    final Connection connection = connectionManager.connect().get();
+    final Connection connection = dataSource.connect().get();
     final ResultSet resultSet = connection.executeQuery("SELECT *, NULL FROM supporteddatatypes").get();
     final Row row = resultSet.get(0);
 
@@ -43,7 +43,7 @@ public class SupportedDataTypesTest extends AbstractWithConnectionManagerTest {
 
   @Test
   public void supportedInPreparedStatement() throws Exception {
-    final Connection connection = connectionManager.connect().get();
+    final Connection connection = dataSource.connect().get();
     final PreparedQuery statement = connection.prepareQuery("SELECT *, NULL FROM supporteddatatypes").get();
     final ResultSet resultSet = statement.execute().get();
     final Row row = resultSet.get(0);
@@ -57,7 +57,7 @@ public class SupportedDataTypesTest extends AbstractWithConnectionManagerTest {
 
   @Test
   public void canBindDatatypesToParameters() throws Exception {
-    final Connection connection = connectionManager.connect().get();
+    final Connection connection = dataSource.connect().get();
     final PreparedQuery statement = connection.prepareQuery("SELECT *, NULL FROM supporteddatatypes "
         + "WHERE intColumn=? " + "AND varCharColumn LIKE ? " + "AND bigIntColumn = ? " + "AND decimalColumn = ? "
         + "AND dateColumn < ? " + "AND doubleColumn < ? " + "AND textColumn LIKE ? ").get();
@@ -74,7 +74,7 @@ public class SupportedDataTypesTest extends AbstractWithConnectionManagerTest {
 
   @Test
   public void canBindNullToParameter() throws Exception {
-    final Connection connection = connectionManager.connect().get();
+    final Connection connection = dataSource.connect().get();
     final PreparedQuery statement = connection
         .prepareQuery("SELECT * FROM table_with_some_values " + "WHERE can_be_null_int=? OR can_be_null_varchar LIKE ?")
         .get();

@@ -20,10 +20,10 @@ import static org.testng.Assert.assertNotNull;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import com.ly.train.flower.db.api.Connection;
-import com.ly.train.flower.db.api.DbException;
 import com.ly.train.flower.db.api.Result;
 import com.ly.train.flower.db.api.ResultSet;
 import com.ly.train.flower.db.api.Value;
+import com.ly.train.flower.db.api.exception.DbException;
 
 @Test(timeOut = 5000)
 public class TransactionTest extends AbstractWithConnectionManagerTest {
@@ -31,7 +31,7 @@ public class TransactionTest extends AbstractWithConnectionManagerTest {
 
 
   public void testBeginTransaction() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     try {
       Assert.assertTrue(!connection.isInTransaction(), "Connections should not start with transaction started");
       connection.beginTransaction();
@@ -48,7 +48,7 @@ public class TransactionTest extends AbstractWithConnectionManagerTest {
   }
 
   public void testCommitRollbackWithNoTransaction() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     try {
       // Test commit with no transaction
       try {
@@ -79,7 +79,7 @@ public class TransactionTest extends AbstractWithConnectionManagerTest {
   }
 
   public void testAfterCommitNotTransactionIsActive() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
 
     connection.beginTransaction();
 
@@ -91,7 +91,7 @@ public class TransactionTest extends AbstractWithConnectionManagerTest {
   }
 
   public void testAfterRollbackNotTransactionIsActive() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
 
     connection.beginTransaction();
 
@@ -103,7 +103,7 @@ public class TransactionTest extends AbstractWithConnectionManagerTest {
   }
 
   public void testRollback() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     try {
       // Clear out updates table
       Result result = connection.executeUpdate("DELETE FROM updates").get();
@@ -142,8 +142,8 @@ public class TransactionTest extends AbstractWithConnectionManagerTest {
   }
 
   public void testCommit() throws Exception {
-    Connection connection = connectionManager.connect().get();
-    Connection connection2 = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
+    Connection connection2 = dataSource.connect().get();
     try {
       // Clear out updates table
       Result result = connection.executeUpdate("DELETE FROM updates").get();
@@ -181,8 +181,8 @@ public class TransactionTest extends AbstractWithConnectionManagerTest {
   }
 
   public void testAfterCommitAutoCommit() throws Exception {
-    Connection connection = connectionManager.connect().get();
-    Connection connection2 = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
+    Connection connection2 = dataSource.connect().get();
     try {
       // Clear out updates table
       Result result = connection.executeUpdate("DELETE FROM updates").get();

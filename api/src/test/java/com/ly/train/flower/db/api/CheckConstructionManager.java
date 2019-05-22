@@ -18,9 +18,11 @@ package com.ly.train.flower.db.api;
 
 import java.util.Map;
 import org.junit.Assert;
+import com.ly.train.flower.db.api.datasource.DataSource;
+import com.ly.train.flower.db.api.exception.DbException;
 
 
-public class CheckConstructionManager implements ConnectionManager {
+public class CheckConstructionManager implements DataSource {
   private final String url;
   private final String username;
   private final String password;

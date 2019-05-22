@@ -43,7 +43,7 @@ public class UpdateResult extends StatusReadingDecoder {
     final ResultOrWait<Integer> affected = IoUtils.tryReadNextInt(stream, ResultOrWait.Start);
     final ResultOrWait<Boolean> autoCommit = IoUtils.tryReadNextBoolean(stream, affected);
     if (autoCommit.couldReadResult) {
-      DefaultResultEventsHandler handler = new DefaultResultEventsHandler();
+      DefaultResultEventsHandler<ResultSet> handler = new DefaultResultEventsHandler<>();
       DefaultResultSet result = new DefaultResultSet();
 
       return ResultAndState.newState(new QueryHeader<>(connection, handler, result, (success, failure) -> {

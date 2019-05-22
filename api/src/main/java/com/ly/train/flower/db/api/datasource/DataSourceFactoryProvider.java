@@ -13,28 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ly.train.flower.db.api;
+package com.ly.train.flower.db.api.datasource;
 
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ServiceLoader;
-import com.ly.train.flower.db.api.support.ConnectionManagerFactory;
+import com.ly.train.flower.db.api.Configuration;
+import com.ly.train.flower.db.api.StandardProperties;
+import com.ly.train.flower.db.api.exception.DbException;
 
 /**
  * The connection manager provider is the entry point for asyncdb. It looks up
  * the driver in the classpath and returns you the connection manager.
  */
-public final class ConnectionManagerProvider {
+public final class DataSourceFactoryProvider {
 
-  public static final String asyncdb_PROTOCOL = "asyncdb";
   public static final String DBCJ_PROTOCOL = "jdbc";
 
-  private ConnectionManagerProvider() {}
+  private DataSourceFactoryProvider() {}
 
   /**
-   * See
-   * {@link ConnectionManagerProvider#createConnectionManager(String, String, String, java.util.Map)}
+   * 
    *
    * @param configuration {@link Configuration}
    * @return the connection manager, which creates new connections to your
@@ -42,7 +42,7 @@ public final class ConnectionManagerProvider {
    * @throws DbException if it cannot find the driver in the classpath, or one of
    *         the connection parameters is wrong
    */
-  public static ConnectionManager createConnectionManager(Configuration configuration) throws DbException {
+  public static DataSource createDataSource(Configuration configuration) throws DbException {
     if (configuration.getUrl() == null) {
       throw new IllegalArgumentException("Connection url can not be null");
     }
@@ -55,16 +55,16 @@ public final class ConnectionManagerProvider {
     try {
       URI uri = new URI(configuration.getUrl());
       String asyncdbProtocol = uri.getScheme();
-      if (!asyncdb_PROTOCOL.equals(asyncdbProtocol) && !DBCJ_PROTOCOL.equals(asyncdbProtocol)) {
+      if (!DBCJ_PROTOCOL.equals(asyncdbProtocol)) {
         throw new DbException("Invalid connection URL: " + configuration.getUrl());
       }
       URI driverUri = new URI(uri.getSchemeSpecificPart());
       String protocol = driverUri.getScheme();
 
-      ServiceLoader<ConnectionManagerFactory> serviceLoader = ServiceLoader.load(ConnectionManagerFactory.class);
-      for (ConnectionManagerFactory factory : serviceLoader) {
+      ServiceLoader<DataSourceFactory> serviceLoader = ServiceLoader.load(DataSourceFactory.class);
+      for (DataSourceFactory factory : serviceLoader) {
         if (factory.canHandle(protocol)) {
-          return factory.createConnectionManager(configuration);
+          return factory.createDataSource(configuration);
         }
       }
       throw new DbException("Could not find ConnectionManagerFactory for protocol '" + protocol + "'");

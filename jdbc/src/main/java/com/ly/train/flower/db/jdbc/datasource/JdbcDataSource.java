@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ly.train.flower.db.jdbc;
+package com.ly.train.flower.db.jdbc.datasource;
 
 import java.sql.SQLException;
 import java.util.Map;
@@ -25,21 +25,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ly.train.flower.db.api.CloseMode;
 import com.ly.train.flower.db.api.Connection;
-import com.ly.train.flower.db.api.ConnectionManager;
 import com.ly.train.flower.db.api.DbCallback;
-import com.ly.train.flower.db.api.DbException;
-import com.ly.train.flower.db.api.support.AbstractConnectionManager;
+import com.ly.train.flower.db.api.datasource.AbstractDataSource;
+import com.ly.train.flower.db.api.datasource.DataSource;
+import com.ly.train.flower.db.api.exception.DbException;
 import com.ly.train.flower.db.api.support.NoArgFunction;
+import com.ly.train.flower.db.jdbc.JDBCConnectionProvider;
+import com.ly.train.flower.db.jdbc.JdbcConnection;
 
-public class JdbcConnectionManager extends AbstractConnectionManager implements ConnectionManager {
+public class JdbcDataSource extends AbstractDataSource implements DataSource {
   private final ExecutorService executorService;
 
   private final Object lock = this;
   private final JDBCConnectionProvider connectionProvider;
-  private static final Logger LOGGER = LoggerFactory.getLogger(JdbcConnectionManager.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(JdbcDataSource.class);
 
 
-  public JdbcConnectionManager(JDBCConnectionProvider connectionProvider, Map<String, String> properties) {
+  public JdbcDataSource(JDBCConnectionProvider connectionProvider, Map<String, String> properties) {
     super(properties);
     this.executorService = createPool();
     this.connectionProvider = connectionProvider;
@@ -83,7 +85,7 @@ public class JdbcConnectionManager extends AbstractConnectionManager implements 
     executorService.execute(() -> {
       try {
         java.sql.Connection jdbcConnection = connectionGetter.apply();
-        JdbcConnection connection = new JdbcConnection(JdbcConnectionManager.this, jdbcConnection, getExecutorService(),
+        JdbcConnection connection = new JdbcConnection(JdbcDataSource.this, jdbcConnection, getExecutorService(),
             maxQueueLength(), getStackTracingOption());
         synchronized (lock) {
           if (isClosed()) {
@@ -112,7 +114,7 @@ public class JdbcConnectionManager extends AbstractConnectionManager implements 
   }
 
 
-  void closedConnection(com.ly.train.flower.db.jdbc.JdbcConnection jdbcConnection) {
+  public void closedConnection(com.ly.train.flower.db.jdbc.JdbcConnection jdbcConnection) {
     removeConnection(jdbcConnection);
   }
 

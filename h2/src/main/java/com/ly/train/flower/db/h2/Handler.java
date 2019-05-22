@@ -18,7 +18,7 @@ package com.ly.train.flower.db.h2;
 import io.netty.channel.*;
 
 
-class Handler extends SimpleChannelInboundHandler<Object> {
+public class Handler extends SimpleChannelInboundHandler<Object> {
   public Handler() {
     // To change body of created methods use File | Settings | File Templates.
   }

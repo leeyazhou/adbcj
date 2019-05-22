@@ -17,6 +17,7 @@ package com.ly.train.flower.db.api;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import com.ly.train.flower.db.api.exception.DbException;
 
 /**
  * Holds a field value. The {@code Value} methods attempt to convert the field

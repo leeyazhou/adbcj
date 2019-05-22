@@ -15,7 +15,7 @@
  */
 package com.ly.train.flower.db.api.support.stacktracing;
 
-import com.ly.train.flower.db.api.support.ConnectionManagerFactory;
+import com.ly.train.flower.db.api.datasource.DataSourceFactory;
 
 public enum StackTracingOptions {
   /**

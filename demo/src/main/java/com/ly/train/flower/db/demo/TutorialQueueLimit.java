@@ -20,10 +20,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.h2.tools.Server;
 import com.ly.train.flower.db.api.Configuration;
 import com.ly.train.flower.db.api.Connection;
-import com.ly.train.flower.db.api.ConnectionManager;
-import com.ly.train.flower.db.api.ConnectionManagerProvider;
 import com.ly.train.flower.db.api.PreparedQuery;
 import com.ly.train.flower.db.api.StandardProperties;
+import com.ly.train.flower.db.api.datasource.DataSourceFactoryProvider;
+import com.ly.train.flower.db.api.datasource.DataSource;
 
 public class TutorialQueueLimit {
 
@@ -47,13 +47,13 @@ public class TutorialQueueLimit {
     configuration.setUrl("asyncdb:h2://localhost:14242/mem:db1;DB_CLOSE_DELAY=-1;MVCC=TRUE");
     configuration.setUsername("asyncdb");
     configuration.setPassword("password1234");
-    final ConnectionManager connectionManager = ConnectionManagerProvider.createConnectionManager(configuration);
+    final DataSource dataSource = DataSourceFactoryProvider.createDataSource(configuration);
 
 
     int amountOfQueries = 200;
-    runQueries(connectionManager, amountOfQueries);
+    runQueries(dataSource, amountOfQueries);
 
-    connectionManager.close().get();
+    dataSource.close().get();
   }
 
   private static void secondRunWithLongerQueue() throws Exception {
@@ -63,19 +63,19 @@ public class TutorialQueueLimit {
     configuration.setUsername("asyncdb");
     configuration.setPassword("password1234");
     configuration.addProperty(StandardProperties.MAX_QUEUE_LENGTH, String.valueOf(maxQueueLength));
-    final ConnectionManager connectionManager = ConnectionManagerProvider.createConnectionManager(configuration);
+    final DataSource dataSource = DataSourceFactoryProvider.createDataSource(configuration);
 
-    runQueries(connectionManager, maxQueueLength);
+    runQueries(dataSource, maxQueueLength);
 
-    connectionManager.close().get();
+    dataSource.close().get();
   }
 
-  private static void runQueries(ConnectionManager connectionManager, int amountOfQueries) throws Exception {
+  private static void runQueries(DataSource dataSource, int amountOfQueries) throws Exception {
     AtomicInteger failures = new AtomicInteger();
     CountDownLatch waitForCompletion = new CountDownLatch(amountOfQueries);
 
     // Blocking code to keep demo code short
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     PreparedQuery stmt = connection.prepareQuery("SELECT ?").get();
 
     // Issue 200 requests, without waiting for any response

@@ -17,7 +17,7 @@ package com.ly.train.flower.db.mysql.codec.util;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import com.ly.train.flower.db.api.DbException;
+import com.ly.train.flower.db.api.exception.DbException;
 
 
 public class PasswordEncryption {

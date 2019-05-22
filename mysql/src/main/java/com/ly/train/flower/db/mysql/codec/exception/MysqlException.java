@@ -15,7 +15,7 @@
  */
 package com.ly.train.flower.db.mysql.codec.exception;
 
-import com.ly.train.flower.db.api.DbException;
+import com.ly.train.flower.db.api.exception.DbException;
 
 public class MysqlException extends DbException {
     private static final long serialVersionUID = 1L;

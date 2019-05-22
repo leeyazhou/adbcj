@@ -24,9 +24,9 @@ public class ConnectDiffrentUsersTest extends AbstractWithConnectionManagerTest 
   @Test
   public void connectWithOtherUser() throws Exception {
 
-    Connection normalUser = connectionManager.connect().get();
+    Connection normalUser = dataSource.connect().get();
     Connection connectionOtherUser =
-        connectionManager.connect("asyncdb-other-user".toUpperCase(), "asyncdb-other-user").get();
+        dataSource.connect("asyncdb-other-user".toUpperCase(), "asyncdb-other-user").get();
 
     String userNormal = normalUser.executeQuery("SELECT current_user()").get().get(0).get(0).getString();
     String otherUser = connectionOtherUser.executeQuery("SELECT current_user()").get().get(0).get(0).getString();

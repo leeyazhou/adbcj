@@ -15,6 +15,8 @@
  */
 package com.ly.train.flower.db.api;
 
+import com.ly.train.flower.db.api.exception.DbException;
+
 /**
  * The core callback for all operations in asyncdb. A operaition in asyncdb ends in
  * a call of {@see #onComplete}. On a success, the result is passed, and the

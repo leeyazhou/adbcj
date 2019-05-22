@@ -60,7 +60,7 @@ public class OKRegularResponse extends OkResponse {
   @Override
   public String toString() {
     return String.format(
-        "OK response (affected rows: %d, insert id: %d, warning count: %d, message: '%s', server status: %s",
+        "OKRegularResponse(affected rows: %d, insert id: %d, warning count: %d, message: '%s', server status: %s",
         affectedRows, insertId, warningCount, message, serverStatus.toString());
   }
 }

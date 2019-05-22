@@ -15,12 +15,14 @@
  */
 package com.ly.train.flower.db.api;
 
+import com.ly.train.flower.db.api.datasource.DataSourceFactoryProvider;
+import com.ly.train.flower.db.api.exception.DbException;
+
 /**
  * Standard properties, which can be passed to
- * {@link ConnectionManagerProvider#createConnectionManager} via property map
+ * {@link DataSourceFactoryProvider#createConnectionManager} via property map
  */
-public final class StandardProperties {
-  private StandardProperties() {}
+public interface StandardProperties {
 
   /**
    * asyncdb allows to have multiple async operations open running. This parameter

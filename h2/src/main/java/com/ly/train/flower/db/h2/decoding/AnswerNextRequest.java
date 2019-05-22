@@ -36,13 +36,13 @@ public final class AnswerNextRequest extends StatusReadingDecoder {
 
   @Override
   public ResultAndState handleException(H2DbException exception) {
-    final Request requestInfo = connection.dequeRequest();
+    final Request<?> requestInfo = connection.dequeRequest();
     final DecoderState requestDecoder = requestInfo.getStartState();
     return requestDecoder.handleException(exception);
   }
 
   private ResultAndState handleRequest(DataInputStream stream, Channel channel) throws IOException {
-    final Request requestInfo = connection.dequeRequest();
+    final Request<?> requestInfo = connection.dequeRequest();
     assert requestInfo != null;
     final DecoderState requestDecoder = requestInfo.getStartState();
     stream.reset();

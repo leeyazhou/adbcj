@@ -26,7 +26,7 @@ import com.ly.train.flower.db.h2.packets.ClientToServerPacket;
 import java.io.DataOutputStream;
 
 
-class Encoder extends MessageToByteEncoder<ClientToServerPacket> {
+public class Encoder extends MessageToByteEncoder<ClientToServerPacket> {
   private final static Logger logger = LoggerFactory.getLogger(Encoder.class);
 
 

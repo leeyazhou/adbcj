@@ -63,7 +63,7 @@ public class ConnectionReusingTest extends AbstractWithConnectionManagerTest {
   @Test(invocationCount = CONN_NUM, threadPoolSize = CONN_NUM, timeOut = 60000)
   public void reusedByNThreadsTest() throws Exception {
 
-    final Connection connection = connectionManager.connect().get();
+    final Connection connection = dataSource.connect().get();
     CompletableFuture<Void> finalResult = new Object() {
       int randint = randInt();
       int num = threadNum.incrementAndGet();

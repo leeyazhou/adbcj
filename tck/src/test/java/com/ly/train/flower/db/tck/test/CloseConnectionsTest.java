@@ -24,12 +24,12 @@ import org.testng.annotations.Test;
 import com.ly.train.flower.db.api.CloseMode;
 import com.ly.train.flower.db.api.Configuration;
 import com.ly.train.flower.db.api.Connection;
-import com.ly.train.flower.db.api.ConnectionManager;
-import com.ly.train.flower.db.api.ConnectionManagerProvider;
-import com.ly.train.flower.db.api.DbConnectionClosedException;
 import com.ly.train.flower.db.api.PreparedQuery;
 import com.ly.train.flower.db.api.PreparedUpdate;
 import com.ly.train.flower.db.api.ResultSet;
+import com.ly.train.flower.db.api.datasource.DataSourceFactoryProvider;
+import com.ly.train.flower.db.api.datasource.DataSource;
+import com.ly.train.flower.db.api.exception.DbConnectionClosedException;
 import com.ly.train.flower.db.tck.NoArgAction;
 
 
@@ -37,7 +37,7 @@ public class CloseConnectionsTest extends AbstractWithConnectionManagerTest {
 
   @AfterTest
   public void closeConnectionManager() throws Exception {
-    Future<Void> closeFuture = connectionManager.close();
+    Future<Void> closeFuture = dataSource.close();
     closeFuture.get();
   }
 
@@ -48,7 +48,7 @@ public class CloseConnectionsTest extends AbstractWithConnectionManagerTest {
     configuration.setUrl(url);
     configuration.setUsername(user);
     configuration.setPassword(password);
-    final ConnectionManager manager = ConnectionManagerProvider.createConnectionManager(configuration);
+    final DataSource manager = DataSourceFactoryProvider.createDataSource(configuration);
     final Connection c1 = manager.connect().get();
     final Future<ResultSet> runningQuery = c1.executeQuery("SELECT SLEEP(2)");
     final Future<ResultSet> runningQuery2 = c1.executeQuery("SELECT SLEEP(2)");
@@ -67,7 +67,7 @@ public class CloseConnectionsTest extends AbstractWithConnectionManagerTest {
     configuration.setUrl(url);
     configuration.setUsername(user);
     configuration.setPassword(password);
-    final ConnectionManager manager = ConnectionManagerProvider.createConnectionManager(configuration);
+    final DataSource manager = DataSourceFactoryProvider.createDataSource(configuration);
     final Connection c1 = manager.connect().get();
     final Connection c2 = manager.connect().get();
     c2.beginTransaction();
@@ -85,7 +85,7 @@ public class CloseConnectionsTest extends AbstractWithConnectionManagerTest {
 
   @Test
   public void closingConnectionDoesNotAcceptNewRequests() throws Exception {
-    final Connection connection = connectionManager.connect().get();
+    final Connection connection = dataSource.connect().get();
     final PreparedQuery preparedSelect = connection.prepareQuery("SELECT 1").get();
     final PreparedUpdate preparedUpdate = connection.prepareUpdate("SELECT 1").get();
     final Future<ResultSet> runningQuery = connection.executeQuery("SELECT SLEEP(5)");
@@ -103,7 +103,7 @@ public class CloseConnectionsTest extends AbstractWithConnectionManagerTest {
 
   @Test
   public void forceCloseConnections() throws Exception {
-    final Connection connection = connectionManager.connect().get();
+    final Connection connection = dataSource.connect().get();
 
     final CompletableFuture<ResultSet> rs1 = connection
         .executeQuery("SELECT int_val, str_val " + "FROM simple_values where str_val LIKE 'Not-In-Database-Value'");
@@ -133,20 +133,20 @@ public class CloseConnectionsTest extends AbstractWithConnectionManagerTest {
 
     // Warmup
     for (int i = 0; i < 10; i++) {
-      final Connection connection = connectionManager.connect().get();
+      final Connection connection = dataSource.connect().get();
       connection.close(CloseMode.CLOSE_GRACEFULLY).get();
     }
 
     long startPooled = System.nanoTime();
     for (int i = 0; i < 100; i++) {
-      final Connection connection = connectionManager.connect().get();
+      final Connection connection = dataSource.connect().get();
       connection.close(CloseMode.CLOSE_GRACEFULLY).get();
     }
     long timeUsedPooled = System.nanoTime() - startPooled;
 
     long startForced = System.nanoTime();
     for (int i = 0; i < 100; i++) {
-      final Connection connection = connectionManager.connect().get();
+      final Connection connection = dataSource.connect().get();
       connection.close(CloseMode.CLOSE_FORCIBLY).get();
     }
     long timeUsedForced = System.nanoTime() - startForced;

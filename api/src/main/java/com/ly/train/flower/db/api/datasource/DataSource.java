@@ -13,9 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ly.train.flower.db.api;
+package com.ly.train.flower.db.api.datasource;
 
 import java.util.concurrent.CompletableFuture;
+import com.ly.train.flower.db.api.AsyncCloseable;
+import com.ly.train.flower.db.api.CloseMode;
+import com.ly.train.flower.db.api.Connection;
+import com.ly.train.flower.db.api.DbCallback;
+import com.ly.train.flower.db.api.exception.DbException;
 import com.ly.train.flower.db.api.support.DbCompletableFuture;
 
 /**
@@ -29,7 +34,7 @@ import com.ly.train.flower.db.api.support.DbCompletableFuture;
  *
  * @author leeyazhou
  */
-public interface ConnectionManager extends AsyncCloseable {
+public interface DataSource extends AsyncCloseable {
 
   /**
    * Establishes a new database connection.

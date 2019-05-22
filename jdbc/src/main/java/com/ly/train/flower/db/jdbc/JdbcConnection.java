@@ -27,22 +27,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ly.train.flower.db.api.CloseMode;
 import com.ly.train.flower.db.api.Connection;
-import com.ly.train.flower.db.api.ConnectionManager;
 import com.ly.train.flower.db.api.DbCallback;
-import com.ly.train.flower.db.api.DbConnectionClosedException;
-import com.ly.train.flower.db.api.DbException;
 import com.ly.train.flower.db.api.PreparedQuery;
 import com.ly.train.flower.db.api.PreparedUpdate;
 import com.ly.train.flower.db.api.Result;
-import com.ly.train.flower.db.api.ResultHandler;
 import com.ly.train.flower.db.api.StandardProperties;
+import com.ly.train.flower.db.api.datasource.DataSource;
+import com.ly.train.flower.db.api.exception.DbConnectionClosedException;
+import com.ly.train.flower.db.api.exception.DbException;
+import com.ly.train.flower.db.api.handler.ResultHandler;
 import com.ly.train.flower.db.api.support.CloseOnce;
 import com.ly.train.flower.db.api.support.stacktracing.StackTracingOptions;
+import com.ly.train.flower.db.jdbc.datasource.JdbcDataSource;
 
 public class JdbcConnection implements Connection {
   private final static Logger LOGGER = LoggerFactory.getLogger(JdbcConnection.class);
 
-  private final JdbcConnectionManager connectionManager;
+  private final JdbcDataSource connectionManager;
   private final java.sql.Connection jdbcConnection;
   private final ExecutorService threadPool;
   private final int maxQueueSize;
@@ -53,7 +54,7 @@ public class JdbcConnection implements Connection {
   private boolean isInTransaction;
   private final CloseOnce closer = new CloseOnce();
 
-  public JdbcConnection(JdbcConnectionManager connectionManager, java.sql.Connection jdbcConnection,
+  public JdbcConnection(JdbcDataSource connectionManager, java.sql.Connection jdbcConnection,
       ExecutorService threadPool, int maxQueueSize, StackTracingOptions strackTraces) {
     this.connectionManager = connectionManager;
     this.jdbcConnection = jdbcConnection;
@@ -64,7 +65,7 @@ public class JdbcConnection implements Connection {
   }
 
 
-  public ConnectionManager getConnectionManager() {
+  public DataSource getConnectionManager() {
     return connectionManager;
   }
 

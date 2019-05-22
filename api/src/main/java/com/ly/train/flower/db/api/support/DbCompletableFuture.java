@@ -18,7 +18,7 @@ package com.ly.train.flower.db.api.support;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ly.train.flower.db.api.DbCallback;
-import com.ly.train.flower.db.api.DbException;
+import com.ly.train.flower.db.api.exception.DbException;
 import java.util.concurrent.CompletableFuture;
 
 public final class DbCompletableFuture<T> extends CompletableFuture<T> implements DbCallback<T> {

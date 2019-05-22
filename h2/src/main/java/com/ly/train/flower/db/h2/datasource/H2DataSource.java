@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ly.train.flower.db.h2;
+package com.ly.train.flower.db.h2.datasource;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -22,9 +22,14 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ly.train.flower.db.api.*;
-import com.ly.train.flower.db.api.support.AbstractConnectionManager;
+import com.ly.train.flower.db.api.datasource.AbstractDataSource;
+import com.ly.train.flower.db.api.exception.DbConnectionClosedException;
+import com.ly.train.flower.db.api.exception.DbException;
 import com.ly.train.flower.db.api.support.ConnectionPool;
 import com.ly.train.flower.db.api.support.LoginCredentials;
+import com.ly.train.flower.db.h2.Encoder;
+import com.ly.train.flower.db.h2.H2Connection;
+import com.ly.train.flower.db.h2.Handler;
 import com.ly.train.flower.db.h2.decoding.AnswerNextRequest;
 import com.ly.train.flower.db.h2.decoding.Decoder;
 import com.ly.train.flower.db.h2.packets.ClientHandshake;
@@ -32,19 +37,19 @@ import java.net.InetSocketAddress;
 import java.util.Map;
 
 
-public class H2ConnectionManager extends AbstractConnectionManager {
-  private final static Logger logger = LoggerFactory.getLogger(H2ConnectionManager.class);
+public class H2DataSource extends AbstractDataSource {
+  private final static Logger logger = LoggerFactory.getLogger(H2DataSource.class);
 
   private final Bootstrap bootstrap;
-  private static final String ENCODER = H2ConnectionManager.class.getName() + ".encoder";
-  static final String DECODER = H2ConnectionManager.class.getName() + ".decoder";
+  private static final String ENCODER = H2DataSource.class.getName() + ".encoder";
+  public static final String DECODER = H2DataSource.class.getName() + ".decoder";
   private final String url;
   private final LoginCredentials defaultCredentials;
   private final Map<String, String> keys;
   private final NioEventLoopGroup eventLoop;
-  final ConnectionPool<LoginCredentials, Channel> connectionPool;
+  private final ConnectionPool<LoginCredentials, Channel> connectionPool;
 
-  public H2ConnectionManager(Configuration configuration, Map<String, String> properties, Map<String, String> keys) {
+  public H2DataSource(Configuration configuration, Map<String, String> properties, Map<String, String> keys) {
     super(properties);
     this.url = configuration.getUrl();
     this.defaultCredentials =
@@ -72,6 +77,13 @@ public class H2ConnectionManager extends AbstractConnectionManager {
     }
   }
 
+
+  /**
+   * @return the connectionPool
+   */
+  public ConnectionPool<LoginCredentials, Channel> getConnectionPool() {
+    return connectionPool;
+  }
 
   @Override
   public void connect(DbCallback<Connection> connected) {
@@ -120,7 +132,7 @@ public class H2ConnectionManager extends AbstractConnectionManager {
       }
 
       H2Connection connection =
-          new H2Connection(credentials, maxQueueLength(), H2ConnectionManager.this, channel, getStackTracingOption());
+          new H2Connection(credentials, maxQueueLength(), H2DataSource.this, channel, getStackTracingOption());
       channel.pipeline().addFirst(DECODER, new Decoder(connected, connection, entry));
       channel.writeAndFlush(new ClientHandshake(credentials.getDatabase(), url, credentials.getUserName(),
           credentials.getPassword(), keys));
@@ -151,7 +163,7 @@ public class H2ConnectionManager extends AbstractConnectionManager {
     }.start();
   }
 
-  void closedConnection(Connection connection) {
+  public void closedConnection(Connection connection) {
     removeConnection(connection);
   }
 

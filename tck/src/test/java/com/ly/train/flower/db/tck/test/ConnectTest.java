@@ -33,7 +33,7 @@ public class ConnectTest extends AbstractWithConnectionManagerTest {
   public void testConnectImmediateClose() throws Exception {
     final CountDownLatch latch = new CountDownLatch(2);
 
-    Future<Connection> connectFuture = connectionManager.connect().thenApply(res -> {
+    Future<Connection> connectFuture = dataSource.connect().thenApply(res -> {
       latch.countDown();
       return res;
     });
@@ -51,7 +51,7 @@ public class ConnectTest extends AbstractWithConnectionManagerTest {
   public void testConnectNonImmediateClose() throws Exception {
     final CountDownLatch latch = new CountDownLatch(1);
 
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     assertTrue(!connection.isClosed());
     connection.close().thenApply(res -> {
       latch.countDown();
@@ -62,14 +62,14 @@ public class ConnectTest extends AbstractWithConnectionManagerTest {
   }
 
   public void testConnectAndDisconnect() throws Exception {
-    final Future<Connection> future = connectionManager.connect();
+    final Future<Connection> future = dataSource.connect();
     Connection connection = future.get();
     final Future<Void> closeFuture = connection.close();
     closeFuture.get();
   }
 
   public void testNonImmediateClose() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
 
     List<Future<ResultSet>> futures = new ArrayList<Future<ResultSet>>();
 

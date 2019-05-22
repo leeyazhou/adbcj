@@ -13,22 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ly.train.flower.db.api.support;
-
-import com.ly.train.flower.db.api.Configuration;
-import com.ly.train.flower.db.api.ConnectionManager;
-import com.ly.train.flower.db.api.DbException;
+package com.ly.train.flower.db.api.exception;
 
 /**
- * Entry point to find a driver. The
- * {@link com.ly.train.flower.db.api.ConnectionManagerProvider} loads the
- * ConnectionManagerFactory's via {@link java.util.ServiceLoader}. Then checks
- * if can handle the given protocol at hand
+ * The connection to the database was closed
  */
-public interface ConnectionManagerFactory {
+public class DbConnectionClosedException extends DbException {
 
-  ConnectionManager createConnectionManager(Configuration configuration) throws DbException;
+  private static final long serialVersionUID = 1L;
 
-  boolean canHandle(String protocol);
+  public DbConnectionClosedException() {
+    super("This database connection has been closed");
+  }
+
+  public DbConnectionClosedException(String message) {
+    super(message);
+  }
+
+  public DbConnectionClosedException(String message, Throwable cause, StackTraceElement[] entry) {
+    super(message, cause, entry);
+  }
 
 }

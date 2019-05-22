@@ -18,8 +18,8 @@ package com.ly.train.flower.db.tck;
 import java.util.Random;
 import com.ly.train.flower.db.api.Configuration;
 import com.ly.train.flower.db.api.Connection;
-import com.ly.train.flower.db.api.ConnectionManager;
-import com.ly.train.flower.db.api.ConnectionManagerProvider;
+import com.ly.train.flower.db.api.datasource.DataSourceFactoryProvider;
+import com.ly.train.flower.db.api.datasource.DataSource;
 
 /**
  *
@@ -36,8 +36,8 @@ public class PopulateLarge {
     configuration2.setUsername("asyncdb");
     configuration2.setPassword("asyncdb");
 
-    ConnectionManager mysqlCM = ConnectionManagerProvider.createConnectionManager(configuration);
-    ConnectionManager pgCM = ConnectionManagerProvider.createConnectionManager(configuration2);
+    DataSource mysqlCM = DataSourceFactoryProvider.createDataSource(configuration);
+    DataSource pgCM = DataSourceFactoryProvider.createDataSource(configuration2);
 
     Connection mysql = mysqlCM.connect().get();
     Connection pg = pgCM.connect().get();

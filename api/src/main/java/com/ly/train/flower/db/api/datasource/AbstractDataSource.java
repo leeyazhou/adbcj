@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ly.train.flower.db.api.support;
+package com.ly.train.flower.db.api.datasource;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,10 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ly.train.flower.db.api.CloseMode;
 import com.ly.train.flower.db.api.Connection;
-import com.ly.train.flower.db.api.ConnectionManager;
 import com.ly.train.flower.db.api.DbCallback;
-import com.ly.train.flower.db.api.DbException;
 import com.ly.train.flower.db.api.StandardProperties;
+import com.ly.train.flower.db.api.exception.DbException;
+import com.ly.train.flower.db.api.support.CloseOnce;
 import com.ly.train.flower.db.api.support.stacktracing.StackTracingOptions;
 
 
@@ -34,15 +34,15 @@ import com.ly.train.flower.db.api.support.stacktracing.StackTracingOptions;
  * 
  * @author lee
  */
-public abstract class AbstractConnectionManager implements ConnectionManager {
-  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractConnectionManager.class);
+public abstract class AbstractDataSource implements DataSource {
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDataSource.class);
   protected final Map<String, String> properties;
   private final StackTracingOptions stackTracingOption;
   private final HashSet<Connection> connections = new HashSet<Connection>();
   private final CloseOnce closer = new CloseOnce();
   protected final boolean useConnectionPool;
 
-  public AbstractConnectionManager(Map<String, String> properties) {
+  public AbstractDataSource(Map<String, String> properties) {
     this.properties = Collections.unmodifiableMap(properties);
     this.stackTracingOption = readStackTracingOption(properties);
     this.useConnectionPool = readConnectionPoolEnabled(properties);

@@ -17,8 +17,8 @@ package com.ly.train.flower.db.demo;
 
 import org.h2.tools.Server;
 import com.ly.train.flower.db.api.Configuration;
-import com.ly.train.flower.db.api.ConnectionManager;
-import com.ly.train.flower.db.api.ConnectionManagerProvider;
+import com.ly.train.flower.db.api.datasource.DataSourceFactoryProvider;
+import com.ly.train.flower.db.api.datasource.DataSource;
 
 public class TutorialFirstConnectionFuture {
 
@@ -29,14 +29,14 @@ public class TutorialFirstConnectionFuture {
     configuration.setUrl("asyncdb:h2://localhost:14242/mem:db1;DB_CLOSE_DELAY=-1;MVCC=TRUE");
     configuration.setUsername("asyncdb");
     configuration.setPassword("password1234");
-    final ConnectionManager connectionManager = ConnectionManagerProvider.createConnectionManager(configuration);
+    final DataSource dataSource = DataSourceFactoryProvider.createDataSource(configuration);
 
-    connectionManager.connect().thenCompose(connection -> {
+    dataSource.connect().thenCompose(connection -> {
       System.out.println("Connected!");
       return connection.close();
     }).thenCompose(closeComplete -> {
       System.out.println("Close complete!");
-      return connectionManager.close();
+      return dataSource.close();
     }).whenComplete((complete, error) -> {
       if (error != null) {
         error.printStackTrace();

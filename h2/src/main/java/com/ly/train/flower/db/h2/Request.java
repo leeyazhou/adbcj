@@ -16,7 +16,7 @@
 package com.ly.train.flower.db.h2;
 
 import com.ly.train.flower.db.api.DbCallback;
-import com.ly.train.flower.db.api.DbException;
+import com.ly.train.flower.db.api.exception.DbException;
 import com.ly.train.flower.db.h2.decoding.DecoderState;
 import com.ly.train.flower.db.h2.packets.ClientToServerPacket;
 import java.util.ArrayList;

@@ -16,6 +16,7 @@
 package com.ly.train.flower.db.h2;
 
 import com.ly.train.flower.db.api.*;
+import com.ly.train.flower.db.api.handler.ResultHandler;
 
 
 public class H2PreparedQuery extends AbstractStatement implements PreparedQuery {

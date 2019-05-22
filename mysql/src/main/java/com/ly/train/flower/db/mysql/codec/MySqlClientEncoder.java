@@ -26,17 +26,16 @@ public class MySqlClientEncoder {
     int length = request.getLength();
 
     // Write the length of the packet
-    out.write(length & 0xFF);
-    out.write(length >> 8 & 0xFF);
-    out.write(length >> 16 & 0xFF);
+    out.write((byte) (length & 0xFF));
+    out.write((byte) (length >> 8 & 0xFF));
+    out.write((byte) (length >> 16 & 0xFF));
 
 
     // Write the packet number
-    out.write(request.getPacketNumber());
+    out.write((byte) request.getPacketNumber());
 
     request.writeToOutputStream(out);
 
   }
-
 
 }

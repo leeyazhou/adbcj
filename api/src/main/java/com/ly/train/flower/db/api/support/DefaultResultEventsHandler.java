@@ -18,57 +18,58 @@ package com.ly.train.flower.db.api.support;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ly.train.flower.db.api.Field;
-import com.ly.train.flower.db.api.ResultHandler;
+import com.ly.train.flower.db.api.ResultSet;
 import com.ly.train.flower.db.api.Value;
+import com.ly.train.flower.db.api.handler.ResultHandler;
 
-public final class DefaultResultEventsHandler implements ResultHandler<DefaultResultSet> {
+public final class DefaultResultEventsHandler<T extends ResultSet> implements ResultHandler<T> {
   private static final Logger logger = LoggerFactory.getLogger(DefaultResultEventsHandler.class);
 
   // TODO: Make this handler stateless
   private Value[] currentRow;
   private int rowIndex;
 
-  public void startFields(DefaultResultSet accumulator) {
+  public void startFields(T accumulator) {
     logger.debug("ResultSetEventHandler: startFields");
   }
 
-  public void field(Field field, DefaultResultSet accumulator) {
+  public void field(Field field, T accumulator) {
     logger.debug("ResultSetEventHandler: field");
-    accumulator.addField(field);
+    ((DefaultResultSet) accumulator).addField(field);
   }
 
-  public void endFields(DefaultResultSet accumulator) {
+  public void endFields(T accumulator) {
     logger.debug("ResultSetEventHandler: endFields");
   }
 
-  public void startResults(DefaultResultSet accumulator) {
+  public void startResults(T accumulator) {
     logger.debug("ResultSetEventHandler: startResults");
   }
 
-  public void startRow(DefaultResultSet accumulator) {
+  public void startRow(T accumulator) {
     logger.debug("ResultSetEventHandler: startRow");
 
     int columnCount = accumulator.getFields().size();
     currentRow = new Value[columnCount];
   }
 
-  public void value(Value value, DefaultResultSet accumulator) {
+  public void value(Value value, T accumulator) {
     logger.debug("ResultSetEventHandler: value");
 
     currentRow[rowIndex % currentRow.length] = value;
     rowIndex++;
   }
 
-  public void endRow(DefaultResultSet accumulator) {
+  public void endRow(T accumulator) {
     logger.debug("ResultSetEventHandler: endRow");
     DefaultRow row = new DefaultRow(accumulator, currentRow);
-    accumulator.addResult(row);
+    ((DefaultResultSet) accumulator).addResult(row);
     currentRow = null;
   }
 
-  public void endResults(DefaultResultSet accumulator) {
+  public void endResults(T accumulator) {
     logger.debug("ResultSetEventHandler: endResults");
   }
 
-  public void exception(Throwable t, DefaultResultSet accumulator) {}
+  public void exception(Throwable t, T accumulator) {}
 }

@@ -18,7 +18,7 @@ package com.ly.train.flower.db.mysql.codec.decoder.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ly.train.flower.db.api.DbCallback;
-import com.ly.train.flower.db.api.DbException;
+import com.ly.train.flower.db.api.exception.DbException;
 
 public class SandboxDbCallback<T> implements DbCallback<T> {
   private static final Logger logger = LoggerFactory.getLogger(SandboxDbCallback.class);

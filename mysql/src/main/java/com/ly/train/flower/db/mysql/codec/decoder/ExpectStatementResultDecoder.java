@@ -16,7 +16,7 @@
 package com.ly.train.flower.db.mysql.codec.decoder;
 
 import com.ly.train.flower.db.api.DbCallback;
-import com.ly.train.flower.db.api.ResultHandler;
+import com.ly.train.flower.db.api.handler.ResultHandler;
 import com.ly.train.flower.db.api.support.OneArgFunction;
 import com.ly.train.flower.db.mysql.MySqlConnection;
 import com.ly.train.flower.db.mysql.codec.model.ResponseWrapper;

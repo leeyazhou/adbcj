@@ -26,7 +26,7 @@ import com.ly.train.flower.db.api.ResultSet;
 public class PreparedUpdateTest extends AbstractWithConnectionManagerTest {
   @Test
   public void testCanInsert() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     cleanUp(connection);
     PreparedUpdate insert = connection.prepareUpdate("INSERT INTO updates (id) VALUES (1)").get();
     insert.execute().get();

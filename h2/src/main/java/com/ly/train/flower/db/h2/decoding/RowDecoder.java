@@ -17,6 +17,8 @@ package com.ly.train.flower.db.h2.decoding;
 
 import io.netty.channel.Channel;
 import com.ly.train.flower.db.api.*;
+import com.ly.train.flower.db.api.exception.DbException;
+import com.ly.train.flower.db.api.handler.ResultHandler;
 import com.ly.train.flower.db.h2.H2Connection;
 import com.ly.train.flower.db.h2.H2DbException;
 import com.ly.train.flower.db.h2.protocol.ReadUtils;
@@ -67,8 +69,8 @@ public class RowDecoder<T> implements DecoderState {
 
   }
 
-  private ResultAndState decodeRow(DataInputStream stream, ResultOrWait row) throws IOException {
-    ResultOrWait<Value> lastValue = (ResultOrWait) row;
+  private ResultAndState decodeRow(DataInputStream stream, ResultOrWait<?> row) throws IOException {
+    ResultOrWait<Value> lastValue = (ResultOrWait<Value>) row;
     ResultOrWait<Value> values[] = new ResultOrWait[fields.size()];
     for (int i = 0; i < fields.size(); i++) {
       final ResultOrWait<Integer> type = IoUtils.tryReadNextInt(stream, lastValue);

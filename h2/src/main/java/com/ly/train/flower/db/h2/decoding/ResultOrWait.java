@@ -20,8 +20,8 @@ public final class ResultOrWait<T> {
   public final T result;
   public final boolean couldReadResult;
 
-  public final static ResultOrWait WaitLonger = new ResultOrWait(null, false);
-  public final static ResultOrWait Start = new ResultOrWait(null, true);
+  public final static ResultOrWait WaitLonger = new ResultOrWait<>(null, false);
+  public final static ResultOrWait Start = new ResultOrWait<>(null, true);
 
 
   ResultOrWait(T result, boolean couldReadResult) {

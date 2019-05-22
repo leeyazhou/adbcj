@@ -17,9 +17,9 @@ package com.ly.train.flower.db.demo;
 
 import org.h2.tools.Server;
 import com.ly.train.flower.db.api.Configuration;
-import com.ly.train.flower.db.api.ConnectionManager;
-import com.ly.train.flower.db.api.ConnectionManagerProvider;
 import com.ly.train.flower.db.api.StandardProperties;
+import com.ly.train.flower.db.api.datasource.DataSourceFactoryProvider;
+import com.ly.train.flower.db.api.datasource.DataSource;
 
 public class TutorialFirstConnectionAsync {
 
@@ -30,10 +30,10 @@ public class TutorialFirstConnectionAsync {
         configuration.setUrl("asyncdb:h2://localhost:14242/mem:db1;DB_CLOSE_DELAY=-1;MVCC=TRUE");
         configuration.setUsername("asyncdb");
         configuration.setPassword("password1234");
-        final ConnectionManager connectionManager = ConnectionManagerProvider.createConnectionManager(configuration);
+        final DataSource dataSource = DataSourceFactoryProvider.createDataSource(configuration);
 
         // Aysync with raw callbacks.
-        connectionManager.connect((connection, connectionFailure) -> {
+        dataSource.connect((connection, connectionFailure) -> {
             if (connectionFailure == null) {
                 System.out.println("Connected!");
                 // No failure, continue the operations
@@ -45,7 +45,7 @@ public class TutorialFirstConnectionAsync {
                     }
 
                     // At the end, close the connection manger
-                    connectionManager.close((managerClosed, managerCloseFailure) -> {
+                    dataSource.close((managerClosed, managerCloseFailure) -> {
                         if (managerCloseFailure != null) {
                             managerCloseFailure.printStackTrace();
                         }

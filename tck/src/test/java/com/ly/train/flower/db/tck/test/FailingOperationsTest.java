@@ -20,15 +20,15 @@ import java.util.concurrent.ExecutionException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import com.ly.train.flower.db.api.Connection;
-import com.ly.train.flower.db.api.DbException;
 import com.ly.train.flower.db.api.StandardProperties;
+import com.ly.train.flower.db.api.exception.DbException;
 
 
 public class FailingOperationsTest extends AbstractWithConnectionManagerTest {
 
   @Test
   public void failingQuery() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     try {
       connection.executeQuery("SELECT invalid query so it will throw").get();
       Assert.fail("Expect failure");

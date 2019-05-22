@@ -13,22 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ly.train.flower.db.h2;
+package com.ly.train.flower.db.h2.datasource;
 
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import com.ly.train.flower.db.api.Configuration;
-import com.ly.train.flower.db.api.ConnectionManager;
-import com.ly.train.flower.db.api.DbException;
-import com.ly.train.flower.db.api.support.ConnectionManagerFactory;
+import com.ly.train.flower.db.api.datasource.DataSource;
+import com.ly.train.flower.db.api.datasource.DataSourceFactory;
+import com.ly.train.flower.db.api.exception.DbException;
 
-public class H2ConnectionManagerFactory implements ConnectionManagerFactory {
+public class H2DataSourceFactory implements DataSourceFactory {
   private static final String PROTOCOL = "h2";
   private static final int DEFAULT_PORT = 8082;
 
   @Override
-  public ConnectionManager createConnectionManager(Configuration configuration) throws DbException {
+  public DataSource createDataSource(Configuration configuration) throws DbException {
     try {
       URI uri = new URI(configuration.getUrl());
       uri = new URI(uri.getSchemeSpecificPart());
@@ -51,7 +51,7 @@ public class H2ConnectionManagerFactory implements ConnectionManagerFactory {
       configuration.setPort(port);
 
       Map<String, String> keys = parsKeys(configuration.getUrl());
-      return new H2ConnectionManager(configuration, configuration.getProperties(), keys);
+      return new H2DataSource(configuration, configuration.getProperties(), keys);
 
     } catch (Exception e) {
       throw DbException.wrap(e);

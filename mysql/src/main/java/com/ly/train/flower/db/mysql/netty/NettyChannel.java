@@ -18,7 +18,6 @@
  */
 package com.ly.train.flower.db.mysql.netty;
 
-import java.util.logging.Handler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ly.train.flower.db.mysql.codec.packets.request.AbstractRequest;

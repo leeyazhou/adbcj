@@ -26,7 +26,7 @@ public class UnicodeTest extends AbstractWithConnectionManagerTest {
 
   @Test
   public void canReadDifferentTexts() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     ResultSet resultSet = connection.executeQuery("SELECT textData FROM textcontent ORDER by lang").get();
     Assert.assertEquals(5, resultSet.size());
 
@@ -39,7 +39,7 @@ public class UnicodeTest extends AbstractWithConnectionManagerTest {
 
   @Test
   public void canReadWriteDelete() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     connection
         .executeUpdate("INSERT INTO textcontent (lang, textData) VALUES ('fa','ویکی‌پدیا (به انگلیسی: Wikipedia)')")
         .get();
@@ -58,7 +58,7 @@ public class UnicodeTest extends AbstractWithConnectionManagerTest {
 
   @Test
   public void worksWithPreparedStatements() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     PreparedQuery statement = connection.prepareQuery("SELECT textData FROM textcontent WHERE textData LIKE ?").get();
     ResultSet resultSet = statement.execute("%한국어%").get();
 

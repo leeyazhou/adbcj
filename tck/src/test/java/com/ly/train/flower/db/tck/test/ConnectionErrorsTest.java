@@ -21,9 +21,9 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 import com.ly.train.flower.db.api.Configuration;
 import com.ly.train.flower.db.api.Connection;
-import com.ly.train.flower.db.api.ConnectionManager;
-import com.ly.train.flower.db.api.ConnectionManagerProvider;
-import com.ly.train.flower.db.api.DbException;
+import com.ly.train.flower.db.api.datasource.DataSourceFactoryProvider;
+import com.ly.train.flower.db.api.datasource.DataSource;
+import com.ly.train.flower.db.api.exception.DbException;
 
 
 public class ConnectionErrorsTest {
@@ -36,9 +36,9 @@ public class ConnectionErrorsTest {
     configuration.setUrl(unconnectableUrl);
     configuration.setUsername("root");
     configuration.setPassword("");
-    ConnectionManager connectionManager = ConnectionManagerProvider.createConnectionManager(configuration);
+    DataSource dataSource = DataSourceFactoryProvider.createDataSource(configuration);
     try {
-      Connection connection = connectionManager.connect().get();
+      Connection connection = dataSource.connect().get();
       Assert.fail("should not be able to connect, but got" + connection);
     } catch (ExecutionException e) {
       // expected
@@ -56,9 +56,9 @@ public class ConnectionErrorsTest {
     configuration.setUrl(unconnectableUrl);
     configuration.setUsername(user);
     configuration.setPassword(pwd);
-    ConnectionManager connectionManager = ConnectionManagerProvider.createConnectionManager(configuration);
+    DataSource dataSource = DataSourceFactoryProvider.createDataSource(configuration);
     try {
-      Connection connection = connectionManager.connect().get();
+      Connection connection = dataSource.connect().get();
       Assert.fail("should not be able to connect, but got" + connection);
     } catch (ExecutionException e) {
       // expected

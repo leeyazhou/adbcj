@@ -16,6 +16,8 @@
 package com.ly.train.flower.db.api;
 
 import org.junit.Test;
+import com.ly.train.flower.db.api.datasource.DataSourceFactoryProvider;
+import com.ly.train.flower.db.api.datasource.DataSource;
 
 
 public class PassesStandardPropertiesTest {
@@ -27,14 +29,14 @@ public class PassesStandardPropertiesTest {
     configuration.setUrl("asyncdb:apimock:url");
     configuration.setUsername("sa");
     configuration.setPassword("pwd");
-    final ConnectionManager connectionManager = ConnectionManagerProvider.createConnectionManager(configuration);
+    final DataSource dataSource = DataSourceFactoryProvider.createDataSource(configuration);
     final CheckConstructionManager check = CheckConstructionMock.lastInstanceRequestedOnThisThread();
 
     check.assertURL("asyncdb:apimock:url");
     check.assertUserName("sa");
     check.assertPassword("pwd");
     check.assertProperty(StandardProperties.MAX_QUEUE_LENGTH, "256");
-    connectionManager.close();
+    dataSource.close();
   }
 
   @Test
@@ -44,11 +46,11 @@ public class PassesStandardPropertiesTest {
     configuration.setUsername("sa");
     configuration.setPassword("pwd");
     configuration.addProperty(StandardProperties.MAX_QUEUE_LENGTH, "128");
-    final ConnectionManager connectionManager = ConnectionManagerProvider.createConnectionManager(configuration);
+    final DataSource dataSource = DataSourceFactoryProvider.createDataSource(configuration);
     final CheckConstructionManager check = CheckConstructionMock.lastInstanceRequestedOnThisThread();
 
     check.assertProperty(StandardProperties.MAX_QUEUE_LENGTH, "128");
-    connectionManager.close();
+    dataSource.close();
   }
 
 }

@@ -15,7 +15,7 @@
  */
 package com.ly.train.flower.db.h2;
 
-import com.ly.train.flower.db.api.DbException;
+import com.ly.train.flower.db.api.exception.DbException;
 
 
 public class H2DbException extends DbException {

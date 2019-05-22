@@ -26,12 +26,12 @@ import java.util.concurrent.TimeoutException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import com.ly.train.flower.db.api.Connection;
-import com.ly.train.flower.db.api.DbException;
 import com.ly.train.flower.db.api.Field;
-import com.ly.train.flower.db.api.ResultHandler;
 import com.ly.train.flower.db.api.ResultSet;
 import com.ly.train.flower.db.api.Row;
 import com.ly.train.flower.db.api.Value;
+import com.ly.train.flower.db.api.exception.DbException;
+import com.ly.train.flower.db.api.handler.ResultHandler;
 
 
 
@@ -40,7 +40,7 @@ public class SelectTest extends AbstractWithConnectionManagerTest {
 
 
   public void testSelectWhichReturnsNothing() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     final CountDownLatch latch = new CountDownLatch(1);
     ResultSet resultSet = connection
         .executeQuery("SELECT int_val, str_val " + "FROM simple_values where str_val " + "LIKE 'Not-In-Database-Value'")
@@ -58,7 +58,7 @@ public class SelectTest extends AbstractWithConnectionManagerTest {
   public void testSimpleSelect() throws Exception {
     final CountDownLatch latch = new CountDownLatch(1);
 
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     try {
       ResultSet resultSet =
           connection.executeQuery("SELECT int_val, str_val " + "FROM simple_values " + "ORDER BY int_val")
@@ -110,7 +110,7 @@ public class SelectTest extends AbstractWithConnectionManagerTest {
   }
 
   public void testSelectWithNullFields() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
 
     ResultSet resultSet =
         connection.executeQuery("SELECT * FROM `table_with_some_values` WHERE `can_be_null_int` IS NULL").get();
@@ -123,7 +123,7 @@ public class SelectTest extends AbstractWithConnectionManagerTest {
   }
 
   public void testMultipleSelectStatements() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
 
     List<Future<ResultSet>> futures = new LinkedList<Future<ResultSet>>();
     for (int i = 0; i < 50; i++) {
@@ -140,7 +140,7 @@ public class SelectTest extends AbstractWithConnectionManagerTest {
   }
 
   public void testWorksWithCallback() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
 
 
     Future<StringBuilder> resultFuture =
@@ -155,7 +155,7 @@ public class SelectTest extends AbstractWithConnectionManagerTest {
   }
 
   public void testExceptionInCallbackHandler() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
 
     int throwOn = 0;
     boolean stillHasToExplore = true;
@@ -181,7 +181,7 @@ public class SelectTest extends AbstractWithConnectionManagerTest {
   }
 
   public void testTwoSelectsAfterEachOther() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
 
 
     Future<ResultSet> firstCall =
@@ -196,7 +196,7 @@ public class SelectTest extends AbstractWithConnectionManagerTest {
   }
 
   public void testExceptionInCallbackHandlerDoesNotAffectNextCall() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
 
     Future<StringBuilder> errorCause =
         connection.executeQuery("SELECT str_val FROM simple_values " + "WHERE str_val LIKE 'Zero'",
@@ -216,7 +216,7 @@ public class SelectTest extends AbstractWithConnectionManagerTest {
 
 
   public void testBrokenSelect() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
 
     Future<ResultSet> future = connection.executeQuery("SELECT broken_query");
     try {
@@ -231,7 +231,7 @@ public class SelectTest extends AbstractWithConnectionManagerTest {
   }
 
   public void testFollowBrokenSelectWithValid() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
 
     Future<ResultSet> future = connection.executeQuery("SELECT broken_query");
     try {
@@ -252,7 +252,7 @@ public class SelectTest extends AbstractWithConnectionManagerTest {
 
 
   public void testCanUseProjectedNames() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
 
     Future<ResultSet> future = connection.executeQuery(
         "SELECT int_val AS number, str_val AS otherName " + "FROM simple_values " + "WHERE str_val LIKE 'Two'");

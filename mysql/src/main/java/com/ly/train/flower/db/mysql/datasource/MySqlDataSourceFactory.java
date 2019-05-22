@@ -13,28 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ly.train.flower.db.mysql;
+package com.ly.train.flower.db.mysql.datasource;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Map;
 import com.ly.train.flower.db.api.Configuration;
-import com.ly.train.flower.db.api.ConnectionManager;
-import com.ly.train.flower.db.api.DbException;
-import com.ly.train.flower.db.api.support.ConnectionManagerFactory;
+import com.ly.train.flower.db.api.datasource.DataSource;
+import com.ly.train.flower.db.api.datasource.DataSourceFactory;
+import com.ly.train.flower.db.api.exception.DbException;
 
-public class MySqlConnectionManagerFactory implements ConnectionManagerFactory {
+public class MySqlDataSourceFactory implements DataSourceFactory {
 
   public static final String PROTOCOL = "mysql";
   public static final int DEFAULT_PORT = 3306;
 
   @Override
-  public ConnectionManager createConnectionManager(Configuration configuration)
-      throws DbException {
+  public DataSource createDataSource(Configuration configuration) throws DbException {
     try {
       URI uri = new URI(configuration.getUrl());
       uri = new URI(uri.getSchemeSpecificPart());
-
       String host = uri.getHost();
       int port = uri.getPort();
       if (port < 0) {
@@ -50,7 +47,7 @@ public class MySqlConnectionManagerFactory implements ConnectionManagerFactory {
       configuration.setHost(host);
       configuration.setPort(port);
 
-      return new MysqlConnectionManager(configuration);
+      return new MysqlDataSource(configuration);
     } catch (URISyntaxException e) {
       throw new DbException("Could not create connection to " + configuration.getUrl(), e);
     }

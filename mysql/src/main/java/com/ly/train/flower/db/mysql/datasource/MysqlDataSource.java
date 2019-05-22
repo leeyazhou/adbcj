@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ly.train.flower.db.mysql;
+package com.ly.train.flower.db.mysql.datasource;
 
 import java.net.InetSocketAddress;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,10 +23,12 @@ import com.ly.train.flower.db.api.CloseMode;
 import com.ly.train.flower.db.api.Configuration;
 import com.ly.train.flower.db.api.Connection;
 import com.ly.train.flower.db.api.DbCallback;
-import com.ly.train.flower.db.api.DbException;
-import com.ly.train.flower.db.api.support.AbstractConnectionManager;
+import com.ly.train.flower.db.api.datasource.AbstractDataSource;
+import com.ly.train.flower.db.api.exception.DbException;
 import com.ly.train.flower.db.api.support.ConnectionPool;
 import com.ly.train.flower.db.api.support.LoginCredentials;
+import com.ly.train.flower.db.mysql.MySqlConnection;
+import com.ly.train.flower.db.mysql.MySqlHandler;
 import com.ly.train.flower.db.mysql.codec.decoder.AcceptNextResponseDecoder;
 import com.ly.train.flower.db.mysql.codec.decoder.HandshakeDecoder;
 import com.ly.train.flower.db.mysql.netty.NettyChannel;
@@ -45,10 +46,10 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.concurrent.DefaultThreadFactory;
 
-public class MysqlConnectionManager extends AbstractConnectionManager {
-  private static final Logger logger = LoggerFactory.getLogger(MysqlConnectionManager.class);
-  private static final String ENCODER = MysqlConnectionManager.class.getName() + ".encoder";
-  public static final String DECODER = MysqlConnectionManager.class.getName() + ".decoder";
+public class MysqlDataSource extends AbstractDataSource {
+  private static final Logger logger = LoggerFactory.getLogger(MysqlDataSource.class);
+  private static final String ENCODER = MysqlDataSource.class.getName() + ".encoder";
+  public static final String DECODER = MysqlDataSource.class.getName() + ".decoder";
   private final LoginCredentials loginCredentials;
 
   private final Bootstrap bootstrap;
@@ -57,7 +58,7 @@ public class MysqlConnectionManager extends AbstractConnectionManager {
 
   private final ConnectionPool<LoginCredentials, NettyChannel> connectionPool;
 
-  public MysqlConnectionManager(Configuration configuration) {
+  public MysqlDataSource(Configuration configuration) {
     super(configuration.getProperties());
     this.loginCredentials = new LoginCredentials(configuration);
     this.eventLoop = new NioEventLoopGroup(0, new DefaultThreadFactory("asyncdb-io"));
@@ -132,7 +133,7 @@ public class MysqlConnectionManager extends AbstractConnectionManager {
         }
         return;
       }
-      MySqlConnection connection = new MySqlConnection(loginCredentials, maxQueueLength(), MysqlConnectionManager.this,
+      MySqlConnection connection = new MySqlConnection(loginCredentials, maxQueueLength(), MysqlDataSource.this,
           channel, getStackTracingOption());
       addConnection(connection);
       channel.addLast(DECODER, new NettyDecoder(new HandshakeDecoder(connected, entry, connection), connection));
@@ -164,12 +165,13 @@ public class MysqlConnectionManager extends AbstractConnectionManager {
 
   }
 
-  int nextId() {
+  public int nextId() {
     return idCounter.incrementAndGet();
   }
 
 
-  void closedConnect(Connection connection) {
+
+  public void closedConnect(Connection connection) {
     removeConnection(connection);
   }
 }

@@ -34,8 +34,8 @@ public class SelectForUpdateTest extends AbstractWithConnectionManagerTest {
     final CountDownLatch latch1 = new CountDownLatch(1);
     final CountDownLatch latch2 = new CountDownLatch(1);
 
-    Connection conn1 = connectionManager.connect().get();
-    Connection conn2 = connectionManager.connect().get();
+    Connection conn1 = dataSource.connect().get();
+    Connection conn2 = dataSource.connect().get();
 
     // Get lock on locks table
     conn1.beginTransaction();

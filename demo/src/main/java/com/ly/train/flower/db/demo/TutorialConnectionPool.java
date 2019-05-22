@@ -19,9 +19,9 @@ import java.util.ArrayList;
 import org.h2.tools.Server;
 import com.ly.train.flower.db.api.Configuration;
 import com.ly.train.flower.db.api.Connection;
-import com.ly.train.flower.db.api.ConnectionManager;
-import com.ly.train.flower.db.api.ConnectionManagerProvider;
 import com.ly.train.flower.db.api.StandardProperties;
+import com.ly.train.flower.db.api.datasource.DataSourceFactoryProvider;
+import com.ly.train.flower.db.api.datasource.DataSource;
 
 public class TutorialConnectionPool {
 
@@ -37,28 +37,28 @@ public class TutorialConnectionPool {
     configuration.setPassword("password1234");
     configuration.addProperty(StandardProperties.CONNECTION_POOL_ENABLE, "true");
 
-    final ConnectionManager connectionManager = ConnectionManagerProvider.createConnectionManager(configuration);
+    final DataSource dataSource = DataSourceFactoryProvider.createDataSource(configuration);
 
     long firstTime = System.currentTimeMillis();
-    openCloseBunchOfConnections(connectionManager);
+    openCloseBunchOfConnections(dataSource);
     System.out.println(
         "First time: Time to connect: " + ((System.currentTimeMillis() - firstTime) / TEST_CONNECTION_COUNT) + "ms");
 
 
     long secondTime = System.currentTimeMillis();
-    openCloseBunchOfConnections(connectionManager);
+    openCloseBunchOfConnections(dataSource);
     System.out.println("First time, pooled: Time to connect: "
         + ((System.currentTimeMillis() - secondTime) / TEST_CONNECTION_COUNT) + "ms");
 
-    connectionManager.close().get();
+    dataSource.close().get();
 
     demoH2Db.shutdown();
   }
 
-  private static void openCloseBunchOfConnections(ConnectionManager connectionManager) throws Exception {
+  private static void openCloseBunchOfConnections(DataSource dataSource) throws Exception {
     ArrayList<Connection> connections = new ArrayList<>();
     for (int i = 0; i < TEST_CONNECTION_COUNT; i++) {
-      connections.add(connectionManager.connect().get());
+      connections.add(dataSource.connect().get());
     }
     for (Connection connection : connections) {
       connection.close().get();

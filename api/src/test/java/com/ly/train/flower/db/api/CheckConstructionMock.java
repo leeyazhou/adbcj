@@ -15,14 +15,16 @@
  */
 package com.ly.train.flower.db.api;
 
-import com.ly.train.flower.db.api.support.ConnectionManagerFactory;
+import com.ly.train.flower.db.api.datasource.DataSource;
+import com.ly.train.flower.db.api.datasource.DataSourceFactory;
+import com.ly.train.flower.db.api.exception.DbException;
 
 
-public class CheckConstructionMock implements ConnectionManagerFactory {
+public class CheckConstructionMock implements DataSourceFactory {
   private static ThreadLocal<CheckConstructionManager> lastInstance = new ThreadLocal<CheckConstructionManager>();
 
   @Override
-  public ConnectionManager createConnectionManager(Configuration configuration) throws DbException {
+  public DataSource createDataSource(Configuration configuration) throws DbException {
     CheckConstructionManager instance = new CheckConstructionManager(configuration.getUrl(),
         configuration.getUsername(), configuration.getPassword(), configuration.getProperties());
     lastInstance.set(instance);

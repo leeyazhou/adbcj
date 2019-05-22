@@ -28,6 +28,7 @@ public abstract class OkResponse extends AbstractResponse {
     super(packetLength, packetNumber);
   }
 
+  // util
   public static OKRegularResponse interpretAsRegularOk(int packetLength, int packetNumber, BoundedInputStream toParse)
       throws IOException {
     long affectedRows = IOUtil.readBinaryLengthEncoding(toParse);
@@ -39,6 +40,7 @@ public abstract class OkResponse extends AbstractResponse {
         message);
   }
 
+  // util
   public static OKPreparedStatementResponse interpretAsPreparedStatement(int packetLength, int packetNumber,
       BoundedInputStream toParse) throws IOException {
     int handlerId = IOUtil.readInt(toParse);

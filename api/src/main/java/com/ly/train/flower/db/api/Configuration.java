@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 配置信息
  * 
  * @author lee
  */

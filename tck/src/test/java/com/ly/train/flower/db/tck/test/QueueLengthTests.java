@@ -24,16 +24,16 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 import com.ly.train.flower.db.api.Configuration;
 import com.ly.train.flower.db.api.Connection;
-import com.ly.train.flower.db.api.ConnectionManager;
-import com.ly.train.flower.db.api.ConnectionManagerProvider;
-import com.ly.train.flower.db.api.DbException;
 import com.ly.train.flower.db.api.StandardProperties;
+import com.ly.train.flower.db.api.datasource.DataSourceFactoryProvider;
+import com.ly.train.flower.db.api.datasource.DataSource;
+import com.ly.train.flower.db.api.exception.DbException;
 
 public class QueueLengthTests extends AbstractWithConnectionManagerTest {
 
   @Test
   public void reportQueueOverflowAsCallbackException() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
 
 
     CompletableFuture<DbException> ex = new CompletableFuture<>();
@@ -59,8 +59,8 @@ public class QueueLengthTests extends AbstractWithConnectionManagerTest {
     configuration.setUsername(user);
     configuration.setPassword(password);
     configuration.addProperty(StandardProperties.MAX_QUEUE_LENGTH, String.valueOf(limit));
-    ConnectionManager connectionManager = ConnectionManagerProvider.createConnectionManager(configuration);
-    Connection connection = connectionManager.connect().get();
+    DataSource dataSource = DataSourceFactoryProvider.createDataSource(configuration);
+    Connection connection = dataSource.connect().get();
 
     try {
       CountDownLatch expectSuccess = new CountDownLatch(limit);
@@ -79,7 +79,7 @@ public class QueueLengthTests extends AbstractWithConnectionManagerTest {
       Assert.assertNull(neverSet.get());
 
     } finally {
-      connectionManager.close().get();
+      dataSource.close().get();
 
     }
 

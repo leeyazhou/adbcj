@@ -19,20 +19,20 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import com.ly.train.flower.db.api.AbstractResultHandler;
 import com.ly.train.flower.db.api.Connection;
-import com.ly.train.flower.db.api.DbException;
 import com.ly.train.flower.db.api.PreparedQuery;
 import com.ly.train.flower.db.api.PreparedUpdate;
 import com.ly.train.flower.db.api.Result;
 import com.ly.train.flower.db.api.ResultSet;
+import com.ly.train.flower.db.api.exception.DbException;
+import com.ly.train.flower.db.api.handler.AbstractResultHandler;
 
 
 @Test(invocationCount = 3, threadPoolSize = 5, timeOut = 500000)
 public class PreparedStatementsTest extends AbstractWithConnectionManagerTest {
 
   public void testSimpleSelect() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     PreparedQuery statement = connection.prepareQuery("SELECT * FROM simple_values" + " WHERE str_val LIKE ?").get();
 
     assertQueryFor(statement, "Zero");
@@ -41,7 +41,7 @@ public class PreparedStatementsTest extends AbstractWithConnectionManagerTest {
   }
 
   public void testOrderIsCorrect() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     PreparedQuery statement =
         connection.prepareQuery("SELECT * FROM simple_values" + " WHERE int_val > 0 ORDER BY int_val DESC").get();
 
@@ -58,7 +58,7 @@ public class PreparedStatementsTest extends AbstractWithConnectionManagerTest {
   }
 
   public void testSelectWithNull() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     PreparedQuery statement =
         connection.prepareQuery("SELECT int_val,str_val,NULL FROM simple_values" + " WHERE str_val LIKE ?").get();
 
@@ -72,7 +72,7 @@ public class PreparedStatementsTest extends AbstractWithConnectionManagerTest {
   }
 
   public void testErrorIsReported() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     Future<PreparedQuery> future = connection.prepareQuery("SELECT * FROM this:is:an:invalid:query ");
 
     try {
@@ -86,7 +86,7 @@ public class PreparedStatementsTest extends AbstractWithConnectionManagerTest {
   }
 
   public void testMultiErrorReported() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     Future<PreparedUpdate> insert =
         connection.prepareUpdate("INSERT INTO this:is:an:invalid:query(name)" + " VALUES(42)");
     Future<PreparedUpdate> update =
@@ -118,7 +118,7 @@ public class PreparedStatementsTest extends AbstractWithConnectionManagerTest {
   }
 
   public void testCanReuseStatement() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     PreparedQuery statement = connection.prepareQuery("SELECT * FROM simple_values" + " WHERE str_val LIKE ?").get();
 
 
@@ -130,7 +130,7 @@ public class PreparedStatementsTest extends AbstractWithConnectionManagerTest {
   }
 
   public void testCanSelectNull() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     PreparedQuery statement =
         connection.prepareQuery("SELECT * FROM table_with_some_values " + "WHERE `can_be_null_int` IS NULL").get();
 
@@ -144,7 +144,7 @@ public class PreparedStatementsTest extends AbstractWithConnectionManagerTest {
   }
 
   public void testCanCloseStatement() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     PreparedQuery statement =
         connection.prepareQuery("SELECT * FROM `table_with_some_values` " + "WHERE `can_be_null_int` IS NULL").get();
 
@@ -155,7 +155,7 @@ public class PreparedStatementsTest extends AbstractWithConnectionManagerTest {
   }
 
   public void testThrowsOnInvalidArgumentCount() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     PreparedQuery statement = connection.prepareQuery("SELECT * FROM simple_values" + " WHERE str_val LIKE ?").get();
     try {
       statement.execute("1", "2", "3").get();
@@ -170,7 +170,7 @@ public class PreparedStatementsTest extends AbstractWithConnectionManagerTest {
 
   public void testWorksWithCallback() throws Exception {
 
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
 
     PreparedQuery query = connection.prepareQuery("SELECT str_val FROM simple_values " + " WHERE str_val LIKE ?").get();
 
@@ -186,7 +186,7 @@ public class PreparedStatementsTest extends AbstractWithConnectionManagerTest {
   }
 
   public void testExceptionInCallbackHandler() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
 
 
     PreparedQuery query = connection.prepareQuery("SELECT str_val FROM simple_values " + " WHERE str_val LIKE ?").get();
@@ -208,7 +208,7 @@ public class PreparedStatementsTest extends AbstractWithConnectionManagerTest {
   }
 
   public void testExceptionInCallbackHandlerDoesNotAffectOtherOperatins() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
 
     PreparedQuery query = connection.prepareQuery("SELECT str_val FROM simple_values " + " WHERE str_val LIKE ?").get();
     Future<StringBuilder> causeOfError = query.executeWithCallback(new AbstractResultHandler<StringBuilder>() {

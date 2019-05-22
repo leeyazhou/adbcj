@@ -22,18 +22,57 @@ import java.sql.Types;
  * @author leeyazhou
  */
 public enum Type {
-  ARRAY(Types.ARRAY), BIGINT(Types.BIGINT), BINARY(Types.BINARY), BIT(Types.BIT), BLOB(Types.BLOB), BOOLEAN(
-      Types.BOOLEAN), CHAR(Types.CHAR), CLOB(Types.CLOB), DATALINK(Types.DATALINK), DATE(Types.DATE), DECIMAL(
-          Types.DECIMAL), DISTINCT(Types.DISTINCT), DOUBLE(Types.DOUBLE), FLOAT(Types.FLOAT), INTEGER(
-              Types.INTEGER), JAVA_OBJECT(Types.JAVA_OBJECT), LONGVARBINARY(Types.LONGVARBINARY), LONGVARCHAR(
-                  Types.LONGVARCHAR), NULL(Types.NULL), NUMERIC(Types.NUMERIC), OTHER(Types.OTHER), REAL(
-                      Types.REAL), REF(Types.REF), SMALLINT(Types.SMALLINT), STRUCT(Types.STRUCT), TIME(
-                          Types.TIME), TIMESTAMP(Types.TIMESTAMP), TINYINT(
-                              Types.TINYINT), VARBINARY(Types.VARBINARY), VARCHAR(Types.VARCHAR);
+  ARRAY(Types.ARRAY),
 
-  private final int jdbcType;
+  BIGINT(Types.BIGINT),
 
-  Type(int jdbcType) {
+  BINARY(Types.BINARY),
+
+  BIT(Types.BIT),
+
+  BLOB(Types.BLOB),
+
+  BOOLEAN(Types.BOOLEAN),
+
+  CHAR(Types.CHAR),
+
+  CLOB(Types.CLOB),
+
+  DATALINK(Types.DATALINK),
+
+  DATE(Types.DATE),
+
+  DECIMAL(Types.DECIMAL),
+
+  DISTINCT(Types.DISTINCT),
+
+  DOUBLE(Types.DOUBLE),
+
+  FLOAT(Types.FLOAT),
+
+  INTEGER(Types.INTEGER),
+
+  JAVA_OBJECT(Types.JAVA_OBJECT),
+
+  LONGVARBINARY(Types.LONGVARBINARY),
+
+  LONGVARCHAR(Types.LONGVARCHAR),
+
+  NULL(Types.NULL),
+
+  NUMERIC(Types.NUMERIC), OTHER(Types.OTHER), REAL(Types.REAL),
+
+  REF(Types.REF), SMALLINT(Types.SMALLINT),
+
+  STRUCT(Types.STRUCT), TIME(Types.TIME),
+
+  TIMESTAMP(Types.TIMESTAMP), TINYINT(Types.TINYINT),
+
+  VARBINARY(Types.VARBINARY), VARCHAR(Types.VARCHAR);
+
+  private int jdbcType;
+
+  private Type(int jdbcType) {
     this.jdbcType = jdbcType;
   }
 

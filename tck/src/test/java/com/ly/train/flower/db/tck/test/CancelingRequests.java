@@ -32,7 +32,7 @@ public class CancelingRequests extends AbstractWithConnectionManagerTest {
   @Test
   public void canCancelSelect() throws Exception {
     CountDownLatch newerCalled = new CountDownLatch(1);
-    final Connection connection = connectionManager.connect().get();
+    final Connection connection = dataSource.connect().get();
 
     final CompletableFuture<ResultSet> result = connection.executeQuery("SELECT SLEEP(2)");
     Thread.sleep(500);
@@ -53,7 +53,7 @@ public class CancelingRequests extends AbstractWithConnectionManagerTest {
 
   @Test
   public void mayCanChancelNotYetRunningStatement() throws Exception {
-    final Connection connection = connectionManager.connect().get();
+    final Connection connection = dataSource.connect().get();
 
 
     final Future<ResultSet> runningStatment = connection.executeQuery("SELECT SLEEP(1)");

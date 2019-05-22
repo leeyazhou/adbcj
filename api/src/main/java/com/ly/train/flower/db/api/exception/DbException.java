@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ly.train.flower.db.api;
+package com.ly.train.flower.db.api.exception;
 
 /**
  * Root class for all asyncdb failures.

@@ -20,20 +20,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ly.train.flower.db.api.CloseMode;
 import com.ly.train.flower.db.api.Connection;
-import com.ly.train.flower.db.api.ConnectionManager;
 import com.ly.train.flower.db.api.DbCallback;
-import com.ly.train.flower.db.api.DbConnectionClosedException;
-import com.ly.train.flower.db.api.DbException;
 import com.ly.train.flower.db.api.PreparedQuery;
 import com.ly.train.flower.db.api.PreparedUpdate;
 import com.ly.train.flower.db.api.Result;
-import com.ly.train.flower.db.api.ResultHandler;
 import com.ly.train.flower.db.api.StandardProperties;
+import com.ly.train.flower.db.api.datasource.DataSource;
+import com.ly.train.flower.db.api.exception.DbConnectionClosedException;
+import com.ly.train.flower.db.api.exception.DbException;
+import com.ly.train.flower.db.api.handler.ResultHandler;
 import com.ly.train.flower.db.api.support.CloseOnce;
 import com.ly.train.flower.db.api.support.LoginCredentials;
 import com.ly.train.flower.db.api.support.stacktracing.StackTracingOptions;
 import com.ly.train.flower.db.mysql.codec.model.MySqlRequest;
 import com.ly.train.flower.db.mysql.codec.util.MySqlRequestUtil;
+import com.ly.train.flower.db.mysql.datasource.MysqlDataSource;
 import com.ly.train.flower.db.mysql.netty.NettyChannel;
 
 public class MySqlConnection implements Connection {
@@ -42,7 +43,7 @@ public class MySqlConnection implements Connection {
 
   private final LoginCredentials login;
   private final int maxQueueSize;
-  private final MysqlConnectionManager connectionManager;
+  private final MysqlDataSource connectionManager;
   private final NettyChannel channel;
 
   protected final int id;
@@ -54,7 +55,7 @@ public class MySqlConnection implements Connection {
   private final CloseOnce closer = new CloseOnce();
   private volatile boolean isInTransaction = false;
 
-  public MySqlConnection(LoginCredentials login, int maxQueueSize, MysqlConnectionManager connectionManager,
+  public MySqlConnection(LoginCredentials login, int maxQueueSize, MysqlDataSource connectionManager,
       NettyChannel channel, StackTracingOptions strackTraces) {
     this.login = login;
     this.maxQueueSize = maxQueueSize;
@@ -68,7 +69,7 @@ public class MySqlConnection implements Connection {
   }
 
 
-  public ConnectionManager getConnectionManager() {
+  public DataSource getConnectionManager() {
     return connectionManager;
   }
 
@@ -172,7 +173,7 @@ public class MySqlConnection implements Connection {
               if (this.connectionManager.isClosed()) {
                 doActualClose(closeMode, entry);
               } else {
-                channel.removeHandler(MysqlConnectionManager.DECODER);
+                channel.removeHandler(MysqlDataSource.DECODER);
                 connectionManager.getConnectionPool().release(login, channel);
                 callback.onComplete(result, null);
               }

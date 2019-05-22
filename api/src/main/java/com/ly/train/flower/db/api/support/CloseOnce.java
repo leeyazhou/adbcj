@@ -17,7 +17,7 @@ package com.ly.train.flower.db.api.support;
 
 import java.util.ArrayList;
 import com.ly.train.flower.db.api.DbCallback;
-import com.ly.train.flower.db.api.DbException;
+import com.ly.train.flower.db.api.exception.DbException;
 
 public final class CloseOnce {
   private final ArrayList<DbCallback<Void>> closeListeners = new ArrayList<>();

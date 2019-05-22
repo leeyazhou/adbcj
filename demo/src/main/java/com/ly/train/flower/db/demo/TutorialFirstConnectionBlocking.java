@@ -20,8 +20,8 @@ import java.util.concurrent.ExecutionException;
 import org.h2.tools.Server;
 import com.ly.train.flower.db.api.Configuration;
 import com.ly.train.flower.db.api.Connection;
-import com.ly.train.flower.db.api.ConnectionManager;
-import com.ly.train.flower.db.api.ConnectionManagerProvider;
+import com.ly.train.flower.db.api.datasource.DataSourceFactoryProvider;
+import com.ly.train.flower.db.api.datasource.DataSource;
 
 public class TutorialFirstConnectionBlocking {
 
@@ -32,16 +32,16 @@ public class TutorialFirstConnectionBlocking {
     configuration.setUrl("asyncdb:h2://localhost:14242/mem:db1;DB_CLOSE_DELAY=-1;MVCC=TRUE");
     configuration.setUsername("asyncdb");
     configuration.setPassword("password1234");
-    final ConnectionManager connectionManager = ConnectionManagerProvider.createConnectionManager(configuration);
+    final DataSource dataSource = DataSourceFactoryProvider.createDataSource(configuration);
 
     // BLOCKING! Not recommended. Just example to get started
-    CompletableFuture<Connection> connectionFuture = connectionManager.connect();
+    CompletableFuture<Connection> connectionFuture = dataSource.connect();
     try {
       Connection connection = connectionFuture.get();
       System.out.println("Connected!");
       connection.close().get();
       System.out.println("Closed!");
-      connectionManager.close();
+      dataSource.close();
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
     } catch (ExecutionException e) {

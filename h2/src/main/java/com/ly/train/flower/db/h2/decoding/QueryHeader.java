@@ -17,8 +17,8 @@ package com.ly.train.flower.db.h2.decoding;
 
 import io.netty.channel.Channel;
 import com.ly.train.flower.db.api.DbCallback;
-import com.ly.train.flower.db.api.DbException;
-import com.ly.train.flower.db.api.ResultHandler;
+import com.ly.train.flower.db.api.exception.DbException;
+import com.ly.train.flower.db.api.handler.ResultHandler;
 import com.ly.train.flower.db.api.support.SizeConstants;
 import com.ly.train.flower.db.h2.H2Connection;
 import com.ly.train.flower.db.h2.H2DbException;

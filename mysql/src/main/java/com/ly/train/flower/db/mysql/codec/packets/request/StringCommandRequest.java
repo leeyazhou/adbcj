@@ -15,7 +15,7 @@
  */
 package com.ly.train.flower.db.mysql.codec.packets.request;
 
-import com.ly.train.flower.db.api.DbException;
+import com.ly.train.flower.db.api.exception.DbException;
 import com.ly.train.flower.db.mysql.codec.model.MysqlCharacterSet;
 import com.ly.train.flower.db.mysql.codec.packets.Command;
 import java.io.IOException;
@@ -58,7 +58,7 @@ public class StringCommandRequest extends CommandRequest {
       return dataAsBytes;
     }
     try {
-      dataAsBytes = payload.getBytes(MysqlCharacterSet.UTF8_UNICODE_CI.getCharsetName());
+      this.dataAsBytes = payload.getBytes(MysqlCharacterSet.UTF8_UNICODE_CI.getCharsetName());
       return dataAsBytes;
     } catch (UnsupportedEncodingException e) {
       throw new DbException(e.getMessage(), e);

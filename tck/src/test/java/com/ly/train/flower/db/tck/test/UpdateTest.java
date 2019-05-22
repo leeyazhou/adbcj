@@ -29,7 +29,7 @@ public class UpdateTest extends AbstractWithConnectionManagerTest {
 
 
   public void testSimpleUpdates() throws Exception {
-    Connection connection = connectionManager.connect().get();
+    Connection connection = dataSource.connect().get();
     assertNotNull(connection);
 
     // Clear out updates table

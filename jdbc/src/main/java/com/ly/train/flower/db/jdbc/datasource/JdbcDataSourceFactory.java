@@ -13,25 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ly.train.flower.db.jdbc;
+package com.ly.train.flower.db.jdbc.datasource;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ly.train.flower.db.api.Configuration;
-import com.ly.train.flower.db.api.ConnectionManager;
-import com.ly.train.flower.db.api.DbException;
-import com.ly.train.flower.db.api.support.ConnectionManagerFactory;
+import com.ly.train.flower.db.api.datasource.DataSource;
+import com.ly.train.flower.db.api.datasource.DataSourceFactory;
+import com.ly.train.flower.db.api.exception.DbException;
+import com.ly.train.flower.db.jdbc.PlainJDBCConnection;
 
 
-public class JdbcConnectionManagerFactory implements ConnectionManagerFactory {
-  private static final Logger log = LoggerFactory.getLogger(JdbcConnectionManagerFactory.class);
+public class JdbcDataSourceFactory implements DataSourceFactory {
+  private static final Logger log = LoggerFactory.getLogger(JdbcDataSourceFactory.class);
 
   private static final String PROTOCOL = "jdbc";
 
   @Override
-  public ConnectionManager createConnectionManager(Configuration configuration) throws DbException {
+  public DataSource createDataSource(Configuration configuration) throws DbException {
     try {
       URI uri = new URI(configuration.getUrl());
       // Throw away the 'asyncdb' protocol part of the URL
@@ -43,7 +44,7 @@ public class JdbcConnectionManagerFactory implements ConnectionManagerFactory {
       log.warn("It is very slow and should not be used in production");
       log.warn("DO NOT USE IN PRODUCTION!!!");
 
-      return new JdbcConnectionManager(new PlainJDBCConnection(jdbcUrl, configuration.getUsername(),
+      return new JdbcDataSource(new PlainJDBCConnection(jdbcUrl, configuration.getUsername(),
           configuration.getPassword(), configuration.getProperties()), configuration.getProperties());
     } catch (URISyntaxException e) {
       throw DbException.wrap(e);

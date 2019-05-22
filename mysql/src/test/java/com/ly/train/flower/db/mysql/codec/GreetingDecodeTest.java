@@ -26,12 +26,12 @@ import com.ly.train.flower.db.api.support.DbCompletableFuture;
 import com.ly.train.flower.db.api.support.LoginCredentials;
 import com.ly.train.flower.db.api.support.stacktracing.StackTracingOptions;
 import com.ly.train.flower.db.mysql.MySqlConnection;
-import com.ly.train.flower.db.mysql.MysqlConnectionManager;
 import com.ly.train.flower.db.mysql.codec.decoder.HandshakeDecoder;
 import com.ly.train.flower.db.mysql.codec.model.ClientCapability;
 import com.ly.train.flower.db.mysql.codec.model.MysqlCharacterSet;
 import com.ly.train.flower.db.mysql.codec.model.ServerStatus;
 import com.ly.train.flower.db.mysql.codec.packets.response.HandshakeResponse;
+import com.ly.train.flower.db.mysql.datasource.MysqlDataSource;
 import com.ly.train.flower.db.mysql.netty.NettyChannel;
 import io.netty.channel.embedded.EmbeddedChannel;
 
@@ -138,7 +138,7 @@ public class GreetingDecodeTest {
     configuration.setPassword("sa");
     configuration.setUsername("sa");
     configuration.setDatabase("test");
-    return new MySqlConnection(login, 64, new MysqlConnectionManager(configuration),
+    return new MySqlConnection(login, 64, new MysqlDataSource(configuration),
         new NettyChannel(new EmbeddedChannel()), StackTracingOptions.GLOBAL_DEFAULT);
   }
 

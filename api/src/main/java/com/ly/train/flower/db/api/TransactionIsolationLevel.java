@@ -16,5 +16,13 @@
 package com.ly.train.flower.db.api;
 
 public enum TransactionIsolationLevel {
-  NONE, READ_COMMITTED, READ_UNCOMMITTED, REPEATABLE_READ, SERIALIZABLE
+  NONE,
+
+  READ_COMMITTED,
+
+  READ_UNCOMMITTED,
+
+  REPEATABLE_READ,
+
+  SERIALIZABLE;
 }

@@ -27,9 +27,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ly.train.flower.db.api.Configuration;
 import com.ly.train.flower.db.api.Connection;
-import com.ly.train.flower.db.api.ConnectionManager;
-import com.ly.train.flower.db.api.ConnectionManagerProvider;
 import com.ly.train.flower.db.api.StandardProperties;
+import com.ly.train.flower.db.api.datasource.DataSourceFactoryProvider;
+import com.ly.train.flower.db.api.datasource.DataSource;
 
 public class ConnectTest {
   final static Logger log = LoggerFactory.getLogger(ConnectTest.class);
@@ -48,10 +48,10 @@ public class ConnectTest {
     final AtomicInteger success = new AtomicInteger(0);
     final CountDownLatch cnlat = new CountDownLatch(n);
     final CountDownLatch colat = new CountDownLatch(1);
-    ConnectionManager cm = null;
+    DataSource cm = null;
     try {
       configuration.addProperty(StandardProperties.CONNECTION_POOL_ENABLE, "false");
-      cm = ConnectionManagerProvider.createConnectionManager(configuration);
+      cm = DataSourceFactoryProvider.createDataSource(configuration);
       for (int i = 0; i < n; ++i) {
         log.debug("connecting-{} pending", i);
         CompletableFuture<Connection> cf = cm.connect();

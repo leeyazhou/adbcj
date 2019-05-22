@@ -42,9 +42,9 @@ public enum H2Types {
 
   private final int id;
   private final Type type;
-  private final Class className;
+  private final Class<?> className;
 
-  H2Types(int id, Type type, Class className) {
+  H2Types(int id, Type type, Class<?> className) {
     this.id = id;
     this.type = type;
     this.className = className;
@@ -56,5 +56,12 @@ public enum H2Types {
 
   public int id() {
     return id;
+  }
+
+  /**
+   * @return the className
+   */
+  public Class<?> getClassName() {
+    return className;
   }
 }
